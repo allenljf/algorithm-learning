@@ -34,8 +34,19 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-001
 - Parallel group: `platform-roots`
 - Spec refs: 6.1, 6.3, 10.7, 13.1-13.2, 15, 16.1
+- Execution contract: `three-perspectives` analysis; `test-candidates` test
+  approach; `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: select and lock mutually compatible stable Java 21,
+  Spring Boot, Maven Wrapper, and test-library versions. Establish only the
+  modular-monolith composition root: feature package boundaries, Spring Web/JPA/
+  Security/Validation/Flyway/Actuator dependencies, non-secret configuration
+  binding, request-ID/error composition seams, and a backend test harness.
+  Implement the harness first, then add candidate context/configuration tests;
+  defer all migrations, authentication flows, REST resources, and Docker Compose
+  to their assigned tasks. Update the API README with the actual local entry
+  points and configuration prerequisites.
 - Verification: `cd services/api && ./mvnw -q test`; `cd services/api && ./mvnw -q package -DskipTests`
-- Status: ready
+- Status: completed
 
 ### ALG-003 — Bootstrap the Flutter application composition root
 
@@ -57,7 +68,7 @@ human-readable execution contract. Select the per-task execution contract with
 - Parallel group: `backend-schema`
 - Spec refs: 8.1-8.4, 13.1, 16.1; AC-OPS-02
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`
-- Status: pending
+- Status: ready
 
 ## Phase 2 — Secured library API
 

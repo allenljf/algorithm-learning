@@ -1,6 +1,33 @@
 # Progress
 
-尚未開始產品程式碼開發。
+Flutter product code has not started; the backend composition root is complete.
+
+## ALG-002 closeout — 2026-09-01
+
+- Established the Java 21 Spring Boot 4.1.1 modular-monolith composition root
+  with Maven Wrapper 3.9.16, feature package boundaries, Web/JPA/Security/
+  Validation/Flyway/Actuator dependencies, PostgreSQL runtime support,
+  non-secret configuration binding, request-ID propagation, Problem Details
+  error seam, and candidate configuration/filter tests.
+- Recovery attempt 1 fixed only a candidate-test compile error caused by the
+  generic `ServletResponse` type exposed by `FilterChain`; the request-ID
+  assertion now uses the concrete mock response after the chain returns.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test` and
+  `cd services/api && ./mvnw -q package -DskipTests`.
+- `ALG-002` is `completed`. `ALG-003` and `ALG-004` are both `ready`; neither
+  has an execution contract yet.
+
+## ALG-002 recovery attempt 1 — 2026-09-01
+
+- Diagnosis: `./mvnw -q test` failed during test compilation because the
+  `FilterChain` lambda exposes its second parameter as `ServletResponse`, which
+  has no `getHeader` method. The failure occurred before application startup or
+  test execution.
+- Change: moved the request-ID equality assertion outside the lambda, where the
+  concrete `MockHttpServletResponse` is available; the test still verifies the
+  same request-to-response propagation behavior.
+- Result: reran `./mvnw -q test`; it passed. Next command is the remaining
+  task-limited verification: `./mvnw -q package -DskipTests`.
 
 ## ALG-001 closeout — 2026-09-01
 
@@ -12,8 +39,12 @@
   `test -d apps/learning_app`、`test -d services/api`、
   `test -f infra/env/.env.example`。
 - `ALG-001` 已標記 `completed`。`ALG-002` 與 `ALG-003` 的所有依賴均已完成，
-  因此已標記為 `ready`；兩者都尚未選定 execution contract。
-- 下一步：為一個 ready task 使用 `$execution-strategy` 選定執行合約。
+  因此已標記為 `ready`。
+- `ALG-002` 已由 `$execution-strategy` 選定 contract：
+  `three-perspectives` / `test-candidates` / `update-docs` / `infer`。實作
+  限於 Spring Boot modular-monolith composition root、非機密 configuration
+  binding、request-ID/error seams 與測試 harness；migrations、auth、REST
+  resources 和 Compose 仍由後續 task 負責。目前 status 為 `in_progress`。
 
 ## Work-graph planning — 2026-09-01
 

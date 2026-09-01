@@ -23,10 +23,22 @@ tasks:
       - test -f infra/env/.env.example
   - id: ALG-002
     title: Bootstrap the Spring Boot modular-monolith composition root
-    status: ready
+    status: completed
     depends_on: [ALG-001]
     parallel_group: platform-roots
     spec_refs: ["6.1", "6.3", "10.7", "13.1-13.2", "15", "16.1"]
+    execution_contract:
+      analysis: three-perspectives
+      test_approach: test-candidates
+      documentation: update-docs
+      ambiguity: infer
+    implementation_strategy: >-
+      Lock mutually compatible stable Java 21, Spring Boot, Maven Wrapper, and
+      test-library versions. Establish only the modular-monolith composition
+      root: feature package boundaries, required dependencies, non-secret
+      configuration binding, request-ID/error seams, and a backend test harness.
+      Add candidate context/configuration tests after the harness; defer
+      migrations, authentication flows, REST resources, and Docker Compose.
     verification: ["cd services/api && ./mvnw -q test", "cd services/api && ./mvnw -q package -DskipTests"]
   - id: ALG-003
     title: Bootstrap the Flutter application composition root
@@ -37,7 +49,7 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test"]
   - id: ALG-004
     title: Implement the initial PostgreSQL schema and migration test base
-    status: pending
+    status: ready
     depends_on: [ALG-002]
     parallel_group: backend-schema
     spec_refs: ["8.1-8.4", "13.1", "16.1", "AC-OPS-02"]

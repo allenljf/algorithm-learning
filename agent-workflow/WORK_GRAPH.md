@@ -3,9 +3,9 @@
 ```mermaid
 flowchart TD
   T1[ALG-001 Monorepo skeleton\ncompleted]
-  T2[ALG-002 Spring root\nready]
+  T2[ALG-002 Spring root\ncompleted]
   T3[ALG-003 Flutter root\nready]
-  T4[ALG-004 Flyway schema]
+  T4[ALG-004 Flyway schema\nready]
   T5[ALG-005 Auth/security]
   T6[ALG-006 Tags API]
   T7[ALG-007 Problems API]
