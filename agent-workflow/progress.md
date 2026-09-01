@@ -2,6 +2,30 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-006 closeout — 2026-09-02
+
+- Added an owner-scoped tag aggregate, repository port and JPA adapter, plus
+  authenticated `GET`/`POST /api/v1/tags` endpoints.
+- Tag names use Unicode NFKC, trim, collapsed internal whitespace, and
+  lowercase comparison keys. The `(user_id, normalized_name)` persistence
+  boundary makes the normalized uniqueness owner-local; duplicate creates return
+  the existing tag as `200`, while a new tag returns `201` and `Location`.
+- TDD coverage proves normalization, owner isolation, duplicate idempotency, and
+  the controller's HTTP result boundary.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test -Dtest='*TagTest,*TagControllerTest'`.
+- `ALG-006` is `completed`; `ALG-007` is now `ready`. ALG-011 remains ready and
+  is independent at the workflow level.
+
+## ALG-006 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: user-owned tag normalization, idempotent creation, owned listing/search,
+  and its security/API boundaries only. This task defers problem-tag assignment
+  and all problem behavior to ALG-007.
+- Status is now `in_progress`; tests will establish NFKC whitespace/case-fold
+  normalization, owner isolation, and duplicate-create behavior before the
+  application, JPA, and HTTP layers are added.
+
 ## ALG-005 closeout — 2026-09-01
 
 - Completed the authentication and ownership foundation: Argon2id password

@@ -13,6 +13,8 @@ import dev.algorithmlearning.api.auth.application.InMemoryAuthRateLimiter;
 import dev.algorithmlearning.api.auth.domain.Argon2PasswordHasher;
 import dev.algorithmlearning.api.auth.domain.JwtTokenService;
 import dev.algorithmlearning.api.auth.domain.RefreshTokenService;
+import dev.algorithmlearning.api.tags.application.TagRepository;
+import dev.algorithmlearning.api.tags.application.TagService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -64,4 +66,5 @@ class SecurityConfiguration {
     @Bean AuthService authService(AuthUserRepository users, AuthSessionService sessions, Argon2PasswordHasher passwords, JwtTokenService jwt, Clock clock) { return new AuthService(users, sessions, passwords, jwt, clock); }
     @Bean AuthRateLimiter authRateLimiter(Clock clock) { return new InMemoryAuthRateLimiter(clock); }
     @Bean AllowedOriginValidator allowedOriginValidator(ApiProperties properties) { return new AllowedOriginValidator(properties.cors().allowedOrigins()); }
+    @Bean TagService tagService(TagRepository tags, Clock clock) { return new TagService(tags, clock); }
 }

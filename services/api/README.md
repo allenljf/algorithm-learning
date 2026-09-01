@@ -45,4 +45,12 @@ rotated on use, and persisted only as keyed hashes. The server emits refresh val
 only through a `Secure`, `HttpOnly`, `SameSite=Lax` cookie under `/api/v1/auth`.
 Browser-origin requests to refresh and logout must match `APP_CORS_ALLOWED_ORIGINS`.
 
+## Tags API
+
+Authenticated callers can create and list their own tags at `/api/v1/tags`.
+`POST` accepts `{ "name": "..." }`; names are NFKC-normalized, trimmed,
+whitespace-collapsed, and case-folded for owner-local idempotency. A new tag
+returns `201` with `Location`; a normalized duplicate returns the existing tag
+with `200`. `GET /api/v1/tags?q=...` searches only the caller's tags.
+
 Docker Compose is introduced by ALG-016.
