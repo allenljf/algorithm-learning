@@ -2,6 +2,18 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-015 closeout — 2026-09-02
+
+- Added provider-injected dashboard/home states for loading, retry, no-data and
+  populated totals, difficulty distribution, and due-review count.
+- Task-limited verification passed: `flutter analyze`; `flutter test
+  test/features/dashboard/presentation`.
+- `ALG-015` is completed.
+
+## ALG-015 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+
 ## ALG-014 closeout — 2026-09-02
 
 - Added a `problemId` review route and provider-injected review screen. Its

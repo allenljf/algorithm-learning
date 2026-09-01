@@ -181,10 +181,11 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/reviews test/features/problems/presentation"]
   - id: ALG-015
     title: Build dashboard and mobile Home experience
-    status: pending
+    status: completed
     depends_on: [ALG-011, ALG-012]
     parallel_group: flutter-experiences
     spec_refs: ["3.3", "AC-DASH-01..02", "7.5", "10.5-10.6", "12.2-12.4", "16.2"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/dashboard/presentation"]
   - id: ALG-016
     title: Deliver local Docker Compose and operational documentation

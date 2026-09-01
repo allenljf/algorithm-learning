@@ -16,7 +16,7 @@ flowchart TD
   T12[ALG-012 Flutter repositories\ncompleted]
   T13[ALG-013 Web management\ncompleted]
   T14[ALG-014 Browse/review\ncompleted]
-  T15[ALG-015 Dashboard/home]
+  T15[ALG-015 Dashboard/home\ncompleted]
   T16[ALG-016 Compose]
   T17[ALG-017 K8s target doc]
   T18[ALG-018 MVP acceptance]

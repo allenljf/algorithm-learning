@@ -233,8 +233,9 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-011, ALG-012
 - Parallel group: `flutter-experiences`
 - Spec refs: 3.3, 5 AC-DASH-01..02, 7.5, 10.5-10.6, 12.2-12.4, 16.2; Flutter guides 08, 09, 13, 14, 15
+- Execution contract: `three-perspectives` analysis; `tdd` test approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/learning_app && flutter analyze`; `cd apps/learning_app && flutter test test/features/dashboard/presentation`
-- Status: pending
+- Status: completed
 
 ## Phase 5 — Operability and acceptance
 
