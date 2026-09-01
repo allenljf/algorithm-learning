@@ -42,6 +42,14 @@
 5. `task-execute`：執行 task；再用 `verification-closeout` 更新狀態與推薦下一個節點。
 6. 失敗時使用 `recovery-loop`；暫停、換對話或要查下一步時使用 `session-handoff`。
 
+若使用者明確要求直接完成整個 task，`task-execute` 必須連續執行至
+closeout、recovery 終止或真正外部 blocker；不得以局部 UI slice 或中間測試
+通過作為回覆邊界。
+
+每個 task 在首次修改前，必須把 deliverable、spec refs 與 acceptance criteria
+轉成 completion checklist。除非 checklist 全部完成並已跑 task 限定驗證，否則
+不得回覆局部進度或要求下一次指令；可由現有規格推得的工作不是 blocker。
+
 若介面未自動顯示 project-local skills，直接在 prompt 指定 `$技能名稱`，並要求 agent 讀取 `agent-skills/<技能名稱>/SKILL.md`。所有 agent 都必須先讀根目錄 `AGENTS.md`。
 
 每個 skill 結束時都會依 [Workflow Continuation Contract](agent-skills/WORKFLOW_CONTINUATION.md) 以 workflow phase 為界自動選擇「留在本對話」或「開新對話」其中一種續作方式；不得同時輸出兩者，也不得要求使用者選擇對話路徑。即使該 skill 已完成、被阻塞或本身是 `session-handoff` 也不例外。

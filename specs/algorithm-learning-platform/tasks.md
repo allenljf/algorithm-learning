@@ -211,7 +211,7 @@ human-readable execution contract. Select the per-task execution contract with
 - Parallel group: `flutter-experiences`
 - Spec refs: 3.3, 4.2, 5 AC-PROB-01..05/AC-SOL-01..02/AC-TAG-01..02, 7.1-7.3, 12.2-12.4, 15, 16.2; Flutter guides 08, 09, 10, 13, 14, 15, 17
 - Verification: `cd apps/learning_app && flutter analyze`; `cd apps/learning_app && flutter test test/features/problems/presentation`
-- Status: pending
+- Status: completed
 
 ### ALG-014 — Build adaptive browse and staged Review Mode
 

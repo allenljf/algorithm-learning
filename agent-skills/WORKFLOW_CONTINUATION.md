@@ -2,6 +2,22 @@
 
 Every workflow skill must read and apply this contract before returning. It is a required user-facing closing section, not a suggestion.
 
+## Auto-continuation
+
+When `$execution-strategy` is invoked for a ready task, it records the contract
+and immediately starts `$task-execute` in the same turn. This is one continuous
+execution phase: do not emit a continuation prompt between those two skills.
+Apply the normal continuation rules only after execution reaches closeout,
+recovery, or a material user decision.
+
+For an explicit “complete the whole task” request, partial implementation is
+not a continuation boundary. A workflow response may be emitted only at task
+closeout, terminal recovery/blocker, or after the user revokes that request.
+
+This rule overrides the ordinary requirement to emit a continuation section at
+the end of an intermediate skill response: the task-execution completion gate
+must close first.
+
 ## Required closing output
 
 End with exactly one continuation section. Decide the route automatically; never

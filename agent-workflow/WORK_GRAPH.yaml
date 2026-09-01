@@ -165,10 +165,11 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems test/features/reviews test/features/dashboard"]
   - id: ALG-013
     title: Build Web problem management experience
-    status: pending
+    status: completed
     depends_on: [ALG-011, ALG-012]
     parallel_group: flutter-experiences
     spec_refs: ["3.3", "AC-PROB-01..05", "AC-SOL-01..02", "AC-TAG-01..02", "7.1-7.3", "12.2-12.4", "15", "16.2"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems/presentation"]
   - id: ALG-014
     title: Build adaptive browse and staged Review Mode

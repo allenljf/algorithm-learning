@@ -2,6 +2,19 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-013 closeout — 2026-09-02
+
+- Implemented the Web problem-management experience through an injectable
+  repository/provider boundary: remote list/search/filter/pagination state,
+  create/edit/delete with confirmation and retained validation drafts, owned tag
+  creation/assignment, ordered problem detail, and independent solution
+  create/delete actions.
+- Widget coverage proves loading/error/empty/data states, a recoverable server
+  validation error retaining the draft, independent solution save, and delete
+  confirmation. Task-limited verification passed: `flutter analyze`; `flutter
+  test test/features/problems/presentation`.
+- `ALG-013` is completed. `ALG-014` and `ALG-015` remain independently ready.
+
 ## ALG-012 closeout — 2026-09-02
 
 - Added typed, transport-agnostic remote/repository contracts for problem list,

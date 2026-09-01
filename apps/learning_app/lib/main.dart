@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learning_app/features/problems/presentation/problems_page.dart';
 
 void main() => runApp(const ProviderScope(child: LearningApp()));
 
@@ -9,6 +10,7 @@ final _router = GoRouter(routes: [
   GoRoute(path: '/', builder: (_, _) => const _PlaceholderPage()),
   GoRoute(path: '/login', builder: (_, _) => const _PlaceholderPage()),
   GoRoute(path: '/register', builder: (_, _) => const _PlaceholderPage()),
+  GoRoute(path: '/problems', builder: (_, _) => const ProblemsPage()),
 ]);
 
 class LearningApp extends StatelessWidget {
