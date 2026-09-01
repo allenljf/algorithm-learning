@@ -1,6 +1,58 @@
 # Progress
 
-Flutter product code has not started; the backend composition root is complete.
+The Flutter application root and backend composition root are complete.
+
+## ALG-004 closeout — 2026-09-01
+
+- Added Flyway V1 for the `citext` extension and all initial product tables:
+  users, auth sessions, problems, solutions, tags, problem tags, and reviews.
+  It includes the required checks, indexes, ownership cascades, UTC timestamps,
+  mutable-table update triggers, and a GIN full-text index over problem text
+  only.
+- Added a real PostgreSQL Testcontainers migration test. It proves empty-schema
+  migration, key database checks, and user-owned record cascades.
+- Task-limited verification passed: `cd services/api && DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock TESTCONTAINERS_RYUK_DISABLED=true ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
+- `ALG-004` is `completed`; `ALG-005` is now `ready`.
+
+## ALG-004 recovery attempt 1 — 2026-09-01
+
+- Diagnosis: the initial Testcontainers migration test could not be compiled
+  because Spring Boot 4.1.1 does not manage Testcontainers dependency versions.
+- Change: import the Testcontainers 2.0.5 BOM and use its v2 artifact IDs
+  (`testcontainers-junit-jupiter`, `testcontainers-postgresql`) for test-scoped
+  dependencies.
+- Command: `cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
+- Result: after dependency correction, the test reached the intended missing-schema red state.
+
+## ALG-004 migration implementation adjustment — 2026-09-01
+
+- Diagnosis: PostgreSQL rejected the initial full-text GIN expression because
+  `concat_ws` is not immutable.
+- Change: replace it with an explicitly immutable `problem_search_vector`
+  function that indexes only the specified problem text fields.
+- Command: `cd services/api && DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock TESTCONTAINERS_RYUK_DISABLED=true ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
+- Result: reran successfully after the immutable-vector correction.
+
+## ALG-004 recovery attempt 2 — 2026-09-01
+
+- Diagnosis: Testcontainers 2.0.5's PostgreSQL container is managed by the
+  JUnit 5 `@Container` annotation, not `@RegisterExtension`.
+- Change: use the Testcontainers JUnit 5 container annotation on the real
+  PostgreSQL test fixture.
+- Command: `cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
+- Result: the fixture then reached Docker discovery; the initial default socket
+  was unavailable.
+
+## ALG-004 recovery attempt 3 — 2026-09-01
+
+- Diagnosis: the default Docker socket is unavailable, but the local Colima
+  context is healthy at `/Users/allen/.colima/default/docker.sock`; Colima
+  cannot mount that macOS socket into Testcontainers' Ryuk cleanup container.
+- Change: no repository change; run the task's exact Maven verification against
+  the available Docker endpoint with Ryuk disabled for this local test process.
+- Command: `cd services/api && DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock TESTCONTAINERS_RYUK_DISABLED=true ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
+- Result: with the available Colima endpoint and Ryuk disabled, the test reached
+  the intended missing-schema red state before V1 was added.
 
 ## ALG-003 closeout — 2026-09-01
 

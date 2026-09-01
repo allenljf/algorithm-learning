@@ -24,7 +24,14 @@ never commit credentials or signing keys.
 | `DATABASE_PASSWORD` | empty | Database password |
 | `APP_CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed browser origins |
 
-Docker Compose and the first Flyway migration are intentionally introduced by
-ALG-016 and ALG-004 respectively. This task establishes the composition root,
-health endpoint exposure, security boundary, request-ID propagation, and Problem
-Details error seam only.
+Flyway owns the PostgreSQL schema in `src/main/resources/db/migration`; Hibernate
+validates it and must not generate DDL. Migration integration tests use a real
+PostgreSQL Testcontainers database, so they require a Docker-compatible daemon:
+
+```sh
+./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'
+```
+
+Docker Compose is introduced by ALG-016. This task establishes the composition
+root, health endpoint exposure, security boundary, request-ID propagation, and
+Problem Details error seam only.

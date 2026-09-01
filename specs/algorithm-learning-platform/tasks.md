@@ -76,9 +76,11 @@ human-readable execution contract. Select the per-task execution contract with
   cascades, timestamps, and real-PostgreSQL Testcontainers migration coverage.
 - Depends on: ALG-002
 - Parallel group: `backend-schema`
+- Execution contract: `three-perspectives` analysis; `tdd` test approach; `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: define migration-test cases first, then implement ordered Flyway migrations and Testcontainers coverage for all specified tables, constraints, indexes, cascades, and timestamps; defer API behavior to later tasks.
 - Spec refs: 8.1-8.4, 13.1, 16.1; AC-OPS-02
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`
-- Status: ready
+- Status: completed
 
 ## Phase 2 — Secured library API
 
@@ -91,7 +93,7 @@ human-readable execution contract. Select the per-task execution contract with
 - Parallel group: `backend-security`
 - Spec refs: 4.1, 5 AC-AUTH-01..04, 10.2, 11.1-11.3, 13.1-13.2, 16.1
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd services/api && ./mvnw -q verify`
-- Status: pending
+- Status: ready
 
 ### ALG-006 — Implement owned tag API and normalization policy
 

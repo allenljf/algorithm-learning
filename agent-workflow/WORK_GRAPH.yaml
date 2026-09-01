@@ -61,14 +61,16 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test"]
   - id: ALG-004
     title: Implement the initial PostgreSQL schema and migration test base
-    status: ready
+    status: completed
     depends_on: [ALG-002]
     parallel_group: backend-schema
     spec_refs: ["8.1-8.4", "13.1", "16.1", "AC-OPS-02"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: Define migration tests first, then implement ordered Flyway migrations and Testcontainers coverage; defer API behavior.
     verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'"]
   - id: ALG-005
     title: Deliver authentication, JWT, refresh rotation, and ownership infrastructure
-    status: pending
+    status: ready
     depends_on: [ALG-002, ALG-004]
     parallel_group: backend-security
     spec_refs: ["4.1", "AC-AUTH-01..04", "10.2", "11.1-11.3", "13.1-13.2", "16.1"]
