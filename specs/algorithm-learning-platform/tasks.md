@@ -137,8 +137,14 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-004, ALG-005, ALG-007
 - Parallel group: `backend-library`
 - Spec refs: 5 AC-SOL-01..02, 7.2-7.3, 8.2 solutions, 10.3, 10.6-10.7, 16.1
+- Execution contract: `three-perspectives` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: establish owner-scoped solution CRUD and validation
+  through focused failing tests first. Each solution operation is independent of
+  Problem CRUD; parent/problem and solution lookups are owner-scoped, reads use
+  stable creation order, and review/dashboard behavior remains deferred.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'`
-- Status: pending
+- Status: completed
 
 ### ALG-009 — Implement review policy, events, due lists, and history
 

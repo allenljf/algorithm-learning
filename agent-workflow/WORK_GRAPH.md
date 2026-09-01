@@ -9,7 +9,7 @@ flowchart TD
   T5[ALG-005 Auth/security\ncompleted]
   T6[ALG-006 Tags API\ncompleted]
   T7[ALG-007 Problems API\ncompleted]
-  T8[ALG-008 Solutions API]
+  T8[ALG-008 Solutions API\ncompleted]
   T9[ALG-009 Reviews API]
   T10[ALG-010 Dashboard API]
   T11[ALG-011 Flutter auth]

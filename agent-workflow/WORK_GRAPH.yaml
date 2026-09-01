@@ -104,10 +104,16 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'"]
   - id: ALG-008
     title: Implement independent Solution CRUD
-    status: pending
+    status: completed
     depends_on: [ALG-004, ALG-005, ALG-007]
     parallel_group: backend-library
     spec_refs: ["AC-SOL-01..02", "7.2-7.3", "8.2 solutions", "10.3", "10.6-10.7", "16.1"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Define owner-scoped solution CRUD behavior and validation through focused
+      failing tests first. Keep solution transactions independent from Problem
+      CRUD; scope every parent/problem or solution lookup by the authenticated
+      owner, preserve stable creation ordering, and defer review/dashboard work.
     verification: ["cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'"]
   - id: ALG-009
     title: Implement review policy, events, due lists, and history

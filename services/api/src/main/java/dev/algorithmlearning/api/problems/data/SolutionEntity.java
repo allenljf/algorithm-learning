@@ -1,0 +1,3 @@
+package dev.algorithmlearning.api.problems.data;
+import jakarta.persistence.*; import java.time.Instant; import java.util.UUID;
+@Entity @Table(name="solutions") class SolutionEntity { @Id UUID id; @Column(name="problem_id") UUID problemId; String language,code,explanation; @Column(name="created_at") Instant createdAt; @Column(name="updated_at") Instant updatedAt; protected SolutionEntity(){} SolutionEntity(UUID id,UUID problemId,String language,String code,String explanation,Instant createdAt,Instant updatedAt){this.id=id;this.problemId=problemId;this.language=language;this.code=code;this.explanation=explanation;this.createdAt=createdAt;this.updatedAt=updatedAt;} }

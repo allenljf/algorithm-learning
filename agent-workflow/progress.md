@@ -2,6 +2,34 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-008 closeout — 2026-09-02
+
+- Added independent owner-scoped Solution CRUD beneath owned problems and at
+  direct solution routes. Solution lookups join through the owning problem, so
+  foreign identifiers remain non-disclosing.
+- Validation permits only Kotlin, Java, Python, or Dart; preserves code text,
+  trims optional explanations, limits content sizes, and requires non-blank
+  code or explanation. Lists use stable `created_at, id` ordering.
+- Task-limited verification passed:
+  `cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'`.
+- `ALG-008` is `completed`. `ALG-009` and independent `ALG-011` remain ready;
+  select one through `$execution-strategy` before implementation.
+
+## ALG-008 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Planner perspective: keep solution CRUD independent from Problem replacement
+  and expose it only through the specified nested/list and direct solution
+  routes.
+- Implementer perspective: use focused red-green tests for owner-scoped parent
+  and solution lookups, language/content validation, stable creation ordering,
+  and delete behavior.
+- Evaluator perspective: confirm no Problem write schema is expanded with
+  solution fields and that unowned identifiers remain non-disclosing `404`s.
+- Status is now `in_progress`; implementation begins with failing solution
+  domain/application tests. The task-limited verification remains
+  `cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'`.
+
 ## ALG-007 closeout — 2026-09-02
 
 - Completed owner-scoped Problem create/read/replace/delete infrastructure with
