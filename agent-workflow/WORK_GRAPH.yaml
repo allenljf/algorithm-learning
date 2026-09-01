@@ -1,0 +1,142 @@
+version: 1
+source_of_truth: task dependency and execution state
+tasks:
+  - id: ALG-001
+    title: Create monorepo and reproducible toolchain skeleton
+    status: completed
+    depends_on: []
+    parallel_group: foundation
+    spec_refs: ["6.1", "9", "13.1", "14.1", "18"]
+    execution_contract:
+      analysis: single-agent
+      test_approach: rapid
+      documentation: update-docs
+      ambiguity: infer
+    implementation_strategy: >-
+      Create only the root directory skeleton, ignore and non-secret
+      configuration examples, pinned toolchain/version metadata, and entry-point
+      READMEs. Do not bootstrap application roots or create product code.
+    verification:
+      - git diff --check
+      - test -d apps/learning_app
+      - test -d services/api
+      - test -f infra/env/.env.example
+  - id: ALG-002
+    title: Bootstrap the Spring Boot modular-monolith composition root
+    status: ready
+    depends_on: [ALG-001]
+    parallel_group: platform-roots
+    spec_refs: ["6.1", "6.3", "10.7", "13.1-13.2", "15", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test", "cd services/api && ./mvnw -q package -DskipTests"]
+  - id: ALG-003
+    title: Bootstrap the Flutter application composition root
+    status: ready
+    depends_on: [ALG-001]
+    parallel_group: platform-roots
+    spec_refs: ["9", "12.1", "12.3-12.4", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test"]
+  - id: ALG-004
+    title: Implement the initial PostgreSQL schema and migration test base
+    status: pending
+    depends_on: [ALG-002]
+    parallel_group: backend-schema
+    spec_refs: ["8.1-8.4", "13.1", "16.1", "AC-OPS-02"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'"]
+  - id: ALG-005
+    title: Deliver authentication, JWT, refresh rotation, and ownership infrastructure
+    status: pending
+    depends_on: [ALG-002, ALG-004]
+    parallel_group: backend-security
+    spec_refs: ["4.1", "AC-AUTH-01..04", "10.2", "11.1-11.3", "13.1-13.2", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'", "cd services/api && ./mvnw -q verify"]
+  - id: ALG-006
+    title: Implement owned tag API and normalization policy
+    status: pending
+    depends_on: [ALG-004, ALG-005]
+    parallel_group: backend-library
+    spec_refs: ["AC-TAG-01..02", "8.2 tags/problem_tags", "10.4", "10.7", "11.2", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*TagTest,*TagControllerTest'"]
+  - id: ALG-007
+    title: Implement owner-scoped Problem CRUD, search, filters, and URLs
+    status: pending
+    depends_on: [ALG-004, ALG-005, ALG-006]
+    parallel_group: backend-library
+    spec_refs: ["AC-PROB-01..05", "7.1-7.3", "8.2-8.4", "10.1", "10.3", "10.6-10.7", "11.2", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'"]
+  - id: ALG-008
+    title: Implement independent Solution CRUD
+    status: pending
+    depends_on: [ALG-004, ALG-005, ALG-007]
+    parallel_group: backend-library
+    spec_refs: ["AC-SOL-01..02", "7.2-7.3", "8.2 solutions", "10.3", "10.6-10.7", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'"]
+  - id: ALG-009
+    title: Implement review policy, events, due lists, and history
+    status: pending
+    depends_on: [ALG-004, ALG-005, ALG-007]
+    parallel_group: backend-reports
+    spec_refs: ["AC-REV-01..04", "7.4-7.5", "8.2 reviews", "10.5-10.7", "13.2", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'"]
+  - id: ALG-010
+    title: Implement dashboard aggregation API
+    status: pending
+    depends_on: [ALG-005, ALG-006, ALG-007, ALG-009]
+    parallel_group: backend-reports
+    spec_refs: ["AC-DASH-01..02", "7.5", "8.4", "10.5-10.7", "16.1"]
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'"]
+  - id: ALG-011
+    title: Implement Flutter authentication/session data flow
+    status: pending
+    depends_on: [ALG-003, ALG-005]
+    parallel_group: flutter-data
+    spec_refs: ["4.1", "AC-AUTH-01..04", "10.1-10.2", "11.1-11.3", "12.1-12.3", "15", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/auth"]
+  - id: ALG-012
+    title: Implement Flutter problem-library remote contracts and repositories
+    status: pending
+    depends_on: [ALG-003, ALG-007, ALG-008, ALG-009, ALG-010, ALG-011]
+    parallel_group: flutter-data
+    spec_refs: ["6.3", "7.1-7.5", "10.3-10.7", "12.1-12.2", "15", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems test/features/reviews test/features/dashboard"]
+  - id: ALG-013
+    title: Build Web problem management experience
+    status: pending
+    depends_on: [ALG-011, ALG-012]
+    parallel_group: flutter-experiences
+    spec_refs: ["3.3", "AC-PROB-01..05", "AC-SOL-01..02", "AC-TAG-01..02", "7.1-7.3", "12.2-12.4", "15", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems/presentation"]
+  - id: ALG-014
+    title: Build adaptive browse and staged Review Mode
+    status: pending
+    depends_on: [ALG-011, ALG-012]
+    parallel_group: flutter-experiences
+    spec_refs: ["3.3", "AC-REV-01..04", "7.3-7.5", "12.2-12.4", "15", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/reviews test/features/problems/presentation"]
+  - id: ALG-015
+    title: Build dashboard and mobile Home experience
+    status: pending
+    depends_on: [ALG-011, ALG-012]
+    parallel_group: flutter-experiences
+    spec_refs: ["3.3", "AC-DASH-01..02", "7.5", "10.5-10.6", "12.2-12.4", "16.2"]
+    verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/dashboard/presentation"]
+  - id: ALG-016
+    title: Deliver local Docker Compose and operational documentation
+    status: pending
+    depends_on: [ALG-002, ALG-004, ALG-005, ALG-010]
+    parallel_group: operations
+    spec_refs: ["AC-OPS-01..03", "11.3", "14.1", "15", "16.1"]
+    verification: ["docker compose -f infra/compose.yaml config", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]
+  - id: ALG-017
+    title: Document the Kubernetes deployment target
+    status: pending
+    depends_on: [ALG-016]
+    parallel_group: operations
+    spec_refs: ["3.2", "14.2", "18"]
+    verification: ["test -f infra/kubernetes/README.md", "git diff --check"]
+  - id: ALG-018
+    title: Run the MVP acceptance and integration suite
+    status: pending
+    depends_on: [ALG-010, ALG-013, ALG-014, ALG-015, ALG-016, ALG-017]
+    parallel_group: release-acceptance
+    spec_refs: ["4.1-4.3", "5", "10", "11", "14-17", "AC-AUTH-01..04", "AC-PROB-01..05", "AC-SOL-01..02", "AC-TAG-01..02", "AC-REV-01..04", "AC-DASH-01..02", "AC-OPS-01..03", "AC-QUAL-01"]
+    verification: ["cd services/api && ./mvnw -q verify", "cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test", "cd apps/learning_app && flutter test integration_test", "python3 flutter-dev-guide/tools/check-rules.py --staged", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]

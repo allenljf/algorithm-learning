@@ -1,0 +1,28 @@
+# Operating-system and editor files
+.DS_Store
+.idea/
+*.iml
+
+# Local environment values; examples remain tracked.
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Flutter and Dart build tooling
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/flutter_sdk
+build/
+coverage/
+
+# Java and Gradle build output
+.gradle/
+target/
+*.class
+
+# Logs
+*.log
