@@ -42,10 +42,22 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test", "cd services/api && ./mvnw -q package -DskipTests"]
   - id: ALG-003
     title: Bootstrap the Flutter application composition root
-    status: ready
+    status: completed
     depends_on: [ALG-001]
     parallel_group: platform-roots
     spec_refs: ["9", "12.1", "12.3-12.4", "16.2"]
+    execution_contract:
+      analysis: three-perspectives
+      test_approach: test-candidates
+      documentation: update-docs
+      ambiguity: infer
+    implementation_strategy: >-
+      Use the pinned Flutter SDK to generate the Web/Android/iOS project
+      foundation, then establish only the app composition root: Material 3
+      light/dark theme tokens, English and Traditional Chinese localization, one
+      GoRouter route table, a ProviderScope entry point, feature-first
+      directories, and app-root widget tests. Lock compatible package versions;
+      defer feature behavior and data layers.
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test"]
   - id: ALG-004
     title: Implement the initial PostgreSQL schema and migration test base

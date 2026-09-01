@@ -1,14 +1,17 @@
-# Flutter application
+# learning_app
 
-This directory is reserved for the shared Flutter Web, Android, and iOS client.
-Its SDK is pinned to Flutter 3.47.0 in [`.fvmrc`](.fvmrc).
+A new Flutter project.
 
-After ALG-003 creates the application root, install the pinned SDK and use the
-FVM entry point from this directory:
+## Getting Started
 
-```sh
-fvm install
-fvm flutter run -d chrome
-```
+This project is a starting point for a Flutter application.
 
-No Flutter project or product source is created by ALG-001.
+A few resources to get you started if this is your first Flutter project:
+
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

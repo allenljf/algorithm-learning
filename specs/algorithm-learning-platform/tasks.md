@@ -56,8 +56,18 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-001
 - Parallel group: `platform-roots`
 - Spec refs: 9, 12.1, 12.3-12.4, 16.2; Flutter guides 00, 01, 02, 03, 13, 14, 15
+- Execution contract: `three-perspectives` analysis; `test-candidates` test
+  approach; `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: use the pinned Flutter SDK to generate the
+  Web/Android/iOS project foundation, then establish only the app composition
+  root: Material 3 light/dark theme tokens, English and Traditional Chinese
+  localization, one `GoRouter` route table, a `ProviderScope` entry point,
+  feature-first directories, and app-root widget tests. Lock compatible package
+  versions in `pubspec.lock`; defer auth state, API clients, repositories,
+  feature behavior, and product screens to their assigned tasks. Update the
+  Flutter README with actual bootstrap, test, and run commands.
 - Verification: `cd apps/learning_app && flutter analyze`; `cd apps/learning_app && flutter test`
-- Status: ready
+- Status: completed
 
 ### ALG-004 — Implement the initial PostgreSQL schema and migration test base
 

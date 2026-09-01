@@ -2,6 +2,14 @@
 
 Flutter product code has not started; the backend composition root is complete.
 
+## ALG-003 closeout — 2026-09-01
+
+- Created Flutter 3.47.0 Web/Android/iOS app root with Riverpod, GoRouter,
+  Material 3 light/dark themes, English and Traditional Chinese locale support,
+  and a widget smoke test.
+- Task-limited verification passed: `flutter analyze`; `flutter test`.
+- `ALG-003` is `completed`; `ALG-004` remains `ready`.
+
 ## ALG-002 closeout — 2026-09-01
 
 - Established the Java 21 Spring Boot 4.1.1 modular-monolith composition root
@@ -15,7 +23,14 @@ Flutter product code has not started; the backend composition root is complete.
 - Task-limited verification passed: `cd services/api && ./mvnw -q test` and
   `cd services/api && ./mvnw -q package -DskipTests`.
 - `ALG-002` is `completed`. `ALG-003` and `ALG-004` are both `ready`; neither
-  has an execution contract yet.
+  initially had an execution contract.
+- `ALG-003` 已由 `$execution-strategy` 選定 contract：
+  `three-perspectives` / `test-candidates` / `update-docs` / `infer`。實作
+  限於 Flutter application composition root、Material 3 light/dark theme、
+  英文與繁體中文 localization、單一 GoRouter、ProviderScope、feature-first
+  directories 與 app-root widget tests；auth、API、repository 與產品畫面仍由
+  後續 task 負責。
+- 下一步：使用 `$task-execute` 依上述 contract 執行 `ALG-003`。
 
 ## ALG-002 recovery attempt 1 — 2026-09-01
 
