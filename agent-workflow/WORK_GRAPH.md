@@ -13,7 +13,7 @@ flowchart TD
   T9[ALG-009 Reviews API\ncompleted]
   T10[ALG-010 Dashboard API\ncompleted]
   T11[ALG-011 Flutter auth\ncompleted]
-  T12[ALG-012 Flutter repositories]
+  T12[ALG-012 Flutter repositories\ncompleted]
   T13[ALG-013 Web management]
   T14[ALG-014 Browse/review]
   T15[ALG-015 Dashboard/home]

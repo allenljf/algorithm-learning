@@ -2,6 +2,21 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-012 closeout — 2026-09-02
+
+- Added typed, transport-agnostic remote/repository contracts for problem list,
+  tags, solutions, review history, and dashboard, using immutable domain models
+  and no durable problem-data cache.
+- Task-limited verification passed: `flutter analyze`; `flutter test
+  test/features/problems test/features/reviews test/features/dashboard`.
+- `ALG-012` is completed. ALG-013, ALG-014, and ALG-015 are now ready.
+
+## ALG-012 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: typed remote/repository boundaries for the library, immutable domain
+  models, explicit failure/cancellation seams, fakes/provider seams, and no cache.
+
 ## ALG-011 closeout — 2026-09-02
 
 - Added transport-agnostic auth session/repository contracts and an auth state

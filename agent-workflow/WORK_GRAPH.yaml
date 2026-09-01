@@ -153,10 +153,15 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/auth"]
   - id: ALG-012
     title: Implement Flutter problem-library remote contracts and repositories
-    status: pending
+    status: completed
     depends_on: [ALG-003, ALG-007, ALG-008, ALG-009, ALG-010, ALG-011]
     parallel_group: flutter-data
     spec_refs: ["6.3", "7.1-7.5", "10.3-10.7", "12.1-12.2", "15", "16.2"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Test typed remote contracts and repository delegation first. Keep DTO/HTTP
+      details in remote services, return immutable domain models, expose fake/
+      provider seams, and add no durable problem-data cache.
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems test/features/reviews test/features/dashboard"]
   - id: ALG-013
     title: Build Web problem management experience
