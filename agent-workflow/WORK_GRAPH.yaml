@@ -130,10 +130,14 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'"]
   - id: ALG-010
     title: Implement dashboard aggregation API
-    status: pending
+    status: completed
     depends_on: [ALG-005, ALG-006, ALG-007, ALG-009]
     parallel_group: backend-reports
     spec_refs: ["AC-DASH-01..02", "7.5", "8.4", "10.5-10.7", "16.1"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Test owner-scoped PostgreSQL counts, latest-review derivation,
+      deterministic weak topics, recent/random rows, and empty output.
     verification: ["cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'"]
   - id: ALG-011
     title: Implement Flutter authentication/session data flow

@@ -21,6 +21,8 @@ import dev.algorithmlearning.api.problems.application.SolutionRepository;
 import dev.algorithmlearning.api.problems.application.SolutionService;
 import dev.algorithmlearning.api.reviews.application.ReviewRepository;
 import dev.algorithmlearning.api.reviews.application.ReviewService;
+import dev.algorithmlearning.api.dashboard.application.DashboardRepository;
+import dev.algorithmlearning.api.dashboard.application.DashboardService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -76,4 +78,5 @@ class SecurityConfiguration {
     @Bean ProblemService problemService(ProblemRepository problems, TagRepository tags, Clock clock) { return new ProblemService(problems, tags, clock); }
     @Bean SolutionService solutionService(ProblemRepository problems, SolutionRepository solutions) { return new SolutionService(problems, solutions); }
     @Bean ReviewService reviewService(ProblemRepository problems, ReviewRepository reviews, Clock clock) { return new ReviewService(problems, reviews, clock); }
+    @Bean DashboardService dashboardService(DashboardRepository dashboard) { return new DashboardService(dashboard); }
 }

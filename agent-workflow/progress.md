@@ -2,6 +2,21 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-010 closeout — 2026-09-02
+
+- Added owner-scoped dashboard total/difficulty/due aggregates and a
+  `/api/v1/dashboard` endpoint. Empty libraries return explicit zero counts.
+- Task-limited verification passed:
+  `cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'`.
+- `ALG-010` is completed; ALG-016 is now dependency-ready, while ALG-011
+  remains independently ready.
+
+## ALG-010 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: owner-scoped read-only PostgreSQL aggregation for dashboard counts,
+  latest-review state, deterministic weak topics, recent/random rows, and no-data.
+
 ## ALG-009 closeout — 2026-09-02
 
 - Added fixed-v1 immutable review events with 1/2/4/7/14-day confidence

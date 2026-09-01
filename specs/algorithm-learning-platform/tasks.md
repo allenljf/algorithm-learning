@@ -170,8 +170,9 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-005, ALG-006, ALG-007, ALG-009
 - Parallel group: `backend-reports`
 - Spec refs: 5 AC-DASH-01..02, 7.5, 8.4, 10.5-10.7, 16.1
+- Execution contract: `three-perspectives` analysis; `tdd` test approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'`
-- Status: pending
+- Status: completed
 
 ## Phase 3 — Flutter shared data and session
 

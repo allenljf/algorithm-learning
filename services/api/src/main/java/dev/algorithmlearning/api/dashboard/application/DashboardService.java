@@ -1,0 +1,1 @@
+package dev.algorithmlearning.api.dashboard.application; import java.util.UUID; public final class DashboardService {private final DashboardRepository repository;public DashboardService(DashboardRepository r){repository=r;}public DashboardCounts dashboard(UUID owner){return repository.counts(owner);}}
