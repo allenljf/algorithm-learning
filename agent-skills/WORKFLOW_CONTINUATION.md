@@ -30,9 +30,19 @@ phase, or current context no longer safely carries the needed evidence.
 
 ### Route selection
 
+**Phase-change default:** A next task under a different `Phase` heading in
+`tasks.md` is a materially different phase. When the completed task's closeout
+is persisted in `tasks.md`, `WORK_GRAPH.yaml`, and `progress.md`, its route is
+**Start a new conversation**. This is deterministic: do not emit a
+same-conversation `$execution-strategy` command for that next task.
+
+Compare Phase headings before context length, topic similarity, or dependency
+readiness. Only a next task in the same Phase may use **Continue in this
+conversation**.
+
 Choose **Continue in this conversation** when the next action continues the
-active phase, depends on current tool output or reasoning not fully persisted in
-artifacts, and the current context remains focused.
+same active phase, depends on current tool output or reasoning not fully
+persisted in artifacts, and the current context remains focused.
 
 Choose **Start a new conversation** when a completed phase hands off to a
 materially different phase and its state is fully persisted, when the current
