@@ -1,0 +1,1 @@
+package dev.algorithmlearning.api.reviews.application; import java.time.*; import java.util.*; public record Review(UUID id,UUID problemId,int confidence,Instant reviewedAt,Instant nextReviewAt,String notes,String policyVersion){}

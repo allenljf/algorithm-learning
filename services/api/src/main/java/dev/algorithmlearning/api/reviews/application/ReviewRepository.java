@@ -1,0 +1,1 @@
+package dev.algorithmlearning.api.reviews.application; import java.util.*; import java.time.Instant; public interface ReviewRepository {Review save(Review review);List<Review> due(UUID userId,Instant now,int limit,int offset);List<Review> history(UUID userId,UUID problemId,int limit,int offset);}

@@ -154,8 +154,13 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-004, ALG-005, ALG-007
 - Parallel group: `backend-reports`
 - Spec refs: 5 AC-REV-01..04, 7.4-7.5, 8.2 reviews, 10.5-10.7, 13.2, 16.1
+- Execution contract: `three-perspectives` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: fixed-v1 policy and owner-scoped append-only review
+  events with injected Clock/UUID seams; derive latest state, due lists, and
+  history in PostgreSQL, deferring dashboard aggregation to ALG-010.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'`
-- Status: pending
+- Status: completed
 
 ### ALG-010 — Implement dashboard aggregation API
 

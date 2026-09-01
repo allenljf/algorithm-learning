@@ -117,10 +117,16 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*SolutionTest,*SolutionControllerTest'"]
   - id: ALG-009
     title: Implement review policy, events, due lists, and history
-    status: pending
+    status: completed
     depends_on: [ALG-004, ALG-005, ALG-007]
     parallel_group: backend-reports
     spec_refs: ["AC-REV-01..04", "7.4-7.5", "8.2 reviews", "10.5-10.7", "13.2", "16.1"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Define the fixed-v1 scheduling policy and owner-scoped append-only review
+      workflow with injected Clock/UUID seams through focused failing tests.
+      Derive latest state, due lists, and history in PostgreSQL without storing
+      mutable review state; defer dashboard aggregation to ALG-010.
     verification: ["cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'"]
   - id: ALG-010
     title: Implement dashboard aggregation API

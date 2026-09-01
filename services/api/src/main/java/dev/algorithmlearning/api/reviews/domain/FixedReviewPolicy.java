@@ -1,0 +1,1 @@
+package dev.algorithmlearning.api.reviews.domain; import java.time.*; public final class FixedReviewPolicy {public Instant nextReviewAt(Instant reviewedAt,int confidence){if(confidence<0||confidence>4)throw new IllegalArgumentException("Invalid confidence.");return reviewedAt.plus(Duration.ofDays(new int[]{1,2,4,7,14}[confidence]));}}

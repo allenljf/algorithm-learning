@@ -2,6 +2,27 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-009 closeout — 2026-09-02
+
+- Added fixed-v1 immutable review events with 1/2/4/7/14-day confidence
+  intervals, owner-scoped submission, due retrieval, and newest-first history.
+- The API exposes review creation plus today/history routes; foreign problems
+  are non-disclosing and no review mutation/deletion endpoint is present.
+- Task-limited verification passed:
+  `cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'`.
+- `ALG-009` is `completed`; ALG-010 is now ready. ALG-011 remains independently ready.
+
+## ALG-009 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Planner: review state is derived from immutable events, never stored on a
+  mutable problem record. Implementer: start with fixed-v1 policy tests using
+  injected Clock/UUID, then owner-scoped submission/due/history tests.
+- Evaluator: foreign problem IDs return `404`; no update/delete route is added;
+  dashboard aggregation remains ALG-010 work.
+- Status is `in_progress`; task verification is
+  `cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest'`.
+
 ## ALG-008 closeout — 2026-09-02
 
 - Added independent owner-scoped Solution CRUD beneath owned problems and at

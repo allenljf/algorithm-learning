@@ -10,7 +10,7 @@ flowchart TD
   T6[ALG-006 Tags API\ncompleted]
   T7[ALG-007 Problems API\ncompleted]
   T8[ALG-008 Solutions API\ncompleted]
-  T9[ALG-009 Reviews API]
+  T9[ALG-009 Reviews API\ncompleted]
   T10[ALG-010 Dashboard API]
   T11[ALG-011 Flutter auth]
   T12[ALG-012 Flutter repositories]
