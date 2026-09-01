@@ -124,8 +124,10 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-004, ALG-005, ALG-006
 - Parallel group: `backend-library`
 - Spec refs: 5 AC-PROB-01..05, 7.1-7.3, 8.2-8.4, 10.1, 10.3, 10.6-10.7, 11.2, 16.1
+- Execution contract: `three-perspectives` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'`
-- Status: ready
+- Status: completed
 
 ### ALG-008 — Implement independent Solution CRUD
 

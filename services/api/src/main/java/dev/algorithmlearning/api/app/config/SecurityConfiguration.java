@@ -15,6 +15,8 @@ import dev.algorithmlearning.api.auth.domain.JwtTokenService;
 import dev.algorithmlearning.api.auth.domain.RefreshTokenService;
 import dev.algorithmlearning.api.tags.application.TagRepository;
 import dev.algorithmlearning.api.tags.application.TagService;
+import dev.algorithmlearning.api.problems.application.ProblemRepository;
+import dev.algorithmlearning.api.problems.application.ProblemService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -67,4 +69,5 @@ class SecurityConfiguration {
     @Bean AuthRateLimiter authRateLimiter(Clock clock) { return new InMemoryAuthRateLimiter(clock); }
     @Bean AllowedOriginValidator allowedOriginValidator(ApiProperties properties) { return new AllowedOriginValidator(properties.cors().allowedOrigins()); }
     @Bean TagService tagService(TagRepository tags, Clock clock) { return new TagService(tags, clock); }
+    @Bean ProblemService problemService(ProblemRepository problems, TagRepository tags, Clock clock) { return new ProblemService(problems, tags, clock); }
 }

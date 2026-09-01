@@ -96,10 +96,11 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*TagTest,*TagControllerTest'"]
   - id: ALG-007
     title: Implement owner-scoped Problem CRUD, search, filters, and URLs
-    status: ready
+    status: completed
     depends_on: [ALG-004, ALG-005, ALG-006]
     parallel_group: backend-library
     spec_refs: ["AC-PROB-01..05", "7.1-7.3", "8.2-8.4", "10.1", "10.3", "10.6-10.7", "11.2", "16.1"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd services/api && ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'"]
   - id: ALG-008
     title: Implement independent Solution CRUD

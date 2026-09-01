@@ -30,4 +30,14 @@ class ApiExceptionHandler {
         problem.setProperty("requestId", request.getAttribute(RequestIdFilter.ATTRIBUTE));
         return problem;
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleValidationException(IllegalArgumentException exception, HttpServletRequest request) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, "One or more fields are invalid.");
+        problem.setTitle("Request validation failed");
+        problem.setType(java.net.URI.create("https://algorithm-learning.local/problems/validation-error"));
+        problem.setProperty("code", "validation_error");
+        problem.setProperty("requestId", request.getAttribute(RequestIdFilter.ATTRIBUTE));
+        return problem;
+    }
 }

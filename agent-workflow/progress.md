@@ -2,6 +2,52 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-007 closeout — 2026-09-02
+
+- Completed owner-scoped Problem create/read/replace/delete infrastructure with
+  normalized write fields, HTTPS platform URL policy, and non-disclosing absent
+  resources.
+- Problem writes now replace supplied owner-owned tag links within the problem
+  transaction; foreign, duplicate, or oversized tag selections are rejected.
+- `GET /api/v1/problems` exposes the specified page envelope, deterministic
+  sorting, combined text/difficulty/platform/tag/review-status filters, and
+  PostgreSQL full-text search with `LIMIT/OFFSET`. Problem response schemas now
+  include tag summaries, a never-reviewed summary, and an explicit empty
+  solutions list pending ALG-008/ALG-009 implementations.
+- Added focused TDD coverage for tag replacement/owner isolation plus real
+  PostgreSQL Testcontainers coverage for owner-scoped full-text/tag-AND query
+  behavior.
+- Task-limited verification passed:
+  `cd services/api && DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock TESTCONTAINERS_RYUK_DISABLED=true ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'`.
+- `ALG-007` is `completed`; `ALG-008` and `ALG-009` now have all dependencies
+  complete and are ready for separate execution-strategy selection. `ALG-011`
+  remains ready and independent.
+
+## ALG-007 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: owner-scoped Problem CRUD, write normalization and validation, tag-link
+  replacement, PostgreSQL search/filter/pagination, deterministic sorting, and
+  URL platform policy. Solutions and review summaries remain later task work.
+- Status is now `in_progress`; tests will first establish URL policy, owner
+  isolation/non-disclosing absence, and write/list behavior.
+
+## ALG-007 implementation checkpoint — 2026-09-02
+
+- Completed red-green cycles for HTTPS/platform-host URL policy, owner-scoped
+  replacement/non-disclosing lookup, and the versioned controller path.
+- Added uncommitted Problem domain/application/JPA/controller foundations:
+  write-field trimming and size checks, owner-scoped create/read/replace/delete,
+  basic title/description/difficulty/platform list filtering, and stable
+  `updated_at desc, id desc` repository order.
+- Focused command currently passes:
+  `cd services/api && ./mvnw -q test -Dtest='*ProblemTest,*ProblemControllerTest,*ProblemRepositoryIntegrationTest'`.
+- Remaining before closeout: implement owned tag-link validation/replacement;
+  move combined filters/search/pagination/sort behavior into PostgreSQL queries;
+  add real PostgreSQL repository integration coverage; make response schemas
+  include required tag/review summary fields without taking solution/review
+  behavior from later tasks. Do not commit the partial task.
+
 ## ALG-006 closeout — 2026-09-02
 
 - Added an owner-scoped tag aggregate, repository port and JPA adapter, plus
