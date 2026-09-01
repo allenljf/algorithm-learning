@@ -70,14 +70,25 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'"]
   - id: ALG-005
     title: Deliver authentication, JWT, refresh rotation, and ownership infrastructure
-    status: ready
+    status: completed
     depends_on: [ALG-002, ALG-004]
     parallel_group: backend-security
     spec_refs: ["4.1", "AC-AUTH-01..04", "10.2", "11.1-11.3", "13.1-13.2", "16.1"]
+    execution_contract:
+      analysis: three-perspectives
+      test_approach: tdd
+      documentation: update-docs
+      ambiguity: infer
+    implementation_strategy: >-
+      Build the authentication and ownership foundation test-first: Argon2id
+      hashing, signed 15-minute JWTs, opaque 30-day refresh-token rotation with
+      keyed hashes, cookie/origin handling, rate-limit seam, and user-scoped
+      persistence/security wiring. Keep transport endpoints and access rules
+      minimal but complete; defer tag/problem/solution/review/dashboard behavior.
     verification: ["cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'", "cd services/api && ./mvnw -q verify"]
   - id: ALG-006
     title: Implement owned tag API and normalization policy
-    status: pending
+    status: ready
     depends_on: [ALG-004, ALG-005]
     parallel_group: backend-library
     spec_refs: ["AC-TAG-01..02", "8.2 tags/problem_tags", "10.4", "10.7", "11.2", "16.1"]
@@ -112,7 +123,7 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'"]
   - id: ALG-011
     title: Implement Flutter authentication/session data flow
-    status: pending
+    status: ready
     depends_on: [ALG-003, ALG-005]
     parallel_group: flutter-data
     spec_refs: ["4.1", "AC-AUTH-01..04", "10.1-10.2", "11.1-11.3", "12.1-12.3", "15", "16.2"]

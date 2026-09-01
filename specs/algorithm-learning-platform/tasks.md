@@ -91,9 +91,17 @@ human-readable execution contract. Select the per-task execution contract with
   rate-limit seam, security filters, and owner-scoped repository foundation.
 - Depends on: ALG-002, ALG-004
 - Parallel group: `backend-security`
+- Execution contract: `three-perspectives` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
+- Implementation strategy: build the authentication and ownership foundation
+  test-first: Argon2id hashing, signed 15-minute JWTs, opaque 30-day refresh
+  rotation with keyed hashes, cookie/origin handling, rate-limit seam, and
+  user-scoped persistence/security wiring. Keep transport endpoints and access
+  rules minimal but complete; defer tag/problem/solution/review/dashboard
+  behavior.
 - Spec refs: 4.1, 5 AC-AUTH-01..04, 10.2, 11.1-11.3, 13.1-13.2, 16.1
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd services/api && ./mvnw -q verify`
-- Status: ready
+- Status: completed
 
 ### ALG-006 — Implement owned tag API and normalization policy
 
@@ -104,7 +112,7 @@ human-readable execution contract. Select the per-task execution contract with
 - Parallel group: `backend-library`
 - Spec refs: 5 AC-TAG-01..02, 8.2 tags/problem_tags, 10.4, 10.7, 11.2, 16.1
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*TagTest,*TagControllerTest'`
-- Status: pending
+- Status: ready
 
 ### ALG-007 — Implement owner-scoped Problem CRUD, search, filters, and URLs
 
@@ -161,7 +169,7 @@ human-readable execution contract. Select the per-task execution contract with
 - Parallel group: `flutter-data`
 - Spec refs: 4.1, 5 AC-AUTH-01..04, 10.1-10.2, 11.1-11.3, 12.1-12.3, 15, 16.2; Flutter guides 00, 01, 03, 05, 06, 08, 13, 15, 17
 - Verification: `cd apps/learning_app && flutter analyze`; `cd apps/learning_app && flutter test test/features/auth`
-- Status: pending
+- Status: ready
 
 ### ALG-012 — Implement Flutter problem-library remote contracts and repositories
 

@@ -6,7 +6,7 @@ flowchart TD
   T2[ALG-002 Spring root\ncompleted]
   T3[ALG-003 Flutter root\ncompleted]
   T4[ALG-004 Flyway schema\ncompleted]
-  T5[ALG-005 Auth/security\nready]
+  T5[ALG-005 Auth/security\ncompleted]
   T6[ALG-006 Tags API]
   T7[ALG-007 Problems API]
   T8[ALG-008 Solutions API]

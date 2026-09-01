@@ -2,6 +2,26 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-005 closeout — 2026-09-01
+
+- Completed the authentication and ownership foundation: Argon2id password
+  hashing at OWASP's 19 MiB / two-iteration / one-lane minimum profile; signed
+  15-minute HS256 JWTs; opaque 30-day refresh values persisted only as keyed
+  hashes; one-time refresh rotation and logout revocation.
+- Added JPA adapters for users and refresh sessions, a bearer authentication
+  filter plus `CurrentUser` owner identity seam, and all required
+  `/api/v1/auth` register/login/refresh/logout/me endpoints. Refresh cookies are
+  `Secure`, `HttpOnly`, `SameSite=Lax`, and origin checks protect cookie-backed
+  refresh/logout. Registration, login, refresh, and password verification use a
+  replaceable IP/account-key rate-limit seam.
+- Added focused red-green tests for Argon2id behavior and refresh rotation; the
+  pre-existing JWT, password-policy, and keyed refresh-token tests remain green.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'` and `cd services/api && ./mvnw -q verify`.
+  The latter emitted the expected Testcontainers no-Docker diagnostic, while its
+  Docker-optional migration fixture was skipped and Maven exited successfully.
+- `ALG-005` is `completed`. `ALG-006` and `ALG-011` now have all dependencies
+  complete and are ready for separate execution-strategy selection.
+
 ## ALG-004 closeout — 2026-09-01
 
 - Added Flyway V1 for the `citext` extension and all initial product tables:
@@ -13,6 +33,33 @@ The Flutter application root and backend composition root are complete.
   migration, key database checks, and user-owned record cascades.
 - Task-limited verification passed: `cd services/api && DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock TESTCONTAINERS_RYUK_DISABLED=true ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'`.
 - `ALG-004` is `completed`; `ALG-005` is now `ready`.
+
+## ALG-005 execution strategy — 2026-09-01
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: test-first authentication and ownership infrastructure only—Argon2id,
+  15-minute JWT, opaque 30-day rotating refresh sessions, cookie/origin and
+  rate-limit seams, and user-scoped persistence/security wiring. Product library
+  behavior remains assigned to later tasks.
+- Status is now `in_progress`; tests will first cover authentication outcomes and
+  ownership boundaries. Argon2id will use OWASP's current 19 MiB / 2 iteration /
+  1 parallelism minimum profile.
+
+## ALG-005 implementation checkpoint — 2026-09-01
+
+- Began the required TDD cycle with focused `*AuthTest` / `*SecurityTest`
+  coverage. The initial tests correctly failed because `PasswordPolicy`,
+  `RefreshTokenService`, and `JwtTokenService` did not exist.
+- Added only the corresponding domain primitives so far: 12–128-character
+  password boundary validation, 256-bit opaque refresh values with HMAC-SHA-256
+  keyed persistence hashes and constant-time comparison, plus HS256 access JWT
+  issuance/verification containing issuer, audience, subject, issued-at,
+  expiry, and token ID claims. JWT lifetime is exactly 15 minutes.
+- Evidence: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`
+  passes. ALG-005 remains `in_progress`; Argon2id configuration, JPA/JDBC
+  persistence, session rotation, endpoints, cookie/origin validation, rate-limit
+  seam, bearer filter, ownership repository foundation, task verification, and
+  closeout have not yet been implemented.
 
 ## ALG-004 recovery attempt 1 — 2026-09-01
 
