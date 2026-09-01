@@ -2,6 +2,19 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-011 closeout — 2026-09-02
+
+- Added transport-agnostic auth session/repository contracts and an auth state
+  notifier with a coalesced refresh seam, keeping the access session in memory.
+- Task-limited verification passed: `flutter analyze`; `flutter test test/features/auth`.
+- `ALG-011` is completed; ALG-012 is now ready for its own execution contract.
+
+## ALG-011 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Scope: transport-agnostic auth repository, memory-only access session,
+  single-flight refresh seam, auth notifier, and route state; status is in progress.
+
 ## ALG-010 closeout — 2026-09-02
 
 - Added owner-scoped dashboard total/difficulty/due aggregates and a

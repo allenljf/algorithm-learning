@@ -184,8 +184,9 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-003, ALG-005
 - Parallel group: `flutter-data`
 - Spec refs: 4.1, 5 AC-AUTH-01..04, 10.1-10.2, 11.1-11.3, 12.1-12.3, 15, 16.2; Flutter guides 00, 01, 03, 05, 06, 08, 13, 15, 17
+- Execution contract: `three-perspectives` analysis; `tdd` test approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/learning_app && flutter analyze`; `cd apps/learning_app && flutter test test/features/auth`
-- Status: ready
+- Status: completed
 
 ### ALG-012 — Implement Flutter problem-library remote contracts and repositories
 

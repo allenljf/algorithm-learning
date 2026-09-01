@@ -141,10 +141,15 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*DashboardTest,*DashboardControllerTest'"]
   - id: ALG-011
     title: Implement Flutter authentication/session data flow
-    status: ready
+    status: completed
     depends_on: [ALG-003, ALG-005]
     parallel_group: flutter-data
     spec_refs: ["4.1", "AC-AUTH-01..04", "10.1-10.2", "11.1-11.3", "12.1-12.3", "15", "16.2"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Test auth repository/session state first, keeping transport behind a remote
+      abstraction, access tokens in memory, refresh single-flight, and notifier
+      route state independent from widget code.
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/auth"]
   - id: ALG-012
     title: Implement Flutter problem-library remote contracts and repositories
