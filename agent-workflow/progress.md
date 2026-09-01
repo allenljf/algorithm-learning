@@ -2,6 +2,24 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-014 closeout — 2026-09-02
+
+- Added a `problemId` review route and provider-injected review screen. Its
+  disclosure state permits only the ordered Problem → Think → Hint → My
+  Approach → Solution → confidence progression; review submission is disabled
+  until a confidence is selected after Solution is revealed.
+- Task-limited verification passed: `flutter analyze`; `flutter test
+  test/features/reviews test/features/problems/presentation`.
+- `ALG-014` is completed. `ALG-015` remains ready.
+
+## ALG-014 execution strategy — 2026-09-02
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Planner: route `problemId` into a family/provider input and preserve already
+  revealed stages locally. Implementer: establish stage and submit behavior with
+  focused red-green widget tests. Evaluator: confidence must remain unavailable
+  until Solution is revealed and no solution/review transport reaches widgets.
+
 ## ALG-013 closeout — 2026-09-02
 
 - Implemented the Web problem-management experience through an injectable

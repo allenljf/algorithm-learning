@@ -173,10 +173,11 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/problems/presentation"]
   - id: ALG-014
     title: Build adaptive browse and staged Review Mode
-    status: pending
+    status: completed
     depends_on: [ALG-011, ALG-012]
     parallel_group: flutter-experiences
     spec_refs: ["3.3", "AC-REV-01..04", "7.3-7.5", "12.2-12.4", "15", "16.2"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/reviews test/features/problems/presentation"]
   - id: ALG-015
     title: Build dashboard and mobile Home experience

@@ -15,7 +15,7 @@ flowchart TD
   T11[ALG-011 Flutter auth\ncompleted]
   T12[ALG-012 Flutter repositories\ncompleted]
   T13[ALG-013 Web management\ncompleted]
-  T14[ALG-014 Browse/review]
+  T14[ALG-014 Browse/review\ncompleted]
   T15[ALG-015 Dashboard/home]
   T16[ALG-016 Compose]
   T17[ALG-017 K8s target doc]

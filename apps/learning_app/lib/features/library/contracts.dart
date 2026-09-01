@@ -265,6 +265,8 @@ abstract interface class SolutionRepository {
 }
 
 abstract interface class ReviewRepository {
+  Future<ProblemDetail> problem(String id);
+  Future<Review> submit(String problemId, int confidence, String? notes);
   Future<Page<Review>> history({String? problemId, int page = 1});
 }
 
@@ -289,6 +291,11 @@ class RemoteSolutionRepository implements SolutionRepository {
 class RemoteReviewRepository implements ReviewRepository {
   RemoteReviewRepository(this.remote);
   final ReviewRemote remote;
+  @override
+  Future<ProblemDetail> problem(String id) => throw UnimplementedError();
+  @override
+  Future<Review> submit(String problemId, int confidence, String? notes) =>
+      throw UnimplementedError();
   @override
   Future<Page<Review>> history({String? problemId, int page = 1}) =>
       remote.history(problemId: problemId, page: page);
