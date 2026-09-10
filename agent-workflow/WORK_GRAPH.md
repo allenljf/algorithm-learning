@@ -19,7 +19,7 @@ flowchart TD
   T15[ALG-015 Dashboard/home\ncompleted]
   T16[ALG-016 Compose\ncompleted]
   T17[ALG-017 K8s target doc\ncompleted]
-  T18[ALG-018 MVP acceptance]
+  T18[ALG-018 MVP acceptance\ncompleted]
 
   T1 --> T2
   T1 --> T3

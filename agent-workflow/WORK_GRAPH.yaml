@@ -213,8 +213,9 @@ tasks:
     verification: ["test -f infra/kubernetes/README.md", "git diff --check"]
   - id: ALG-018
     title: Run the MVP acceptance and integration suite
-    status: pending
+    status: completed
     depends_on: [ALG-010, ALG-013, ALG-014, ALG-015, ALG-016, ALG-017]
     parallel_group: release-acceptance
     spec_refs: ["4.1-4.3", "5", "10", "11", "14-17", "AC-AUTH-01..04", "AC-PROB-01..05", "AC-SOL-01..02", "AC-TAG-01..02", "AC-REV-01..04", "AC-DASH-01..02", "AC-OPS-01..03", "AC-QUAL-01"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd services/api && ./mvnw -q verify", "cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test", "cd apps/learning_app && flutter test integration_test", "python3 flutter-dev-guide/tools/check-rules.py --staged", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]

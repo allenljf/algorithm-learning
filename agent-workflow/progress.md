@@ -2,6 +2,38 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-018 closeout — 2026-09-10
+
+- Added Flutter's `integration_test` harness and a stateful, test-only
+  controlled API adapter. The Android integration journey proves problem
+  creation, edit and browse behavior, ordered Review Mode disclosure, and
+  confidence submission without adding test behavior to production widgets.
+- Added `infra/acceptance/README.md`, which records the release-evidence
+  boundary for the API, Flutter, Compose, and Flutter-guide checks. It also
+  explicitly scopes owner isolation to the API/repository suite rather than
+  falsely emulating authorization in Flutter.
+- Task-limited verification passed exactly as contracted: `cd services/api &&
+  ./mvnw -q verify`; `cd apps/learning_app && flutter analyze`; `cd
+  apps/learning_app && flutter test`; `cd apps/learning_app && flutter test
+  integration_test`; `python3 flutter-dev-guide/tools/check-rules.py --staged`;
+  `docker compose -f infra/compose.yaml up -d --build`; `docker compose -f
+  infra/compose.yaml ps` (API and PostgreSQL healthy); and `docker compose -f
+  infra/compose.yaml down`.
+- `ALG-018` is completed. All planned MVP tasks are complete; there is no next
+  ready task.
+
+## ALG-018 execution strategy — 2026-09-10
+
+- Dependency reconciliation confirmed that ALG-010, ALG-013, ALG-014, ALG-015,
+  ALG-016, and ALG-017 are completed. ALG-018 advanced from the stale
+  `pending` graph state to `in_progress`.
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+  Planner scope: a controlled integration boundary plus evidence for the MVP
+  acceptance journeys. Implementer scope: test-first key Flutter journeys and
+  release evidence only. Evaluator boundary: keep provider overrides/fakes at
+  the integration harness seam, verify owner isolation and operations via the
+  existing API and Compose suites, and run only ALG-018's listed checks.
+
 ## ALG-017 execution strategy — 2026-09-10
 
 - `$work-graph` synchronization advanced ALG-017 from `pending` to `ready`
