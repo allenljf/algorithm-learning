@@ -246,11 +246,11 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationModeTest'", "cd services/api && ./mvnw -q test"]
   - id: GCP-003
     title: Add the OIDC Cloud Run migration and deployment workflow
-    status: ready
+    status: completed
     depends_on: [GCP-001, GCP-002]
     parallel_group: continuous-delivery
     spec_refs: ["2", "3", "4.1-4.2", "AC-GCP-01..07", "6-8"]
-    execution_contract: null
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
     implementation_strategy: >-
       Use SHA-pinned actions and GitHub OIDC only. Serialize production runs,
       test/build/push an immutable image, wait for the migration Job, deploy

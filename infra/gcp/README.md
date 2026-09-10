@@ -98,11 +98,97 @@ migration Job do not exist yet. After the first controlled deployment, narrow
 that binding to the named service and Job if the organization policy permits
 resource-level Cloud Run IAM bindings.
 
-## Next phase
+## Continuous-delivery workflow
 
-GCP-003 adds the GitHub deployment workflow. That workflow will create/update
-the `algorithm-learning-migrate` Cloud Run Job, wait for it to complete, then
-deploy the Flyway-disabled `algorithm-learning-api` service. The Job sets
-`APP_MIGRATION_ONLY=true` and leaves Flyway enabled; the serving service sets
-`SPRING_FLYWAY_ENABLED=false`. GCP-004 is the only task authorized to run the
-bootstrap and first-release commands.
+`.github/workflows/gcp-production-deploy.yml` runs only for `main` (or a
+manual dispatch whose ref still satisfies the WIF condition) and uses the
+protected `production` Environment. Every referenced action is pinned to its
+full commit SHA. The deploy job is the only job that requests `id-token: write`;
+it exchanges GitHub's ephemeral OIDC token for credentials to
+`algorithm-learning-github-deployer`. It never consumes a service-account key
+or GitHub credential secret.
+
+Each production run is serialized (`gcp-production-api`, with cancellation
+disabled). After the API test suite, it builds and pushes exactly one immutable
+Artifact Registry image:
+
+```text
+asia-east1-docker.pkg.dev/alert-study-508214-s5/algorithm-learning/api:<git-sha>
+```
+
+The workflow deploys that exact image to `algorithm-learning-migrate`, waits
+for its one-shot execution to succeed, and only then deploys the same image to
+`algorithm-learning-api`. Both workload types use
+`algorithm-learning-runtime@alert-study-508214-s5.iam.gserviceaccount.com`,
+the dedicated Direct VPC network/subnet, and this non-secret Cloud SQL JDBC
+format:
+
+```text
+jdbc:postgresql:///algorithm_learning?cloudSqlInstance=alert-study-508214-s5:asia-east1:algorithm-learning-postgres&ipTypes=PRIVATE&socketFactory=com.google.cloud.sql.postgres.SocketFactory
+```
+
+`services/api/pom.xml` includes the Cloud SQL PostgreSQL Socket Factory needed
+by that URL. The connector uses the runtime service account and the private
+network path; it does not put a database address, credentials, or certificate
+in the image.
+
+The migration Job sets `APP_MIGRATION_ONLY=true` and
+`SPRING_FLYWAY_ENABLED=true`, with zero retries so a failed migration is a
+visible failed release. The serving revision sets
+`APP_MIGRATION_ONLY=false` and `SPRING_FLYWAY_ENABLED=false`; Flyway never runs
+on Cloud Run service startup. Both reference the three Secret Manager values by
+secret ID and version selector only. The service is made publicly invokable for
+the authentication routes, while the Job is never public.
+
+## First-deploy checklist
+
+GCP-004 is the only task authorized to run a real first release. Before it is
+started, the operator verifies all of the following without entering any secret
+value into GitHub, a shell history, source control, or this conversation:
+
+1. `bash infra/gcp/bootstrap.sh --apply` has completed in the intended project.
+2. Cloud SQL has database `algorithm_learning` and least-privilege user
+   `algorithm_learning_app`; the user's password is the current value of
+   `algorithm-learning-db-password`.
+3. The `algorithm-learning-jwt-key` and
+   `algorithm-learning-refresh-hash-key` containers each have a distinct,
+   random value of at least 32 characters.
+4. GitHub Environment `production` is protected to `main` and holds every
+   non-secret variable in the table above, including an intentionally empty
+   `GCP_CORS_ALLOWED_ORIGINS` until a controlled Flutter Web origin exists.
+5. The WIF provider name has the form
+   `projects/730295148186/locations/global/workloadIdentityPools/github-actions/providers/github-provider`,
+   and its condition remains restricted to this repository, branch, and
+   environment.
+6. A reviewer has confirmed the generated workflow contains only SHA-pinned
+   actions and no `GCP_SA_KEY`, credential JSON, or secret value.
+
+## Rollout, verification, and rollback
+
+For every release, preserve the deployed Git SHA, the new Cloud Run revision
+name, and the immediately preceding known-good revision name in the release
+record. The workflow itself fails before API deployment if the migration Job
+does not complete successfully. After deployment, it verifies readiness with:
+
+```sh
+SERVICE_URL="$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')"
+curl --fail --retry 12 --retry-delay 5 "${SERVICE_URL}/actuator/health/readiness"
+```
+
+If the new service revision is unhealthy after a successful migration, do not
+rerun or reverse Flyway. First list revisions and select the previously recorded
+known-good serving revision:
+
+```sh
+gcloud run revisions list --service=algorithm-learning-api --region=asia-east1
+gcloud run services update-traffic algorithm-learning-api \
+  --region=asia-east1 \
+  --to-revisions=KNOWN_GOOD_REVISION=100
+```
+
+Then repeat the readiness command. This rolls serving traffic back to the
+known-good Cloud Run revision while retaining forward database migrations. It
+is safe only when migrations are forward-compatible with the prior service;
+otherwise pause the rollout and use a separately authorized Cloud SQL restore
+or incident procedure. Never treat a reverse Flyway migration as the routine
+rollback mechanism.

@@ -1,0 +1,116 @@
+name: Deploy API to GCP Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gcp-production-api
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify API
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Java 21
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Run API tests
+        working-directory: services/api
+        run: ./mvnw -q test
+
+  deploy:
+    name: Migrate and deploy API
+    needs: verify
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Authenticate to Google Cloud through GitHub OIDC
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          version: '>= 416.0.0'
+      - name: Build and publish immutable API image
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GCP_ARTIFACT_REPOSITORY: ${{ vars.GCP_ARTIFACT_REPOSITORY }}
+        run: |
+          image_uri="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_ARTIFACT_REPOSITORY}/api:${GITHUB_SHA}"
+          gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+          docker build --tag "${image_uri}" services/api
+          docker push "${image_uri}"
+          printf 'IMAGE_URI=%s\n' "${image_uri}" >> "$GITHUB_ENV"
+      - name: Deploy and run the Flyway migration Job
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GCP_CORS_ALLOWED_ORIGINS: ${{ vars.GCP_CORS_ALLOWED_ORIGINS }}
+        run: |
+          runtime_service_account="algorithm-learning-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+          instance_connection_name="${GCP_PROJECT_ID}:${GCP_REGION}:algorithm-learning-postgres"
+          database_url="jdbc:postgresql:///algorithm_learning?cloudSqlInstance=${instance_connection_name}&ipTypes=PRIVATE&socketFactory=com.google.cloud.sql.postgres.SocketFactory"
+          gcloud run jobs deploy algorithm-learning-migrate \
+            --image="${IMAGE_URI}" \
+            --region="${GCP_REGION}" \
+            --service-account="${runtime_service_account}" \
+            --add-cloudsql-instances="${instance_connection_name}" \
+            --network=algorithm-learning-vpc \
+            --subnet=algorithm-learning-run \
+            --vpc-egress=private-ranges-only \
+            --max-retries=0 \
+            --task-timeout=10m \
+            --set-env-vars="^|^DATABASE_URL=${database_url}|DATABASE_USERNAME=algorithm_learning_app|APP_CORS_ALLOWED_ORIGINS=${GCP_CORS_ALLOWED_ORIGINS}|APP_JWT_ISSUER=algorithm-learning-api|APP_JWT_AUDIENCE=algorithm-learning-client|APP_MIGRATION_ONLY=true|SPRING_FLYWAY_ENABLED=true" \
+            --set-secrets="^|^APP_JWT_KEY=algorithm-learning-jwt-key:latest|APP_REFRESH_HASH_KEY=algorithm-learning-refresh-hash-key:latest|DATABASE_PASSWORD=algorithm-learning-db-password:latest"
+          gcloud run jobs execute algorithm-learning-migrate --region="${GCP_REGION}" --wait
+      - name: Deploy the Flyway-disabled API service
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GCP_CLOUD_RUN_SERVICE: ${{ vars.GCP_CLOUD_RUN_SERVICE }}
+          GCP_CORS_ALLOWED_ORIGINS: ${{ vars.GCP_CORS_ALLOWED_ORIGINS }}
+        run: |
+          runtime_service_account="algorithm-learning-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+          instance_connection_name="${GCP_PROJECT_ID}:${GCP_REGION}:algorithm-learning-postgres"
+          database_url="jdbc:postgresql:///algorithm_learning?cloudSqlInstance=${instance_connection_name}&ipTypes=PRIVATE&socketFactory=com.google.cloud.sql.postgres.SocketFactory"
+          gcloud run deploy "${GCP_CLOUD_RUN_SERVICE}" \
+            --image="${IMAGE_URI}" \
+            --region="${GCP_REGION}" \
+            --service-account="${runtime_service_account}" \
+            --add-cloudsql-instances="${instance_connection_name}" \
+            --network=algorithm-learning-vpc \
+            --subnet=algorithm-learning-run \
+            --vpc-egress=private-ranges-only \
+            --allow-unauthenticated \
+            --set-env-vars="^|^DATABASE_URL=${database_url}|DATABASE_USERNAME=algorithm_learning_app|APP_CORS_ALLOWED_ORIGINS=${GCP_CORS_ALLOWED_ORIGINS}|APP_JWT_ISSUER=algorithm-learning-api|APP_JWT_AUDIENCE=algorithm-learning-client|APP_MIGRATION_ONLY=false|SPRING_FLYWAY_ENABLED=false" \
+            --set-secrets="^|^APP_JWT_KEY=algorithm-learning-jwt-key:latest|APP_REFRESH_HASH_KEY=algorithm-learning-refresh-hash-key:latest|DATABASE_PASSWORD=algorithm-learning-db-password:latest"
+      - name: Verify the deployed readiness endpoint
+        env:
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GCP_CLOUD_RUN_SERVICE: ${{ vars.GCP_CLOUD_RUN_SERVICE }}
+        run: |
+          service_url="$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --region="${GCP_REGION}" --format='value(status.url)')"
+          curl --fail --retry 12 --retry-delay 5 "${service_url}/actuator/health/readiness"

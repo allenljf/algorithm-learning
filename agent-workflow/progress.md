@@ -2,6 +2,42 @@
 
 The Flutter application root and backend composition root are complete.
 
+## GCP-003 closeout — 2026-09-10
+
+- Added `.github/workflows/gcp-production-deploy.yml`: a SHA-pinned,
+  serialized `main` production workflow with minimal deployment-job OIDC
+  permission. It verifies the API, publishes an immutable Git-SHA Artifact
+  Registry image through WIF, deploys and waits for one Cloud Run migration
+  Job, then deploys that exact image as a Flyway-disabled public API service
+  and checks Actuator readiness.
+- Added the PostgreSQL Cloud SQL Java Socket Factory runtime dependency, so the
+  workflow's private-IP JDBC URL works with the runtime service account and
+  Direct VPC egress without embedding credentials or a database endpoint in the
+  image. Runtime secrets remain named Secret Manager references only.
+- Expanded `infra/gcp/README.md` with protected Environment/WIF prerequisites,
+  first-deploy checks, image/revision evidence expectations, readiness command,
+  and a forward-only rollback procedure that returns traffic to a recorded
+  known-good revision without reversing Flyway migrations.
+- Task-limited verification passed: the required workflow static assertion and
+  `git diff --check` both exited successfully. `GCP-003` is completed.
+  `GCP-004` is the next phase and remains blocked on private operator setup of
+  the GitHub Environment and Secret Manager values; no cloud-mutating command
+  was run for GCP-003.
+
+## GCP-003 execution strategy — 2026-09-10
+
+- Dependency reconciliation confirms that `GCP-001` and `GCP-002` are
+  completed, so `GCP-003` advanced from `ready` to `in_progress`.
+- Selected contract: `three-perspectives` / `test-candidates` /
+  `update-docs` / `infer`.
+- Planner boundary: preserve the existing constrained WIF and private Cloud SQL
+  design while serializing releases around one migration Job. Implementer
+  boundary: the production workflow, Cloud SQL JDBC connector dependency, and
+  rollout/rollback documentation only. Evaluator boundary: all actions are
+  commit-SHA pinned, no long-lived credential or secret value is introduced,
+  the Job completes before the Flyway-disabled service deploys, and rollback
+  never reverses Flyway migrations.
+
 ## GCP-002 closeout — 2026-09-10
 
 - Added the explicit `APP_MIGRATION_ONLY=true` startup mode. It switches the

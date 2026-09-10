@@ -46,8 +46,10 @@ human-readable execution contract.
 - Depends on: GCP-001, GCP-002
 - Parallel group: `continuous-delivery`
 - Spec refs: 2, 3, 4.1-4.2, 5 AC-GCP-01..07, 6-8
+- Execution contract: `three-perspectives` analysis; `test-candidates` test
+  approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `python3 -c "from pathlib import Path; text = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'id-token: write' in text and 'GCP_SA_KEY' not in text and 'concurrency:' in text and 'SPRING_FLYWAY_ENABLED=false' in text"`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 3 — First controlled release
 

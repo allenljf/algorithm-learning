@@ -77,15 +77,15 @@ not authorization to begin a task without `$execution-strategy`.
 flowchart TD
   G1[GCP-001 Bootstrap tooling and runbook\ncompleted]
   G2[GCP-002 Migration-only API mode\ncompleted]
-  G3[GCP-003 OIDC deployment workflow\nready]
-  G4[GCP-004 First controlled GCP release\npending]
+  G3[GCP-003 OIDC deployment workflow\ncompleted]
+  G4[GCP-004 First controlled GCP release\nready after user setup]
 
   G1 --> G3
   G2 --> G3
   G3 --> G4
 ```
 
-`GCP-001` and `GCP-002` are completed, so `GCP-003` is ready. `GCP-004` is the
-sole GCP-mutating task and cannot begin before the bootstrap/workflow artifacts
-are complete and the user has privately configured the approved GCP and GitHub
-Environment values.
+`GCP-001`, `GCP-002`, and `GCP-003` are completed. `GCP-004` is the sole
+GCP-mutating task; it becomes ready only after the user has privately configured
+the approved GCP and GitHub Environment values. Its execution must not expose a
+secret value in source control, logs, or this conversation.
