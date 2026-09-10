@@ -2,6 +2,29 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-017 execution strategy — 2026-09-10
+
+- `$work-graph` synchronization advanced ALG-017 from `pending` to `ready`
+  because ALG-016 is completed.
+- Selected contract: `single-agent` / `rapid` / `update-docs` / `infer`; status
+  is now `in_progress`. The target architecture is already locked by the spec,
+  and this task creates documentation only—no Kubernetes manifests, provider
+  choice, or production database deployment are authorized.
+
+## ALG-017 closeout — 2026-09-10
+
+- Added the provider-neutral Kubernetes target document: stateless API
+  Deployment, ClusterIP Service, TLS Ingress, ConfigMap/Secret boundaries,
+  Actuator startup/liveness/readiness probes, a single Flyway migration Job,
+  managed PostgreSQL backups and point-in-time recovery, plus rollout and
+  rollback boundaries.
+- No Helm chart, Kustomize overlay, production manifest, cloud-provider choice,
+  or in-cluster production PostgreSQL configuration was added.
+- Task-limited verification passed: `test -f infra/kubernetes/README.md` and
+  `git diff --check`.
+- `ALG-017` is completed. All dependencies for `ALG-018` are now complete, so
+  it is ready for the release-acceptance phase.
+
 ## ALG-016 work-graph and execution strategy — 2026-09-10
 
 - `$work-graph` synchronization confirmed that all four dependencies

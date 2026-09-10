@@ -9,7 +9,9 @@ PostgreSQL runtime.
   isolated Compose network. PostgreSQL data uses the named `postgres-data`
   volume; Flyway runs once during API startup before Hibernate validates the
   schema.
-- Kubernetes target documentation is intentionally deferred to ALG-017.
+- [Kubernetes deployment target](kubernetes/README.md) documents the future
+  provider-neutral API, networking, probes, migration, and managed-database
+  architecture. It intentionally contains no production manifests.
 
 ## Run locally with Docker Compose
 

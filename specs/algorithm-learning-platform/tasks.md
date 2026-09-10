@@ -260,8 +260,10 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-016
 - Parallel group: `operations`
 - Spec refs: 3.2, 14.2, 18
+- Execution contract: `single-agent` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `test -f infra/kubernetes/README.md`; `git diff --check`
-- Status: pending
+- Status: completed
 
 ### ALG-018 — Run the MVP acceptance and integration suite
 

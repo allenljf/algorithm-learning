@@ -201,10 +201,15 @@ tasks:
     verification: ["docker compose -f infra/compose.yaml config", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]
   - id: ALG-017
     title: Document the Kubernetes deployment target
-    status: pending
+    status: completed
     depends_on: [ALG-016]
     parallel_group: operations
     spec_refs: ["3.2", "14.2", "18"]
+    execution_contract:
+      analysis: single-agent
+      test_approach: rapid
+      documentation: update-docs
+      ambiguity: infer
     verification: ["test -f infra/kubernetes/README.md", "git diff --check"]
   - id: ALG-018
     title: Run the MVP acceptance and integration suite
