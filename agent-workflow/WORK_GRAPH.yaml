@@ -234,11 +234,11 @@ tasks:
     verification: ["bash -n infra/gcp/bootstrap.sh", "bash infra/gcp/bootstrap.sh --help", "git diff --check"]
   - id: GCP-002
     title: Make the API image complete in migration-only Cloud Run Job mode
-    status: ready
+    status: completed
     depends_on: []
     parallel_group: delivery-foundations
     spec_refs: ["2", "3", "AC-GCP-03", "AC-GCP-05", "AC-GCP-07", "6-8"]
-    execution_contract: null
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     implementation_strategy: >-
       Establish a tested non-web migration-only startup path. It applies Flyway
       once and exits for a Cloud Run Job; normal API service startup remains
@@ -246,7 +246,7 @@ tasks:
     verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationModeTest'", "cd services/api && ./mvnw -q test"]
   - id: GCP-003
     title: Add the OIDC Cloud Run migration and deployment workflow
-    status: pending
+    status: ready
     depends_on: [GCP-001, GCP-002]
     parallel_group: continuous-delivery
     spec_refs: ["2", "3", "4.1-4.2", "AC-GCP-01..07", "6-8"]

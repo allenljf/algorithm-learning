@@ -50,10 +50,12 @@ GitHub Actions (allenljf/algorithm-learning, main + protected production environ
   assertion.ref == 'refs/heads/main' && assertion.environment == 'production'`.
   It must not accept arbitrary repositories, pull requests, or branches.
 - A single Cloud Run Job named `algorithm-learning-migrate` runs the API image
-  with `SPRING_MAIN_WEB_APPLICATION_TYPE=none` and Flyway enabled. GitHub
-  Actions waits for that execution to succeed before deploying the API service
-  revision with `SPRING_FLYWAY_ENABLED=false`. A workflow concurrency group
-  permits one production release at a time. The service never runs migrations.
+  with `APP_MIGRATION_ONLY=true` and Flyway enabled. The explicit application
+  mode disables the HTTP listener and exits after context/Flyway initialization.
+  GitHub Actions waits for that execution to succeed before deploying the API
+  service revision with `SPRING_FLYWAY_ENABLED=false`. A workflow concurrency
+  group permits one production release at a time. The service never runs
+  migrations.
 
 ## 3. Scope
 

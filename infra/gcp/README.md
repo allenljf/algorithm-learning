@@ -102,6 +102,7 @@ resource-level Cloud Run IAM bindings.
 
 GCP-003 adds the GitHub deployment workflow. That workflow will create/update
 the `algorithm-learning-migrate` Cloud Run Job, wait for it to complete, then
-deploy the Flyway-disabled `algorithm-learning-api` service. GCP-004 is the
-only task authorized to run the bootstrap and first-release commands.
-
+deploy the Flyway-disabled `algorithm-learning-api` service. The Job sets
+`APP_MIGRATION_ONLY=true` and leaves Flyway enabled; the serving service sets
+`SPRING_FLYWAY_ENABLED=false`. GCP-004 is the only task authorized to run the
+bootstrap and first-release commands.

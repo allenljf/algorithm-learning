@@ -27,6 +27,7 @@ never commit credentials or signing keys.
 | `APP_JWT_ISSUER` | `algorithm-learning-api` | Access-token issuer |
 | `APP_JWT_AUDIENCE` | `algorithm-learning-client` | Access-token audience |
 | `APP_REFRESH_HASH_KEY` | development-only local value | Server-side HMAC key for refresh-session hashes; replace in every deployed environment |
+| `APP_MIGRATION_ONLY` | `false` | Set to `true` only for the Cloud Run migration Job; starts non-web, runs Flyway, then exits with Spring's exit code |
 
 Flyway owns the PostgreSQL schema in `src/main/resources/db/migration`; Hibernate
 validates it and must not generate DDL. Migration integration tests use a real
@@ -35,6 +36,11 @@ PostgreSQL Testcontainers database, so they require a Docker-compatible daemon:
 ```sh
 ./mvnw -q test -Dtest='*MigrationTest,*RepositoryIntegrationTest'
 ```
+
+For production delivery, the one-shot Cloud Run migration Job uses the same API
+image with `APP_MIGRATION_ONLY=true` and Flyway enabled. The serving Cloud Run
+service sets `SPRING_FLYWAY_ENABLED=false`; it never performs schema migration
+during instance startup.
 
 ## Authentication API
 

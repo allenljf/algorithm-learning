@@ -2,6 +2,33 @@
 
 The Flutter application root and backend composition root are complete.
 
+## GCP-002 closeout — 2026-09-10
+
+- Added the explicit `APP_MIGRATION_ONLY=true` startup mode. It switches the
+  Spring Boot process to `WebApplicationType.NONE`, lets Flyway initialize the
+  configured datasource, then exits through Spring's exit-code path; normal API
+  startup remains Servlet-based.
+- Added TDD coverage for both migration and normal startup mode selection, and
+  documented the Cloud Run Job/service environment split in the API and GCP
+  operator documentation. The serving service will set
+  `SPRING_FLYWAY_ENABLED=false`; only the Job enables Flyway.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test
+  -Dtest='*MigrationModeTest'`; `cd services/api && ./mvnw -q test`. The full
+  suite exited successfully while emitting the expected Docker-unavailable
+  Testcontainers diagnostic for its Docker-optional fixture.
+- `GCP-002` is completed. Both foundations are now complete, so `GCP-003` is
+  ready for the continuous-delivery phase.
+
+## GCP-002 execution strategy — 2026-09-10
+
+- `GCP-002` advanced from `ready` to `in_progress`; it has no dependencies.
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+- Planner boundary: the Cloud Run Job uses an explicit application mode rather
+  than relying on incidental non-web JVM termination. Implementer boundary:
+  test-first bootstrap behavior and backend operational documentation only.
+  Evaluator boundary: migration mode must preserve normal API startup, avoid an
+  HTTP listener, and use Spring's exit path only after Flyway has initialized.
+
 ## GCP-001 closeout — 2026-09-10
 
 - Added `infra/gcp/bootstrap.sh` with a safe default `--plan` and an explicit
