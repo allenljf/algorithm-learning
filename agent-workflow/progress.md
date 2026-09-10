@@ -2,6 +2,100 @@
 
 The Flutter application root and backend composition root are complete.
 
+## GCP-001 closeout — 2026-09-10
+
+- Added `infra/gcp/bootstrap.sh` with a safe default `--plan` and an explicit
+  `--apply`. The script defines idempotent GCP API, custom VPC/private-service
+  access, private-IP PostgreSQL 16 Cloud SQL, Artifact Registry, empty Secret
+  Manager containers, dedicated runtime/deployer accounts, least-privilege IAM,
+  and GitHub repository/branch/environment-constrained WIF resources.
+- Added `infra/gcp/README.md`, which separates operator-only secret-value and
+  GitHub Environment setup from the script. Neither artifact reads, prints,
+  accepts, or commits a credential or secret value.
+- Task-limited verification passed exactly as contracted: `bash -n
+  infra/gcp/bootstrap.sh`; `bash infra/gcp/bootstrap.sh --help`; and `git diff
+  --check`.
+- `GCP-001` is completed. `GCP-002` remains ready in the same Delivery
+  foundations phase; `GCP-003` still waits for both foundations.
+
+## GCP-001 execution strategy — 2026-09-10
+
+- `GCP-001` advanced from `ready` to `in_progress` after dependency
+  reconciliation confirmed it has none.
+- Selected contract: `three-perspectives` / `test-candidates` / `update-docs`
+  / `infer`.
+- Planner boundary: a transparent, idempotent bootstrap plan/apply interface
+  that never accepts or prints secret values. Implementer boundary: only
+  `infra/gcp` bootstrap/runbook artifacts. Evaluator boundary: exact IAM/WIF
+  scope, private Cloud SQL topology, documented manual secret entry, and no
+  cloud-mutating command during this task.
+
+## GCP Cloud Run delivery work graph — 2026-09-10
+
+- `$work-graph` selected `three-perspectives` because GCP delivery crosses
+  GitHub OIDC, IAM, Cloud SQL private networking, Spring Boot migration
+  startup, and a production release boundary.
+- Created `specs/gcp-cloud-run-delivery/plan.md`,
+  `specs/gcp-cloud-run-delivery/tasks.md`, and the GCP dependency view in
+  `agent-workflow/WORK_GRAPH.md`; appended `GCP-001` through `GCP-004` to the
+  YAML source-of-truth graph.
+- `GCP-001` (idempotent bootstrap/runbook) and `GCP-002` (migration-only API
+  mode) are independently `ready`. `GCP-003` waits for both; `GCP-004` is the
+  only cloud-mutating first-release task and waits for the completed workflow
+  plus private user setup of GitHub Environment variables and Secret Manager
+  values.
+- No execution contract has been selected. Next action: choose one ready task
+  with `$execution-strategy`; the recommended first task is `GCP-001`.
+
+## GCP Cloud Run delivery spec governance — 2026-09-10
+
+- `$spec-governance` selected `update-docs + infer` and advanced
+  `gcp-cloud-run-delivery` to governed, ready for `$work-graph`.
+- Locked the WIF condition to `allenljf/algorithm-learning`, `refs/heads/main`,
+  and the `production` GitHub Environment. The WIF provider may impersonate
+  only the dedicated GitHub deploy service account; no long-lived GCP key is
+  allowed.
+- Replaced service-startup migration ambiguity with an explicit single Cloud
+  Run migration Job. It runs the API image non-web with Flyway enabled; the
+  deployed API service disables Flyway, and production releases are serialized.
+- Selected Cloud SQL PostgreSQL 16 with private IP, Direct VPC egress, seven-day
+  backup/PITR retention, a dedicated runtime account, least-privilege secret/
+  Cloud SQL access, and no Flutter browser CORS origin until a future hosting
+  feature supplies one.
+- `plan.md`, `tasks.md`, and a graph node remain absent. `$work-graph` is the
+  next phase and must create them before any deployment implementation.
+
+## GCP Cloud Run delivery workflow intake — 2026-09-10
+
+- The user selected actual GCP delivery for project `alert-study-508214-s5`
+  (project number `730295148186`) and approved the recommended Cloud Run +
+  Cloud SQL + Artifact Registry + Secret Manager + GitHub OIDC/WIF design.
+- Created `specs/gcp-cloud-run-delivery/spec.md` in `brainstorm` intake mode.
+  It explicitly forbids long-lived service-account keys and agent access to
+  secret values. The agreed identifiers are `asia-east1`, Artifact Registry
+  repository `algorithm-learning`, and Cloud Run service
+  `algorithm-learning-api`.
+- `gcp-cloud-run-delivery` has no `plan.md`, `tasks.md`, or graph node yet.
+  `$spec-governance` must confirm the WIF trust boundary, migration safety,
+  IAM roles, and first-deploy assumptions before `$work-graph` creates
+  implementation tasks.
+
+## Spaced-repetition workflow intake — 2026-09-10
+
+- The completed `algorithm-learning-platform` MVP has no ready task. Based on
+  the explicit roadmap in `requirement.md`, `$workflow-intake` selected the
+  next requirement as the post-MVP `spaced-repetition` feature in `brainstorm`
+  mode.
+- Created `specs/spaced-repetition/spec.md`. It proposes a deterministic,
+  server-owned `adaptive-v1` policy; forward-only immutable-event snapshots;
+  fixed-v1 history compatibility; and Flutter schedule context. Notifications,
+  AI, user-configurable policies, offline scheduling, and historical rewrites
+  are deliberately out of scope.
+- `spaced-repetition` has no `plan.md`, `tasks.md`, or `WORK_GRAPH.yaml` node
+  yet. Next workflow phase: `$spec-governance` must govern the policy,
+  migration, API, and UX assumptions before `$work-graph` is allowed to create
+  those artifacts.
+
 ## ALG-018 closeout — 2026-09-10
 
 - Added Flutter's `integration_test` harness and a stateful, test-only

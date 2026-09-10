@@ -219,3 +219,53 @@ tasks:
     spec_refs: ["4.1-4.3", "5", "10", "11", "14-17", "AC-AUTH-01..04", "AC-PROB-01..05", "AC-SOL-01..02", "AC-TAG-01..02", "AC-REV-01..04", "AC-DASH-01..02", "AC-OPS-01..03", "AC-QUAL-01"]
     execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification: ["cd services/api && ./mvnw -q verify", "cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test", "cd apps/learning_app && flutter test integration_test", "python3 flutter-dev-guide/tools/check-rules.py --staged", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]
+  - id: GCP-001
+    title: Add idempotent GCP bootstrap tooling and secret-safe runbook
+    status: completed
+    depends_on: []
+    parallel_group: delivery-foundations
+    spec_refs: ["2", "3", "4.1-4.2", "AC-GCP-01..02", "AC-GCP-04", "AC-GCP-06..07", "6-8"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Build a reviewable --plan/--apply bootstrap script and runbook. It defines
+      private Cloud SQL networking, Artifact Registry, Secret Manager containers,
+      dedicated accounts, and repository/branch/environment-constrained WIF;
+      it must never create, accept, echo, or commit a secret value.
+    verification: ["bash -n infra/gcp/bootstrap.sh", "bash infra/gcp/bootstrap.sh --help", "git diff --check"]
+  - id: GCP-002
+    title: Make the API image complete in migration-only Cloud Run Job mode
+    status: ready
+    depends_on: []
+    parallel_group: delivery-foundations
+    spec_refs: ["2", "3", "AC-GCP-03", "AC-GCP-05", "AC-GCP-07", "6-8"]
+    execution_contract: null
+    implementation_strategy: >-
+      Establish a tested non-web migration-only startup path. It applies Flyway
+      once and exits for a Cloud Run Job; normal API service startup remains
+      Flyway-disabled in production and otherwise unchanged.
+    verification: ["cd services/api && ./mvnw -q test -Dtest='*MigrationModeTest'", "cd services/api && ./mvnw -q test"]
+  - id: GCP-003
+    title: Add the OIDC Cloud Run migration and deployment workflow
+    status: pending
+    depends_on: [GCP-001, GCP-002]
+    parallel_group: continuous-delivery
+    spec_refs: ["2", "3", "4.1-4.2", "AC-GCP-01..07", "6-8"]
+    execution_contract: null
+    implementation_strategy: >-
+      Use SHA-pinned actions and GitHub OIDC only. Serialize production runs,
+      test/build/push an immutable image, wait for the migration Job, deploy
+      the service with Flyway disabled, verify readiness, and document rollback.
+    verification: ["python3 -c \"from pathlib import Path; text = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'id-token: write' in text and 'GCP_SA_KEY' not in text and 'concurrency:' in text and 'SPRING_FLYWAY_ENABLED=false' in text\"", "git diff --check"]
+  - id: GCP-004
+    title: Provision and verify the first GCP production release
+    status: pending
+    depends_on: [GCP-003]
+    parallel_group: production-release
+    spec_refs: ["2", "4", "AC-GCP-01..07", "6-8"]
+    execution_contract: null
+    implementation_strategy: >-
+      Only after the user has configured GitHub Environment variables and
+      created Secret Manager values privately, apply the reviewed bootstrap,
+      execute exactly one migration Job, deploy the service, collect readiness
+      evidence, and record a revision-based rollback path.
+    verification: ["bash infra/gcp/bootstrap.sh --apply", "gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait", "gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'", "curl --fail --retry 12 --retry-delay 5 \"$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness\""]

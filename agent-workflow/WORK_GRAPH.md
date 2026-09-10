@@ -70,3 +70,22 @@ flowchart TD
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.
+
+# GCP Cloud Run Delivery — Dependency Graph
+
+```mermaid
+flowchart TD
+  G1[GCP-001 Bootstrap tooling and runbook\ncompleted]
+  G2[GCP-002 Migration-only API mode\nready]
+  G3[GCP-003 OIDC deployment workflow\npending]
+  G4[GCP-004 First controlled GCP release\npending]
+
+  G1 --> G3
+  G2 --> G3
+  G3 --> G4
+```
+
+`GCP-001` is completed. `GCP-002` remains ready and has a non-overlapping API
+file boundary. `GCP-004` is the sole GCP-mutating task and cannot begin before
+the bootstrap/workflow artifacts are complete and the user has privately
+configured the approved GCP and GitHub Environment values.
