@@ -1,0 +1,46 @@
+name: algorithm-learning
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - path: ./env/.env
+        required: true
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - application
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    env_file:
+      - path: ./env/.env
+        required: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - application
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
+networks:
+  application:
+    driver: bridge
+
+volumes:
+  postgres-data:

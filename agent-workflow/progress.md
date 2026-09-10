@@ -2,6 +2,74 @@
 
 The Flutter application root and backend composition root are complete.
 
+## ALG-016 work-graph and execution strategy — 2026-09-10
+
+- `$work-graph` synchronization confirmed that all four dependencies
+  (`ALG-002`, `ALG-004`, `ALG-005`, and `ALG-010`) are completed, so ALG-016
+  advanced from `pending` to `ready`.
+- Selected contract: `three-perspectives` / `test-candidates` /
+  `update-docs` / `infer`; status is now `in_progress`.
+- Planner: Compose remains a two-service local topology with PostgreSQL as the
+  sole durable store and Flyway running once at API startup. Implementer: add a
+  reproducible API image, named DB volume, startup/readiness health checks, and
+  an ignored local environment file workflow. Evaluator: no secrets enter git,
+  API logs retain their existing redaction policy, and the documented lifecycle
+  must satisfy every task-limited Compose command.
+
+## ALG-016 recovery evidence — 2026-09-10
+
+- The first required verification command,
+  `docker compose -f infra/compose.yaml config`, could not start because this
+  host's Docker CLI has no Compose plugin: it returned `unknown shorthand flag:
+  'f' in -f`. `docker-compose` is also absent, while the Docker daemon itself
+  is healthy (`29.5.2`, `overlayfs`).
+- This is an unavailable local verification dependency, not a Compose-file or
+  application failure. ALG-016 remains `in_progress`; no task closeout or
+  commit was made. Once Docker Compose v2 is installed, rerun the four exact
+  task commands in order, beginning with `docker compose -f infra/compose.yaml
+  config`.
+
+## ALG-016 recovery attempt 1 — 2026-09-10
+
+- Docker Compose v2.5.5.1 was installed with Homebrew and configured as a Docker
+  CLI plugin. `docker compose -f infra/compose.yaml config` then passed, and
+  PostgreSQL became healthy during `up -d --build`.
+- Diagnosis: the API stopped before its readiness check because Hibernate schema
+  validation expected `varchar` for `users.email`, while the Flyway-owned schema
+  correctly uses PostgreSQL `citext`.
+- Change: declare the JPA email column as PostgreSQL `citext`, matching the
+  existing migration and preserving database-managed case-insensitive email
+  uniqueness. The next attempt will rebuild the API and rerun the exact Compose
+  commands.
+
+## ALG-016 recovery attempt 2 — 2026-09-10
+
+- The rebuilt API passed Flyway and schema validation but then failed during
+  transaction-proxy creation: Spring cannot subclass a `final` application
+  service containing `@Transactional` methods.
+- Change: make the transaction-owning Auth, Tag, Problem, Solution, and Review
+  application services proxyable. This preserves their public contracts and
+  allows Spring's class-based transaction proxies to apply at the declared
+  application-service boundary.
+
+## ALG-016 closeout — 2026-09-10
+
+- Delivered `infra/compose.yaml`, a multi-stage Java 21 API image, an ignored
+  local environment-file workflow with a tracked non-secret example, and local
+  operational documentation. Compose uses an isolated application network, a
+  named PostgreSQL volume, PostgreSQL/API health checks, and a dependency gate
+  so Flyway runs once at API startup after PostgreSQL is healthy.
+- Recovery exposed and corrected two production-startup seams: Hibernate now
+  declares `users.email` as PostgreSQL `citext`, and transaction-owning
+  application services are proxyable by Spring.
+- Task-limited verification passed exactly as contracted:
+  `docker compose -f infra/compose.yaml config`; `docker compose -f
+  infra/compose.yaml up -d --build`; `docker compose -f infra/compose.yaml ps`
+  (both services healthy); and `docker compose -f infra/compose.yaml down`.
+- The user supplied a repository-local Git identity and the required commit was
+  created. `ALG-016` is completed; `ALG-017` is now ready in the same
+  operations phase.
+
 ## ALG-015 closeout — 2026-09-02
 
 - Added provider-injected dashboard/home states for loading, retry, no-data and

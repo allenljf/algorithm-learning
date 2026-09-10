@@ -1,6 +1,6 @@
 package dev.algorithmlearning.api.problems.application;
 import java.time.Instant; import java.util.*; import org.springframework.transaction.annotation.Transactional;
-public final class SolutionService { private final ProblemRepository problems; private final SolutionRepository solutions; public SolutionService(ProblemRepository problems,SolutionRepository solutions){this.problems=problems;this.solutions=solutions;}
+public class SolutionService { private final ProblemRepository problems; private final SolutionRepository solutions; public SolutionService(ProblemRepository problems,SolutionRepository solutions){this.problems=problems;this.solutions=solutions;}
  @Transactional public Solution create(UUID owner,UUID problemId,SolutionWrite write){if(problems.findByIdAndUserId(problemId,owner).isEmpty())throw new NoSuchElementException();return solutions.save(from(UUID.randomUUID(),problemId,write,Instant.now(),Instant.now()));}
  public List<Solution> list(UUID owner,UUID problemId){return problems.findByIdAndUserId(problemId,owner).isEmpty()?List.of():solutions.findAllByProblemId(problemId);}
  public Optional<Solution> findById(UUID owner,UUID id){return solutions.findByIdAndUserId(id,owner);}

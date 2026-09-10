@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
-public final class AuthService {
+public class AuthService {
     private final AuthUserRepository users;
     private final AuthSessionService sessions;
     private final Argon2PasswordHasher passwords;

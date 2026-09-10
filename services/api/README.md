@@ -53,4 +53,10 @@ whitespace-collapsed, and case-folded for owner-local idempotency. A new tag
 returns `201` with `Location`; a normalized duplicate returns the existing tag
 with `200`. `GET /api/v1/tags?q=...` searches only the caller's tags.
 
-Docker Compose is introduced by ALG-016.
+## Docker Compose
+
+For the full local API and PostgreSQL lifecycle, follow the instructions in
+[`infra/README.md`](../../infra/README.md). Compose builds this Dockerfile,
+waits for PostgreSQL to become healthy, then starts the API so Flyway applies
+forward migrations before Hibernate validates the schema. API readiness is
+available at `/actuator/health/readiness`.

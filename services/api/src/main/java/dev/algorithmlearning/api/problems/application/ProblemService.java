@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
-public final class ProblemService {
+public class ProblemService {
     private final ProblemRepository problems;
     private final TagRepository tags;
     private final Clock clock;

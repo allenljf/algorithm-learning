@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
-public final class TagService {
+public class TagService {
     private final TagRepository tags;
     private final Clock clock;
 

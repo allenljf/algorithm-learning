@@ -247,8 +247,10 @@ human-readable execution contract. Select the per-task execution contract with
 - Depends on: ALG-002, ALG-004, ALG-005, ALG-010
 - Parallel group: `operations`
 - Spec refs: 5 AC-OPS-01..03, 11.3, 14.1, 15, 16.1
+- Execution contract: `three-perspectives` analysis; `test-candidates` test
+  approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `docker compose -f infra/compose.yaml config`; `docker compose -f infra/compose.yaml up -d --build`; `docker compose -f infra/compose.yaml ps`; `docker compose -f infra/compose.yaml down`
-- Status: pending
+- Status: completed
 
 ### ALG-017 — Document the Kubernetes deployment target
 

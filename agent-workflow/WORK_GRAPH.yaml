@@ -189,10 +189,15 @@ tasks:
     verification: ["cd apps/learning_app && flutter analyze", "cd apps/learning_app && flutter test test/features/dashboard/presentation"]
   - id: ALG-016
     title: Deliver local Docker Compose and operational documentation
-    status: pending
+    status: completed
     depends_on: [ALG-002, ALG-004, ALG-005, ALG-010]
     parallel_group: operations
     spec_refs: ["AC-OPS-01..03", "11.3", "14.1", "15", "16.1"]
+    execution_contract:
+      analysis: three-perspectives
+      test_approach: test-candidates
+      documentation: update-docs
+      ambiguity: infer
     verification: ["docker compose -f infra/compose.yaml config", "docker compose -f infra/compose.yaml up -d --build", "docker compose -f infra/compose.yaml ps", "docker compose -f infra/compose.yaml down"]
   - id: ALG-017
     title: Document the Kubernetes deployment target

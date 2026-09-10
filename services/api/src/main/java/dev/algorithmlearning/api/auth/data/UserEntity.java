@@ -11,7 +11,7 @@ import java.util.UUID;
 @Table(name = "users")
 class UserEntity {
     @Id UUID id;
-    @Column(nullable = false) String email;
+    @Column(nullable = false, columnDefinition = "citext") String email;
     @Column(name = "password_hash", nullable = false) String passwordHash;
     @Column(name = "created_at", nullable = false) Instant createdAt;
 
