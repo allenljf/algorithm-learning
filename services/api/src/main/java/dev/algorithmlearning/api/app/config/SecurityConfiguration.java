@@ -23,6 +23,7 @@ import dev.algorithmlearning.api.reviews.application.ReviewRepository;
 import dev.algorithmlearning.api.reviews.application.ReviewService;
 import dev.algorithmlearning.api.dashboard.application.DashboardRepository;
 import dev.algorithmlearning.api.dashboard.application.DashboardService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -39,6 +40,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 class SecurityConfiguration {
 
     @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -53,6 +55,7 @@ class SecurityConfiguration {
     }
 
     @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     CorsConfigurationSource corsConfigurationSource(ApiProperties apiProperties) {
         var configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(apiProperties.cors().allowedOrigins());

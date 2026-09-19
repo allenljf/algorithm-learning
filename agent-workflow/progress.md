@@ -2,6 +2,30 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NEO-003 recovery evidence — 2026-09-19
+
+- Round 1 (bootstrap): `bash infra/gcp/bootstrap.sh --apply` failed creating the
+  deploy service account because `algorithm-learning-github-deployer` is 35
+  characters (GCP limit 30). Renamed it to `algorithm-learning-deployer` in
+  `infra/gcp/bootstrap.sh`, `infra/gcp/README.md`, and
+  `specs/neon-cloud-run-delivery/spec.md`, and updated the GitHub `production`
+  variable `GCP_DEPLOY_SERVICE_ACCOUNT`. Re-ran `--apply`.
+- Round 2 (bootstrap): `--apply` then failed creating the WIF provider because
+  the display name `Algorithm Learning GitHub Actions` is 33 characters (limit
+  32). Shortened it to `Algorithm Learning GitHub`; `--apply` then completed and
+  created the runtime/deploy accounts, the WIF pool and provider, the Artifact
+  Registry repository, and the IAM bindings.
+- Round 3 (first release): the pushed `main` workflow passed Verify API and the
+  image build, deployed the migration Job, and Flyway migrated successfully
+  against the Neon direct endpoint, but the Job then exited 1: with
+  `APP_MIGRATION_ONLY=true` the non-web context still created
+  `apiSecurityFilterChain`, which requires an `HttpSecurity` bean that does not
+  exist outside a servlet context. Made `apiSecurityFilterChain` and
+  `corsConfigurationSource` `@ConditionalOnWebApplication(type = SERVLET)` so
+  migration-only startup keeps the service beans but no servlet security chain,
+  and added `SecurityConfigurationMigrationModeTest`
+  (`./mvnw -o test -Dtest='SecurityConfigurationMigrationModeTest'` passes).
+
 ## NEO-003 execution strategy — 2026-09-19
 
 - Dependency reconciliation confirmed `NEO-002` is completed; `NEO-003` advanced
