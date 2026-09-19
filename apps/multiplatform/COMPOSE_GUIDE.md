@@ -89,7 +89,8 @@ Chinese. Do not hard-code display strings in composables; add them to
   Compose structure tests that render a screen live in
   `composeApp/src/wasmJsTest` and run under `wasmJsBrowserTest`, because Compose
   Multiplatform cannot run common UI tests through the Android local test
-  configuration; they must not be placed in `commonTest`.
+  configuration; they must not be placed in `commonTest`. The release acceptance
+  suite follows the same split; see section 14.
 
 ## 7. Versions and build
 
@@ -354,3 +355,41 @@ Testing seams:
   behavior.
 - `DashboardScreenUiTest` renders each state and asserts the totals,
   distribution, and due count.
+
+## 14. Cross-platform acceptance
+
+CMP-007 adds the release acceptance suite. It exercises all four experiences
+against one stateful, test-only controlled API adapter at the shared repository
+boundary, without a network or a running backend.
+
+```text
+composeApp/
+  commonTest/kotlin/com/algorithmlearning/app/acceptance/
+    ControlledApiAdapter.kt   # stateful fake over AuthRepository + library repos
+    ComposeAcceptanceTest.kt  # cross-experience journey (Android + Wasm)
+  wasmJsTest/kotlin/com/algorithmlearning/app/acceptance/
+    AcceptanceUiTest.kt       # rendered Compose journeys (wasmJsBrowserTest)
+```
+
+Rules:
+
+1. `ControlledApiAdapter` implements the existing `AuthRepository`,
+   `ProblemRepository`, `TagRepository`, `SolutionRepository`,
+   `ReviewRepository`, and `DashboardRepository` contracts over in-memory state.
+   It lives in `commonTest`, is never shipped, and returns defensive copies so a
+   caller cannot observe or mutate adapter internals.
+2. One adapter instance is shared across experiences in a journey, so a create,
+   edit, or review is visible to the list, the due review, and the dashboard.
+   `ComposeAcceptanceTest` runs from `commonTest`, so the same journey executes
+   on Android (`testDebugUnitTest`) and Web (`wasmJsBrowserTest`).
+3. `AcceptanceUiTest` renders the real stateless screens bound to the real view
+   models and the same adapter, and drives each experience through the UI:
+   register, create a problem and solution, reveal/submit a review, and read the
+   dashboard aggregate.
+4. Owner isolation, authorization, and transport/status mapping remain API and
+   data-layer concerns; the Compose acceptance adapter verifies only client
+   behavior at its injected repository boundary. Every user-visible string still
+   resolves through `AppStrings`.
+
+Verification for this layer is the release task's `./gradlew
+:composeApp:assembleDebug` and `./gradlew :composeApp:allTests`.

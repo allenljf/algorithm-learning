@@ -98,7 +98,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `test-candidates` test
   approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### CMP-008 — Retire the Flutter client and record migration notes
 

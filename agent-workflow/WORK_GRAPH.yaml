@@ -401,7 +401,7 @@ tasks:
       - git diff --check
   - id: CMP-007
     title: Run cross-platform acceptance for the Compose client
-    status: ready
+    status: completed
     depends_on: [CMP-004, CMP-005, CMP-006]
     parallel_group: cmp-release
     spec_refs: ["4", "AC-CMP-01..06"]
@@ -415,7 +415,7 @@ tasks:
       - git diff --check
   - id: CMP-008
     title: Retire the Flutter client and record migration notes
-    status: pending
+    status: ready
     depends_on: [CMP-007]
     parallel_group: cmp-release
     spec_refs: ["4", "AC-CMP-07", "7"]

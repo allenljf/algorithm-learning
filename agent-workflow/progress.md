@@ -2,6 +2,57 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-007 closeout — 2026-09-19
+
+- Added the cross-platform acceptance suite in `composeApp`. The test-only
+  `ControlledApiAdapter` (`commonTest/.../acceptance`) implements the existing
+  `AuthRepository`, `ProblemRepository`, `TagRepository`, `SolutionRepository`,
+  `ReviewRepository`, and `DashboardRepository` contracts over in-memory state,
+  returning defensive copies so callers cannot observe or mutate its internals.
+  It never ships and adds no production behavior.
+- `ComposeAcceptanceTest` (`commonTest`) runs one shared-session journey on
+  Android and Web: register, start from an empty library, create a tagged
+  problem, add a solution, search/filter, work the ordered Review Mode and
+  submit a confidence, then read the dashboard aggregate the journey produced
+  (total 1, hard 1, due 0) and sign out.
+- `AcceptanceUiTest` (`wasmJsTest`) renders the real stateless screens bound to
+  the real view models and the same adapter, driving each experience through the
+  UI: register through the form, create a problem and solution, reveal in order
+  and submit a review, and read the dashboard totals/distribution/due count.
+- `update-docs`: added `COMPOSE_GUIDE.md` section 14 (cross-platform acceptance
+  rules and the `commonTest`/`wasmJsTest` split) and extended
+  `infra/acceptance/README.md` with the Compose client acceptance boundary and
+  evidence mapping. Owner isolation, authorization, and status mapping remain
+  with the API and data-layer suites.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug` (BUILD
+  SUCCESSFUL); `cd apps/multiplatform && ./gradlew :composeApp:allTests`
+  (Android `testDebugUnitTest` 29 tests, Wasm `wasmJsBrowserTest` 48 tests, 0
+  failures); `git diff --check` clean.
+- Evaluator conclusions: the adapter is test-only and no composable reads a
+  repository; the four experiences share one coherent session through the
+  injected contracts; every user-visible string resolves through `AppStrings`;
+  the closeout commit is local only.
+- `CMP-007` is completed. `CMP-008` (retire the Flutter client) is now ready in
+  the same Phase 4 — Release group.
+
+## CMP-007 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-004`, `CMP-005`, and `CMP-006` are
+  completed; `CMP-007` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Planner boundary: one cross-platform acceptance suite that exercises the four
+  experiences (auth, problem management, browse/staged Review Mode, dashboard)
+  against a controlled, stateful API adapter over the shared repository
+  contracts, running on Android and Web. Implementer boundary:
+  `apps/multiplatform/composeApp` test source sets and the acceptance/guide
+  documentation. Evaluator boundary: the adapter is test-only, no production
+  composable reads a repository, every user-visible string resolves through
+  `AppStrings`, and the exact task verification passes.
+- `update-docs`: record the acceptance suite boundary in `COMPOSE_GUIDE.md` and
+  `infra/acceptance/README.md`.
+
 ## CMP-006 closeout — 2026-09-19
 
 - Implemented the dashboard/home experience in `composeApp` `commonMain` under

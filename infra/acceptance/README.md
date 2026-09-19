@@ -34,6 +34,31 @@ owners and asserts that owner-scoped queries do not return another user's
 records. The Flutter harness does not emulate authorization; it verifies only
 the client behavior at its injected repository boundary.
 
+## Compose client acceptance boundary
+
+`CMP-007` repeats this boundary for the Kotlin Compose Multiplatform client in
+`apps/multiplatform`. It adds a stateful, test-only controlled API adapter
+(`composeApp/src/commonTest/.../acceptance/ControlledApiAdapter.kt`) over the
+existing shared repository contracts, so no test behavior enters production
+code.
+
+- `ComposeAcceptanceTest` (`commonTest`) runs the same four-experience journey on
+  Android (`testDebugUnitTest`) and Web (`wasmJsBrowserTest`): register, create
+  and search a problem with a tag and solution, reveal and submit a staged
+  review, then read the dashboard aggregate the journey produced.
+- `AcceptanceUiTest` (`wasmJsTest`, `wasmJsBrowserTest`) renders the real
+  stateless screens against the same adapter and drives each experience through
+  the UI.
+- The acceptance adapter verifies only client behavior at its injected
+  repository boundary; owner isolation, authorization, and status mapping stay
+  with the API and data-layer suites.
+
+| Compose evidence | Acceptance covered |
+|---|---|
+| `apps/multiplatform && ./gradlew :composeApp:allTests` | Auth, problem management, browse/staged Review Mode, and dashboard presentation behavior plus their shared-session integration on Android and Web. |
+| `apps/multiplatform && ./gradlew :composeApp:assembleDebug` | The shared `commonMain` Compose client builds for Android. |
+| `apps/multiplatform/COMPOSE_GUIDE.md` | The client follows its architecture, DI, data, and testing contract (AC-CMP-02). |
+
 ## Required release commands
 
 Run the exact ALG-018 verification list from the repository root. The Compose
