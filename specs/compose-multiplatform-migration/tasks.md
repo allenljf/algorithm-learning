@@ -33,7 +33,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### CMP-003 — Implement shared problem-library, review, and dashboard data flows
 
@@ -46,7 +46,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ## Phase 3 — Experiences
 

@@ -107,8 +107,8 @@ flowchart TD
 ```mermaid
 flowchart TD
   C1[CMP-001 Compose MP root + guide\ncompleted]
-  C2[CMP-002 Auth/session data\nready]
-  C3[CMP-003 Library/review/dashboard data\npending]
+  C2[CMP-002 Auth/session data\ncompleted]
+  C3[CMP-003 Library/review/dashboard data\nready]
   A5[ALG-005 Auth API\ncompleted]
   A7[ALG-007..010 Library APIs\ncompleted]
   C4[CMP-004 Auth + problem UI\npending]

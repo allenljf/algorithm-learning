@@ -119,3 +119,50 @@ application shell; do that as a deliberate change, not incidentally.
 3. Platform-specific code is limited to the HTTP engine, storage, and DI actuals.
 4. The REST contract is frozen; adapt the client, never the API.
 5. Keep `commonMain` free of `android.*` and browser APIs.
+
+## 9. Auth/session data flow
+
+The auth stack lives in `shared` under `com.algorithmlearning.shared.auth`,
+adapting the frozen `/api/v1/auth` contract. It is the template every later data
+task follows.
+
+```text
+auth/
+  AuthModels.kt          # AuthUser, AuthSession, AccessToken, AuthState
+  AuthFailure.kt         # AuthFailure + AuthFailureKind
+  AuthRemote.kt          # transport contract (register/login/refresh/me/logout)
+  AuthRepository.kt      # application contract (login/register/restore/...)
+  RemoteAuthRepository.kt# in-memory token + single-flight refresh
+  AuthSessionHolder.kt   # StateFlow<AuthState> for the UI
+  data/                  # DTOs, mappers, KtorAuthRemote, client factory
+```
+
+Rules:
+
+1. The access token lives only in `RemoteAuthRepository` memory. It is never
+   persisted and never crosses into `composeApp`; screens read `AuthState`.
+2. The refresh token is an HttpOnly cookie owned by the transport. Android
+   installs `HttpCookies` in its engine actual; the Wasm build relies on the
+   browser cookie jar. Platform cookie persistence to secure storage is a
+   separate storage concern.
+3. Refresh is single-flight: `RemoteAuthRepository` serializes it behind a
+   `Mutex` and re-checks the token, so concurrent `401` handling produces one
+   rotation. `AuthSessionHolder.restore()` coalesces app-start restores the same
+   way.
+4. `AuthFailure`/`AuthFailureKind` is the only error type that leaves the data
+   layer; `KtorAuthRemote` maps statuses and transport errors to it.
+5. Consumers of authenticated endpoints call `authRepository.accessToken()` and
+   send `Authorization: Bearer <token>`, calling `invalidateAccessToken()` after
+   a `401` so the next call refreshes. `CMP-003` repositories must take
+   `AuthRepository` (or a token provider) through their constructor.
+6. `AppContainer` is the only place that builds the stack. It takes `baseUrl`,
+   `httpClient`, and `clock` as constructor parameters; tests pass a fake
+   `AuthRemote`/`HttpClient` and a fixed `Clock` instead of using a locator.
+
+Testing seams:
+
+- `FakeAuthRemote` (commonTest) scripts results, failures, call counts, and a
+  refresh gate for single-flight assertions.
+- `KtorAuthRemote` tests drive a Ktor `MockEngine` to assert routes, the bearer
+  header, DTO mapping, and status-to-`AuthFailureKind` mapping without a network.
+- Auth data-flow tests run under `:shared:allTests` on Android and Wasm.

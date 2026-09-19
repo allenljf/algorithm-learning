@@ -2,6 +2,54 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-002 closeout — 2026-09-19
+
+- Implemented the shared auth/session data flow in `shared` `commonMain` under
+  `com.algorithmlearning.shared.auth`: immutable `AuthUser`/`AuthSession`/
+  `AccessToken`/`AuthState`, the `AuthRemote` transport contract, the
+  `AuthRepository` application contract, `RemoteAuthRepository` with an
+  in-memory access token and mutex-serialized single-flight refresh, and
+  `AuthSessionHolder` exposing a coalesced-restore `StateFlow<AuthState>`.
+- Added the Ktor data layer: `auth/data` DTOs and mappers, `KtorAuthRemote` for
+  the frozen `/api/v1/auth` routes (`register`, `login`, `refresh`, `me`,
+  `logout`) with status/transport-to-`AuthFailure` mapping, and an
+  `expect fun createAuthHttpClient()` with an OkHttp (`HttpCookies`) Android
+  actual and a `Js` Wasm actual. DTOs stay internal to the data layer.
+- Wired the stack through `AppContainer`, whose `baseUrl`, `httpClient`, and
+  `clock` are constructor seams; no service locator is used. Added tests
+  authored before implementation: `FakeAuthRemote`, model tests, repository
+  single-flight/expiry/restore/logout tests, session-holder coalescing tests,
+  and `MockEngine` tests for routes, bearer auth, DTO mapping, and error kinds.
+- `update-docs`: extended `COMPOSE_GUIDE.md` with a section 9 describing the
+  auth/session data flow, DI seams, and testing strategy.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :shared:allTests` (Android
+  `testDebugUnitTest` and `wasmJsBrowserTest` both green: 7 existing plus 30 new
+  auth tests per target); `git diff --check` clean. `kotlinWasmUpgradeYarnLock`
+  ran once as required build maintenance because the Ktor JS engine changed
+  `kotlin-js-store/wasm/yarn.lock`.
+- Evaluator conclusions: no DTO, HTTP error, or Ktor type reaches `composeApp`;
+  `commonMain` contains no `android.*` or browser API; concurrent expired-token
+  callers collapse to one refresh; the closeout commit is local only.
+- `CMP-002` is completed; `CMP-003` (library/review/dashboard data flows) is now
+  the only `ready` task and shares Phase 2 with `CMP-002`.
+
+## CMP-002 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-001` and `ALG-005` are completed;
+  `CMP-002` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `tdd` / `update-docs` / `infer`.
+- Planner boundary: one commonMain auth/session data flow (Ktor remote contract,
+  in-memory access token, single-flight refresh, session state holder) adapting
+  to the frozen `/api/v1/auth` REST contract, with platform HTTP engines as the
+  only actuals. Implementer boundary: `apps/multiplatform/shared` and the
+  Compose guide. Evaluator boundary: DTOs stay in the data layer, no
+  `android.*`/browser types in commonMain, concurrent refresh collapses to one
+  rotation, and the exact task verification passes.
+- `update-docs`: extend `COMPOSE_GUIDE.md` with the auth/session data-flow
+  contract and testing seams.
+
 ## NEO-003 closeout — 2026-09-19
 
 - Provisioned the GCP foundation in `alert-study-508214-s5`: enabled the
