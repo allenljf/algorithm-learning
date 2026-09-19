@@ -321,3 +321,36 @@ Testing seams:
   gating, notes trimming, solution switching, and failure handling.
 - `ReviewScreenUiTest` drives the real view model through the stateless UI to
   prove the ordered reveal, gated submit, and the adaptive two-pane layout.
+
+## 13. Dashboard presentation
+
+CMP-006 adds the dashboard/home aggregate:
+
+```text
+composeApp/src/commonMain/kotlin/com/algorithmlearning/app/dashboard/
+  DashboardViewModel.kt  # DashboardState (loading/content/failed)
+  DashboardScreen.kt     # totals, difficulty distribution, due count + DashboardActions
+```
+
+Rules:
+
+1. `DashboardViewModel` depends only on the counts-only `DashboardRepository`
+   and maps `ApiFailure` to `ApiFailureKind`; it holds no strings and no HTTP
+   type.
+2. `DashboardScreen` renders the loading spinner, a failed state with retry, a
+   no-data state with an "add problem" action when `totalProblems == 0`, and
+   the populated totals, per-difficulty distribution, and due-review count. The
+   distribution bars use the counts as proportions of the total.
+3. `App` reloads the aggregate each time the Dashboard destination becomes
+   current (`LaunchedEffect(current)`), so the due count reflects a review
+   submitted in the Review tab. The empty-state action switches to the Problems
+   destination with a new draft.
+4. Every user-visible string resolves through `AppStrings`.
+
+Testing seams:
+
+- `FakeDashboardRepository` scripts the aggregate and counts calls.
+- `DashboardViewModelTest` proves the content, failure/retry, and reload
+  behavior.
+- `DashboardScreenUiTest` renders each state and asserts the totals,
+  distribution, and due count.

@@ -102,6 +102,11 @@ data class AppStrings(
     val reviewExitAction: String,
     val reviewSelectPrompt: String,
     val problemReviewAction: String,
+    val dashboardTotalLabel: String,
+    val dashboardDifficultyLabel: String,
+    val dashboardDueReviewsLabel: String,
+    val dashboardEmptyMessage: String,
+    val dashboardLoadFailureMessage: String,
 )
 
 object StringCatalog {
@@ -204,6 +209,11 @@ object StringCatalog {
             reviewExitAction = "Back to review list",
             reviewSelectPrompt = "Select a problem to review",
             problemReviewAction = "Review problem",
+            dashboardTotalLabel = "Total problems",
+            dashboardDifficultyLabel = "Difficulty distribution",
+            dashboardDueReviewsLabel = "Due reviews",
+            dashboardEmptyMessage = "Add your first problem",
+            dashboardLoadFailureMessage = "Unable to load the dashboard",
         )
         AppLanguage.TRADITIONAL_CHINESE -> AppStrings(
             appName = "演算法學習",
@@ -303,6 +313,11 @@ object StringCatalog {
             reviewExitAction = "返回複習列表",
             reviewSelectPrompt = "選擇要複習的題目",
             problemReviewAction = "複習題目",
+            dashboardTotalLabel = "題目總數",
+            dashboardDifficultyLabel = "難度分布",
+            dashboardDueReviewsLabel = "待複習",
+            dashboardEmptyMessage = "新增第一道題目",
+            dashboardLoadFailureMessage = "無法載入儀表板",
         )
     }
 }

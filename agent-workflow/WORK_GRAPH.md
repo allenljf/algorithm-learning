@@ -113,8 +113,8 @@ flowchart TD
   A7[ALG-007..010 Library APIs\ncompleted]
   C4[CMP-004 Auth + problem UI\ncompleted]
   C5[CMP-005 Browse + Review Mode UI\ncompleted]
-  C6[CMP-006 Dashboard/home UI\nready]
-  C7[CMP-007 Cross-platform acceptance\npending]
+  C6[CMP-006 Dashboard/home UI\ncompleted]
+  C7[CMP-007 Cross-platform acceptance\nready]
   C8[CMP-008 Retire Flutter client\npending]
 
   C1 --> C2

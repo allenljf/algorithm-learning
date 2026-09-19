@@ -388,7 +388,7 @@ tasks:
       - git diff --check
   - id: CMP-006
     title: Build dashboard and home UI
-    status: ready
+    status: completed
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-06", "5-6"]
@@ -401,7 +401,7 @@ tasks:
       - git diff --check
   - id: CMP-007
     title: Run cross-platform acceptance for the Compose client
-    status: pending
+    status: ready
     depends_on: [CMP-004, CMP-005, CMP-006]
     parallel_group: cmp-release
     spec_refs: ["4", "AC-CMP-01..06"]

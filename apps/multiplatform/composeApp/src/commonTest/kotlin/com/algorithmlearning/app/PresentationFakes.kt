@@ -3,6 +3,8 @@ package com.algorithmlearning.app
 import com.algorithmlearning.shared.auth.AuthRepository
 import com.algorithmlearning.shared.auth.AuthSession
 import com.algorithmlearning.shared.auth.AuthUser
+import com.algorithmlearning.shared.library.Dashboard
+import com.algorithmlearning.shared.library.DashboardRepository
 import com.algorithmlearning.shared.library.Page
 import com.algorithmlearning.shared.library.ProblemDetail
 import com.algorithmlearning.shared.library.ProblemDifficulty
@@ -178,6 +180,30 @@ class FakeTagRepository : TagRepository {
     override suspend fun create(name: String): Tag {
         created += name
         return createHandler(name)
+    }
+}
+
+fun dashboard(
+    totalProblems: Long = 2,
+    easy: Long = 1,
+    medium: Long = 1,
+    hard: Long = 0,
+    dueReviewCount: Long = 1,
+): Dashboard = Dashboard(
+    totalProblems = totalProblems,
+    easy = easy,
+    medium = medium,
+    hard = hard,
+    dueReviewCount = dueReviewCount,
+)
+
+class FakeDashboardRepository : DashboardRepository {
+    var handler: suspend () -> Dashboard = { dashboard() }
+    var calls = 0
+
+    override suspend fun get(): Dashboard {
+        calls++
+        return handler()
     }
 }
 

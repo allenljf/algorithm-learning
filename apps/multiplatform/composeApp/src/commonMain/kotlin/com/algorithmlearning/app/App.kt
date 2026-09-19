@@ -31,6 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.algorithmlearning.app.auth.AuthScreen
 import com.algorithmlearning.app.auth.AuthViewModel
+import com.algorithmlearning.app.dashboard.DashboardActions
+import com.algorithmlearning.app.dashboard.DashboardScreen
+import com.algorithmlearning.app.dashboard.DashboardViewModel
 import com.algorithmlearning.app.problems.ProblemsActions
 import com.algorithmlearning.app.problems.ProblemsScreen
 import com.algorithmlearning.app.problems.ProblemsViewModel
@@ -126,14 +129,23 @@ private fun SignedInApp(
         )
     }
 
+    val dashboardViewModel = remember(container) {
+        DashboardViewModel(dashboard = container.dashboardRepository, scope = scope)
+    }
+
     val problemsState by problemsViewModel.state.collectAsState()
     val reviewState by reviewViewModel.state.collectAsState()
+    val dashboardState by dashboardViewModel.state.collectAsState()
     val backStack by container.navigator.backStack.collectAsState()
     val current = backStack.last()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(current) {
-        if (current == AppDestination.Review) reviewViewModel.initialize()
+        when (current) {
+            AppDestination.Dashboard -> dashboardViewModel.load()
+            AppDestination.Review -> reviewViewModel.initialize()
+            else -> Unit
+        }
     }
 
     LaunchedEffect(problemsState.message) {
@@ -167,7 +179,17 @@ private fun SignedInApp(
                 .padding(padding),
         ) {
             when (current) {
-                AppDestination.Dashboard -> Placeholder(strings.dashboardTitle)
+                AppDestination.Dashboard -> DashboardScreen(
+                    state = dashboardState,
+                    strings = strings,
+                    actions = DashboardActions(
+                        refresh = dashboardViewModel::refresh,
+                        addProblem = {
+                            problemsViewModel.newProblem()
+                            container.navigator.resetTo(AppDestination.Problems)
+                        },
+                    ),
+                )
                 AppDestination.Problems -> ProblemsScreen(
                     state = problemsState,
                     strings = strings,
@@ -249,21 +271,6 @@ private fun reviewActions(viewModel: ReviewViewModel): ReviewActions = ReviewAct
     notesChanged = viewModel::notesChanged,
     submitReview = viewModel::submitReview,
 )
-
-@Composable
-private fun Placeholder(title: String) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
 
 @Composable
 private fun SettingsContent(

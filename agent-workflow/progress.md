@@ -2,6 +2,54 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-006 closeout — 2026-09-19
+
+- Implemented the dashboard/home experience in `composeApp` `commonMain` under
+  `com.algorithmlearning.app.dashboard`: `DashboardViewModel` (sealed
+  `DashboardState`: loading/content/failed) and the stateless `DashboardScreen`
+  plus a `DashboardActions` callback object.
+- Matches ALG-015 and the delivered counts-only `GET /dashboard` shape: loading
+  spinner, failed state with retry, no-data guidance with an add-problem action
+  when `totalProblems == 0`, and the populated totals, difficulty distribution
+  (proportional bars for easy/medium/hard), and due-review count.
+- `App` reloads the aggregate whenever the Dashboard destination becomes
+  current (`LaunchedEffect(current)`), so the due count reflects a review just
+  submitted in the Review tab; the empty-state action opens a new problem draft
+  on the Problems destination.
+- `update-docs`: added `COMPOSE_GUIDE.md` section 13 covering the dashboard
+  presentation, state shape, refresh behavior, and testing seams; extended
+  `AppStrings` with the dashboard strings in both languages.
+- Tests: `DashboardViewModelTest` (commonTest) proves the content counts,
+  failure/retry, and reload behavior; `DashboardScreenUiTest` (wasmJsTest)
+  renders the loading, failed, empty, and populated states and asserts the
+  totals, distribution, and due count.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :composeApp:allTests` (Android
+  `testDebugUnitTest` 28 tests; Wasm `wasmJsBrowserTest` 43 tests) and
+  `git diff --check` clean.
+- Evaluator conclusions: no composable reads a repository; the counts-only
+  aggregate is rendered as loading/failed/empty/content; every user-visible
+  string resolves through `AppStrings`; the closeout commit is local only.
+- `CMP-006` is completed. All Phase 3 experiences are done, so `CMP-007`
+  advanced from `pending` to `ready`; it opens Phase 4 — Release and requires a
+  new conversation per the workflow continuation contract.
+
+## CMP-006 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-002` and `CMP-003` are completed;
+  `CMP-006` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `tdd` / `update-docs` / `infer`.
+- Planner boundary: one Dashboard/home experience over the counts-only
+  `DashboardRepository`, with loading, retry, no-data guidance, totals,
+  difficulty distribution, and due-review count, matching ALG-015 and the
+  delivered `GET /dashboard` shape. Implementer boundary:
+  `apps/multiplatform/composeApp` and the Compose guide. Evaluator boundary: no
+  composable reads a repository, every user-visible string resolves through
+  `AppStrings`, and the exact task verification passes.
+- `update-docs`: extend `COMPOSE_GUIDE.md` with the dashboard presentation layer
+  and its testing seams.
+
 ## CMP-005 closeout — 2026-09-19
 
 - Implemented the review experience in `composeApp` `commonMain` under
