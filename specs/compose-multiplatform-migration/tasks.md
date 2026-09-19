@@ -46,7 +46,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 3 — Experiences
 
@@ -60,7 +60,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ### CMP-005 — Build adaptive browse and staged Review Mode UI
 
@@ -72,7 +72,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ### CMP-006 — Build dashboard and home UI
 
@@ -84,7 +84,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ## Phase 4 — Release
 

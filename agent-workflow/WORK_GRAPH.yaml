@@ -347,7 +347,7 @@ tasks:
       - git diff --check
   - id: CMP-003
     title: Implement shared problem-library, review, and dashboard data flows
-    status: ready
+    status: completed
     depends_on: [CMP-001, CMP-002, ALG-007, ALG-008, ALG-009, ALG-010]
     parallel_group: cmp-data
     spec_refs: ["3", "4", "AC-CMP-04..06", "5-6"]
@@ -361,7 +361,7 @@ tasks:
       - git diff --check
   - id: CMP-004
     title: Build auth and problem management UI
-    status: pending
+    status: ready
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-03", "AC-CMP-04", "5-6"]
@@ -375,7 +375,7 @@ tasks:
       - git diff --check
   - id: CMP-005
     title: Build adaptive browse and staged Review Mode UI
-    status: pending
+    status: ready
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-05", "5-6"]
@@ -388,7 +388,7 @@ tasks:
       - git diff --check
   - id: CMP-006
     title: Build dashboard and home UI
-    status: pending
+    status: ready
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-06", "5-6"]

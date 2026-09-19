@@ -2,6 +2,61 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-003 closeout — 2026-09-19
+
+- Pushed the deferred NEO-003 closeout and the CMP-002 closeout to `main`
+  (`323544a..96fdea0`); production deploy run `35411580086` completed
+  successfully.
+- Implemented the shared library data flow in `shared` `commonMain` under
+  `com.algorithmlearning.shared.library`: immutable models and wire enums
+  (`Tag`, `ProblemSummary`/`ProblemDetail`, `ProblemWrite`, `Solution`,
+  `SolutionWrite`, `Review`, `ReviewSummary`, `ProblemQuery`, `Dashboard`,
+  `Page`, plus `ProblemPlatform`/`Difficulty`/`Sort`/`SolutionLanguage`/
+  `ReviewStatus`), `ApiFailure`/`ApiFailureKind`, five typed remote contracts,
+  five repository contracts, and delegating `Remote*` adapters.
+- Added the Ktor data layer in `library/data`: DTOs and mappers, `Ktor*Remote`
+  implementations for problems/solutions/tags/reviews/dashboard, and `ApiClient`
+  which attaches the bearer token from `AuthRepository`, retries exactly once
+  after a `401` (invalidating the token), and maps statuses/problem bodies to
+  `ApiFailure` including `fieldErrors`. DTOs stay `internal`; enums convert via
+  `fromWire`.
+- Reconciled the frozen API: platform wire value is `hacker_rank`; `GET
+  /dashboard` is the counts-only shape; `/reviews/today` and `/reviews/history`
+  return bare lists. Wired all five repositories through `AppContainer`.
+- `update-docs`: added `COMPOSE_GUIDE.md` section 10 covering routes, wire
+  values, `ApiClient` auth/error behavior, DI, and testing seams.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :shared:allTests` (Android
+  `testDebugUnitTest` and `wasmJsBrowserTest` both green: 71 tests per target,
+  34 new for the library); `git diff --check` clean. No lockfile change was
+  needed.
+- Evaluator conclusions: no DTO, Ktor, or serialization type reaches a
+  repository caller or `composeApp`; unknown enum values and malformed bodies
+  become `ApiFailure`; concurrent `401` handling refreshes at most once; the
+  closeout commit is local only.
+- `CMP-003` is completed. `CMP-004`, `CMP-005`, and `CMP-006` (Phase 3 —
+  Experiences) are now ready; they share the `cmp-experiences` parallel group.
+
+## CMP-003 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-001`, `CMP-002`, and `ALG-007..010`
+  are completed; `CMP-003` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `tdd` / `update-docs` / `infer`.
+- Reconciled the frozen REST contract with the delivered API. Two spec/API
+  deltas are resolved in favor of the deployed controller: platform wire value
+  is `hacker_rank` (not `hackerRank`), and `GET /dashboard` returns the
+  counts-only `DashboardCounts` shape, not the richer response sketched in the
+  spec. `/reviews/today` and `/reviews/history` return bare lists, not paged
+  envelopes.
+- Planner boundary: one commonMain library data layer (immutable models, typed
+  remotes, Ktor implementations with bearer auth plus one 401 retry, repository
+  seams, fakes) adapting to the frozen API. Implementer boundary:
+  `apps/multiplatform/shared` and the Compose guide. Evaluator boundary: DTOs
+  stay in the data layer, no `android.*`/browser types in commonMain, unknown
+  enums never leak, and the exact task verification passes.
+- `update-docs`: extend `COMPOSE_GUIDE.md` with the library data-flow map.
+
 ## CMP-002 closeout — 2026-09-19
 
 - Implemented the shared auth/session data flow in `shared` `commonMain` under

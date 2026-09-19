@@ -10,8 +10,9 @@ import kotlinx.serialization.json.Json
 /** Default API origin for local development; injected at the composition root. */
 const val DEFAULT_API_BASE_URL: String = "http://localhost:8080"
 
-internal val AuthJson: Json = Json {
+internal val ApiJson: Json = Json {
     ignoreUnknownKeys = true
+    encodeDefaults = true
 }
 
 /**
@@ -20,7 +21,7 @@ internal val AuthJson: Json = Json {
  */
 fun HttpClientConfig<*>.applyAuthDefaults() {
     install(ContentNegotiation) {
-        json(AuthJson)
+        json(ApiJson)
     }
     install(HttpTimeout) {
         requestTimeoutMillis = 15_000

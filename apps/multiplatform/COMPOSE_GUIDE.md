@@ -166,3 +166,63 @@ Testing seams:
 - `KtorAuthRemote` tests drive a Ktor `MockEngine` to assert routes, the bearer
   header, DTO mapping, and status-to-`AuthFailureKind` mapping without a network.
 - Auth data-flow tests run under `:shared:allTests` on Android and Wasm.
+
+## 10. Library data flow
+
+The problem-library data layer mirrors the auth stack. Everything lives in
+`shared` under `com.algorithmlearning.shared.library` and adapts the frozen
+`/api/v1` routes.
+
+```text
+library/
+  LibraryModels.kt       # enums, Tag, ProblemSummary/Detail, Solution, Review, Dashboard, Page
+  LibraryFailure.kt      # ApiFailure + ApiFailureKind
+  LibraryRemotes.kt      # ProblemRemote, TagRemote, SolutionRemote, ReviewRemote, DashboardRemote
+  LibraryRepositories.kt # repository contracts + Remote* delegating adapters
+  data/                  # DTOs, mappers, ApiClient, Ktor*Remote implementations
+```
+
+Routes adapted (all under the `/api/v1` base path):
+
+- Problems: `GET/POST /problems`, `GET/PUT/DELETE /problems/{id}`.
+- Solutions: `GET/POST /problems/{id}/solutions`, `PUT/DELETE /solutions/{id}`.
+- Tags: `GET/POST /tags` (`POST` returns `200` for an existing normalized name).
+- Reviews: `POST /reviews`, `GET /reviews/today`, `GET /reviews/history`.
+- Dashboard: `GET /dashboard`.
+
+Rules:
+
+1. Enum wire values are fixed by the deployed API: platform is `hacker_rank`
+   (not `hackerRank`), difficulty `easy|medium|hard`, review status
+   `neverReviewed|due|scheduled`, sort `updatedDesc|createdDesc|titleAsc`,
+   language `kotlin|java|python|dart`. DTOs carry the raw string; mappers call
+   `fromWire` and throw on unknown values (which `ApiClient.decode` converts to
+   `ApiFailureKind.UNEXPECTED`).
+2. `GET /dashboard` returns the counts-only shape
+   (`totalProblems`, `easy`, `medium`, `hard`, `dueReviewCount`), matching the
+   delivered controller rather than the richer response sketched in the spec.
+   `/reviews/today` and `/reviews/history` return bare lists, not paged
+   envelopes; only `GET /problems` returns a `Page`.
+3. `ApiClient` is the only place that touches bearer auth. It reads a token from
+   `AuthRepository.accessToken()`, attaches `Authorization: Bearer`, and on a
+   `401` calls `invalidateAccessToken()`, refreshes once, and retries exactly
+   once before surfacing `UNAUTHORIZED`.
+4. `ApiClient.decode` is the single wrapper for body parsing and mapping, so a
+   malformed payload becomes `ApiFailure(UNEXPECTED)` instead of leaking a
+   serialization exception.
+5. `ApiFailure` is the only error type leaving the data layer; it carries
+   `kind`, `statusCode`, the problem `code`, and `fieldErrors` parsed from
+   `application/problem+json`.
+6. DTOs are `internal` to `library.data`. Domain models are immutable and use
+   `kotlin.time.Instant`; no Ktor or serialization type reaches a repository
+   caller or `composeApp`.
+7. `AppContainer` builds one `ApiClient` and injects each Ktor remote into its
+   `Remote*Repository`. Tests substitute a Ktor `MockEngine` or a fake remote.
+
+Testing seams:
+
+- `FakeAuthRepository` supplies tokens to `ApiClient` and records invalidations.
+- `Fake*Remote` classes record calls for repository delegation tests.
+- `MockEngine` drives every Ktor remote: path, method, query parameters, body,
+  bearer header, DTO mapping, and status-to-`ApiFailureKind` mapping.
+- Library data-flow tests run under `:shared:allTests` on Android and Wasm.

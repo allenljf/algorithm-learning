@@ -108,12 +108,12 @@ flowchart TD
 flowchart TD
   C1[CMP-001 Compose MP root + guide\ncompleted]
   C2[CMP-002 Auth/session data\ncompleted]
-  C3[CMP-003 Library/review/dashboard data\nready]
+  C3[CMP-003 Library/review/dashboard data\ncompleted]
   A5[ALG-005 Auth API\ncompleted]
   A7[ALG-007..010 Library APIs\ncompleted]
-  C4[CMP-004 Auth + problem UI\npending]
-  C5[CMP-005 Browse + Review Mode UI\npending]
-  C6[CMP-006 Dashboard/home UI\npending]
+  C4[CMP-004 Auth + problem UI\nready]
+  C5[CMP-005 Browse + Review Mode UI\nready]
+  C6[CMP-006 Dashboard/home UI\nready]
   C7[CMP-007 Cross-platform acceptance\npending]
   C8[CMP-008 Retire Flutter client\npending]
 
