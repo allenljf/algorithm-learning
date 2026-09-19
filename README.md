@@ -4,21 +4,23 @@ This repository contains the Algorithm Learning Platform modular monorepo.
 
 ## Toolchains
 
-- Java 21 is pinned in [`.java-version`](.java-version).
-- Flutter 3.47.0 is pinned in [`apps/learning_app/.fvmrc`](apps/learning_app/.fvmrc).
-
-Install the matching Java runtime and FVM-managed Flutter SDK before bootstrapping
-either application. The initial application composition roots are deliberately
-created in later tasks; this repository skeleton contains no runnable product
-application yet.
+- Java 21 is pinned in [`.java-version`](.java-version); the Spring Boot API
+  builds with the Maven Wrapper.
+- The Compose Multiplatform client builds with the Gradle wrapper pinned in
+  [`apps/multiplatform/gradle/wrapper`](apps/multiplatform/gradle/wrapper) on a
+  JDK 17+ toolchain.
+- The retired Flutter toolchain (FVM Flutter 3.47.0, `apps/learning_app/.fvmrc`)
+  is no longer required; the Flutter client is archived.
 
 ## Entry points
 
-- [`apps/learning_app`](apps/learning_app) will contain the Flutter Web, Android,
-  and iOS client after ALG-003.
-- [`services/api`](services/api) will contain the Java/Spring Boot API after
-  ALG-002.
-- [`infra`](infra) will contain local environment and deployment assets. Docker
-  Compose is added by ALG-016.
+- [`apps/multiplatform`](apps/multiplatform) is the active client: a Kotlin
+  Compose Multiplatform application (Android + Web/Wasm) following
+  [`COMPOSE_GUIDE.md`](apps/multiplatform/COMPOSE_GUIDE.md).
+- [`apps/learning_app`](apps/learning_app) is the retired Flutter client; it is
+  archived and inactive (see [`ARCHIVED.md`](apps/learning_app/ARCHIVED.md)).
+- [`services/api`](services/api) is the Java/Spring Boot API.
+- [`infra`](infra) holds local environment and deployment assets, including
+  [`infra/acceptance`](infra/acceptance) release-evidence boundaries.
 
-See each directory's README for its task boundary and eventual local command.
+See each directory's README for its task boundary and local command.

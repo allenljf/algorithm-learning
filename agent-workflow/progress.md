@@ -2,6 +2,46 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-008 closeout — 2026-09-19
+
+- Retired the Flutter client by explicit archive: added
+  `apps/learning_app/ARCHIVED.md` marking the directory inactive and pointing to
+  `apps/multiplatform`, and rewrote `apps/learning_app/README.md` as an archive
+  notice. No Flutter source was deleted, preserving the ALG-018 historical
+  evidence.
+- Recorded parity and migration notes in
+  `specs/compose-multiplatform-migration/retirement.md`: the ALG→CMP task
+  mapping, architecture/target differences (Android + Wasm active; iOS/Desktop
+  deferred), acceptance evidence, and the remaining operator follow-up
+  (least-privilege Neon role rotation).
+- Updated the entry docs and requirement baseline: the root `README.md` now names
+  `apps/multiplatform` as the active client and the Flutter toolchain/entry as
+  archived; `requirement.md` frontend platform/architecture/packages, the
+  REST-sharing note, Docker/test/roadmap sections, and the spec reference now
+  describe the Compose client, with section 2.2 recording the Flutter client as
+  retired/archived. `infra/acceptance/README.md` marks the Flutter harness as
+  frozen historical evidence and names the Compose release checks.
+- Task-limited verification passed exactly as contracted:
+  `test ! -d apps/learning_app || test -f apps/learning_app/ARCHIVED.md` and
+  `git diff --check` both exited successfully (rapid approach; no new tests).
+- `CMP-008` is completed. Phase 4 — Release is complete and every
+  `compose-multiplatform-migration` task is done; there is no next ready task.
+
+## CMP-008 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-007` is completed; `CMP-008`
+  advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `single-agent` / `rapid` /
+  `update-docs` / `infer`.
+- `infer` decision: retire the Flutter client by **explicit archive** rather than
+  deletion. AC-CMP-07 and the task verification both accept `ARCHIVED.md`, and
+  keeping the frozen source preserves the ALG-018 acceptance evidence that
+  `infra/acceptance/README.md` records. The archive notice marks it inactive and
+  names `apps/multiplatform` as the replacement.
+- Boundary: archive the Flutter client, update the entry READMEs and the
+  requirement baseline, and record the parity/migration notes. No Compose code
+  and no API behavior change.
+
 ## CMP-007 closeout — 2026-09-19
 
 - Added the cross-platform acceptance suite in `composeApp`. The test-only

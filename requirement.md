@@ -10,9 +10,9 @@ Web 是主要的題目管理後台；Android 與 iOS 專注於瀏覽、複習與
 
 | 領域 | 需求 |
 |---|---|
-| 前端平台 | Flutter 單一程式碼庫支援 Android、iOS、Web |
-| 前端架構 | Dart、Clean Architecture、feature-based structure、Repository Pattern |
-| 前端套件方向 | Riverpod、GoRouter、Dio、JSON serialization；實際選型需於 SPEC 確認 |
+| 前端平台 | Kotlin Compose Multiplatform 單一程式碼庫，支援 Android 與 Web（Wasm）；iOS/Desktop 為後續目標 |
+| 前端架構 | Kotlin `commonMain` 共用 UI/domain/state、Repository Pattern、composition root 注入依賴 |
+| 前端套件方向 | Compose Multiplatform、Ktor、kotlinx；實際選型與版本以 `apps/multiplatform/gradle/libs.versions.toml` 與 `COMPOSE_GUIDE.md` 為準 |
 | 後端 | Java + Spring Boot REST API；此為已確認且不可替換的決策 |
 | 資料庫 | PostgreSQL |
 | 資料存取 | Spring Data JPA（JPA/Hibernate） |
@@ -20,14 +20,26 @@ Web 是主要的題目管理後台；Android 與 iOS 專注於瀏覽、複習與
 
 ### 2.1 已確認、不可替換的後端決策
 
-- Backend production code 必須使用 Java + Spring Boot；REST API 供 Flutter
-  Web、iOS、Android 共用。
+- Backend production code 必須使用 Java + Spring Boot；REST API 供 Compose
+  Multiplatform client（Android 與 Web）共用。
 - 必須使用 PostgreSQL、Spring Web、Spring Data JPA、Spring Security、Bean
   Validation、Flyway 與 Spring Boot Actuator。
 - 目標是展示 Java 後端面試能力：分層架構、JWT authentication/authorization、
   migration、測試、health check、Docker 與 Kubernetes-ready 設定。
 - 不得改用 FastAPI、Ktor、Go 或其他後端語言／框架。任何變更都必須先取得使用者
   明確同意，並同步更新本需求基線與正式 SPEC。
+
+### 2.2 前端 client 遷移（已確認）
+
+- 原 Flutter client `apps/learning_app` 已由 `compose-multiplatform-migration`
+  的 `CMP-001..CMP-007` 遷移為 Kotlin Compose Multiplatform client
+  `apps/multiplatform`，並於 `CMP-008` 顯式封存（見
+  `apps/learning_app/ARCHIVED.md`）。
+- Compose client 沿用同一後端 REST 契約，不變更 API；其建構與測試準則見
+  `apps/multiplatform/COMPOSE_GUIDE.md`。`flutter-dev-guide/` 僅治理封存的
+  Flutter client，不再治理 `apps/multiplatform`。
+- 對等性與遷移記錄見
+  `specs/compose-multiplatform-migration/retirement.md`。
 
 ## 3. 使用者與產品範圍
 
@@ -163,7 +175,7 @@ reviews
 ## 8. Docker 與部署需求
 
 - 開發環境可透過 `docker compose up -d` 啟動 PostgreSQL 與 Backend。
-- Flutter frontend 可在本機開發執行。
+- Compose Multiplatform client 可在本機開發執行（見 `COMPOSE_GUIDE.md`）。
 - 後續 Kubernetes 部署需涵蓋 API、設定與 secrets；PostgreSQL 的實際部署策略於 SPEC 確認。
 
 ## 9. 測試與品質需求
@@ -171,7 +183,7 @@ reviews
 Backend 至少涵蓋 unit tests、Spring MVC/API tests 與 PostgreSQL persistence
 integration tests；核心授權與 migration 行為必須可驗證。
 
-Flutter 至少涵蓋 unit tests、repository tests、ViewModel/state tests，以及重要畫面的 widget tests。第一版不要求 100% coverage，但核心 business logic 必須有測試。
+Compose client 至少涵蓋 data-layer tests、state-holder tests、Compose 畫面 structure tests，以及跨平台 acceptance suite（見 `COMPOSE_GUIDE.md`）。第一版不要求 100% coverage，但核心 business logic 必須有測試。
 
 程式品質原則：SOLID、Clean Architecture、separation of concerns、small functions、meaningful naming、避免不必要 abstraction、避免過早最佳化、避免重複與無理由套件。
 
@@ -183,11 +195,11 @@ Flutter 至少涵蓋 unit tests、repository tests、ViewModel/state tests，以
 
 採 incremental development，不一次產生大型專案。
 
-1. 建立 repository structure：Flutter、Backend、Database、Docker。
+1. 建立 repository structure：Client、Backend、Database、Docker。
 2. 完成 PostgreSQL schema。
 3. 完成 Backend：health check、Problem CRUD、Solution CRUD、Tag CRUD。
-4. 完成 Flutter Web：Problem List、Problem Editor、CRUD。
-5. 完成 Mobile：Problem List、Problem Detail、Review。
+4. 完成 Client Web：Problem List、Problem Editor、CRUD。
+5. 完成 Client 瀏覽與 Review：Problem List、Problem Detail、Review。
 6. Authentication。
 7. Tests。
 8. Docker / deployment。
@@ -216,5 +228,9 @@ Flutter 至少涵蓋 unit tests、repository tests、ViewModel/state tests，以
 
 本文件是需求基線，不取代實作規格。正式規格位於
 `specs/algorithm-learning-platform/spec.md`；它必須維持整體 architecture、
-monorepo structure、Flutter/Java Spring Boot backend structure、ERD、schema、
-API contract、authentication、Docker/Kubernetes 與 MVP task graph 的可追溯性。
+monorepo structure、Compose Multiplatform client / Java Spring Boot backend
+structure、ERD、schema、API contract、authentication、Docker/Kubernetes 與 MVP
+task graph 的可追溯性。
+
+前端遷移的正式規格位於 `specs/compose-multiplatform-migration/spec.md`，其任務
+與對等性記錄見同目錄 `tasks.md`、`plan.md` 與 `retirement.md`。

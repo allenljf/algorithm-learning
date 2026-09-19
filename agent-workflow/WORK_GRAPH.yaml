@@ -415,7 +415,7 @@ tasks:
       - git diff --check
   - id: CMP-008
     title: Retire the Flutter client and record migration notes
-    status: ready
+    status: completed
     depends_on: [CMP-007]
     parallel_group: cmp-release
     spec_refs: ["4", "AC-CMP-07", "7"]

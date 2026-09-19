@@ -115,7 +115,7 @@ flowchart TD
   C5[CMP-005 Browse + Review Mode UI\ncompleted]
   C6[CMP-006 Dashboard/home UI\ncompleted]
   C7[CMP-007 Cross-platform acceptance\ncompleted]
-  C8[CMP-008 Retire Flutter client\nready]
+  C8[CMP-008 Retire Flutter client\ncompleted]
 
   C1 --> C2
   A5 --> C2

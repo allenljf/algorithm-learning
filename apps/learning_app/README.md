@@ -1,17 +1,14 @@
-# learning_app
+# learning_app (archived)
 
-A new Flutter project.
+> **Archived.** This Flutter client is retired and inactive. See
+> [ARCHIVED.md](ARCHIVED.md). The active client is
+> [`apps/multiplatform`](../multiplatform), built with Kotlin Compose
+> Multiplatform and governed by
+> [`COMPOSE_GUIDE.md`](../multiplatform/COMPOSE_GUIDE.md).
 
-## Getting Started
+This directory holds the original Flutter Web/Android/iOS client that preceded
+the Compose Multiplatform migration. It is kept frozen for historical reference
+only; do not build, test, or change it.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Parity and migration notes:
+[`specs/compose-multiplatform-migration/retirement.md`](../../specs/compose-multiplatform-migration/retirement.md).

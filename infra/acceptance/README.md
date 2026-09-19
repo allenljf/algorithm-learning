@@ -6,6 +6,11 @@ release check does not overstate what an individual test covers.
 
 ## Controlled integration boundary
 
+> **Archived.** The Flutter client is retired (`CMP-008`); this harness is frozen
+> historical evidence and is no longer run. The active client acceptance suite
+> is the Compose boundary below. See
+> [`../../specs/compose-multiplatform-migration/retirement.md`](../../specs/compose-multiplatform-migration/retirement.md).
+
 [`../../apps/learning_app/integration_test/mvp_acceptance_test.dart`](../../apps/learning_app/integration_test/mvp_acceptance_test.dart)
 uses Flutter's `integration_test` harness and a stateful, test-only controlled
 API adapter supplied through Riverpod provider overrides. It drives the real
@@ -61,7 +66,9 @@ code.
 
 ## Required release commands
 
-Run the exact ALG-018 verification list from the repository root. The Compose
-stack is stopped with `docker compose -f infra/compose.yaml down` even if an
-earlier check fails, preserving the named database volume while avoiding a
-stray release-test stack.
+The ALG-018 Flutter commands are historical; the current client release checks
+are `apps/multiplatform && ./gradlew :composeApp:assembleDebug` and
+`apps/multiplatform && ./gradlew :composeApp:allTests`, alongside the API and
+Compose health-check commands. The local Compose stack is stopped with
+`docker compose -f infra/compose.yaml down` even if an earlier check fails,
+preserving the named database volume while avoiding a stray release-test stack.
