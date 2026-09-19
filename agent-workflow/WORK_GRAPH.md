@@ -134,5 +134,15 @@ flowchart TD
   C7 --> C8
 ```
 
+# Neon Least-Privilege Role — Dependency Graph
+
+```mermaid
+flowchart TD
+  L1[NLP-001 Role rotation artifact + runbook\ncompleted]
+  L2[NLP-002 Rotate credential + verify readiness\nready]
+
+  L1 --> L2
+```
+
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

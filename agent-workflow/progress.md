@@ -2,6 +2,99 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NLP-001 closeout — 2026-09-19
+
+- Added `infra/gcp/neon-least-privilege-role.sql`, a password-free template that
+  creates the dedicated login role (`NOSUPERUSER` `NOCREATEDB` `NOCREATEROLE`
+  `NOREPLICATION` `NOBYPASSRLS`), grants the owner session the temporary
+  membership needed to hand over ownership, makes the role own `public`, and
+  `REASSIGN OWNED BY neondb_owner` transfers the existing application objects so
+  Flyway can run DDL, then revokes the temporary membership. The file contains
+  no credential value.
+- `update-docs`: added the "Rotate to the least-privilege role" runbook to
+  `infra/gcp/README.md` covering the boundary, first and later rotations, the
+  Neon console fallback when the owner cannot create roles, the
+  secret/variable update order, the redeploy, verification, and a credential-only
+  rollback that never reverses Flyway migrations. The Secret Manager table now
+  names the dedicated role.
+- No workflow or application code change was needed: the delivery already reads
+  `NEON_DATABASE_USERNAME` and the `algorithm-learning-db-password` secret by
+  name.
+- Task-limited verification passed exactly as contracted:
+  `test -f infra/gcp/neon-least-privilege-role.sql`; the static assertion that the
+  SQL contains `reassign owned`/`nosuperuser`/`nocreatedb`/`nocreaterole`/
+  `noreplication` and no credential assignment; `git diff --check` clean.
+- Evaluator conclusions: the artifact never handles a secret; ownership transfer
+  plus confinement is present; the runbook preserves the operator-only secret
+  boundary and forward-only migration rule; the closeout commit is local only.
+- `NLP-001` is completed. `NLP-002` (operator-gated credential rotation) advanced
+  to `ready` but cannot run until the operator creates the Neon role, sets the
+  Secret Manager value, and updates the GitHub `production` variable; it also
+  requires an authorized production deploy.
+
+## NLP-001 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `NLP-001` has no dependencies; it advanced
+  from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Planner boundary: one password-free ownership/rotation SQL template that
+  creates the dedicated role, transfers ownership from `neondb_owner`, and
+  confines the role, plus the rotation runbook. Implementer boundary:
+  `infra/gcp` only; no workflow or application change; never handle a password.
+  Evaluator boundary: the artifact contains no password, includes the ownership
+  and confinement clauses, and the exact task verification passes.
+
+## Neon least-privilege role work graph — 2026-09-19
+
+- `$work-graph` selected `three-perspectives` because the change crosses Neon
+  role ownership/grants, Secret Manager, a GitHub Environment variable, and a
+  serialized production redeploy.
+- Created `specs/neon-least-privilege-role/plan.md` and `tasks.md` and appended
+  `NLP-001` and `NLP-002` to `agent-workflow/WORK_GRAPH.yaml` with a readable
+  graph in `WORK_GRAPH.md`.
+- `NLP-001` (password-free SQL ownership/rotation artifact + runbook) is
+  `ready`; `NLP-002` (operator-gated rotation and readiness verification) waits
+  on it and needs the operator's private Neon and Secret Manager setup.
+
+## Neon least-privilege role spec governance — 2026-09-19
+
+- `$spec-governance` selected `update-docs + infer` and advanced
+  `neon-least-privilege-role` to governed, ready for `$work-graph`.
+- Topology ruling: **one dedicated application role** that owns the application
+  schema and existing objects, replacing the Neon owner `neondb_owner`. Rationale:
+  it removes the actual `NEO-003` risk with no config-contract expansion, and
+  Flyway's DDL requirement is met by object ownership. Split DDL-migration versus
+  DML-only runtime roles is deferred as the future hardening option the residual
+  serving DDL capability would justify.
+- Contradiction resolved: intake's "grants only" was tightened to "ownership
+  transfer plus grants", because PostgreSQL `ALTER TABLE` requires ownership for
+  Flyway to evolve existing tables. Concrete grants/`REASSIGN OWNED` belong in
+  the operator artifact and runbook.
+- Locked the config contract (`NEON_DATABASE_USERNAME` new role value,
+  `algorithm-learning-db-password` new secret version; endpoints/WIF/IAM
+  otherwise unchanged) and acceptance criteria `AC-NLP-01..07`; non-goals and the
+  agent-never-handles-the-password boundary preserved.
+- `plan.md`, `tasks.md`, and the `WORK_GRAPH.yaml` node do not exist yet;
+  `$work-graph` is the next phase.
+
+## Neon least-privilege role intake — 2026-09-19
+
+- `$workflow-intake` selected `quick-analysis` for the follow-up recorded in the
+  `NEO-003` closeout: replace the Neon owner `neondb_owner` with a dedicated
+  least-privilege application role and rotate the production credential.
+- Created `specs/neon-least-privilege-role/spec.md`. Recommended topology is one
+  dedicated application role that owns the application schema (Flyway needs DDL);
+  splitting into separate migration and runtime roles is recorded as a future
+  hardening option and is the one ambiguity for `$spec-governance`. Acceptance
+  criteria `AC-NLP-01..07` cover the operator artifact, credential rotation,
+  readiness under the new role, runbook, and secret safety.
+- Boundary preserved from `NEO-003`: the agent never handles the role password;
+  role creation and the Secret Manager value are operator-only, so the rotation
+  release task is operator-gated.
+- No `plan.md`, `tasks.md`, or `WORK_GRAPH.yaml` node exists yet; `$spec-governance`
+  is the next phase.
+
 ## CMP-008 closeout — 2026-09-19
 
 - Retired the Flutter client by explicit archive: added

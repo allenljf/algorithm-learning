@@ -53,7 +53,7 @@ workflow, or chat message.
 |---|---|---|
 | `algorithm-learning-jwt-key` | `APP_JWT_KEY` | Random value, at least 32 characters |
 | `algorithm-learning-refresh-hash-key` | `APP_REFRESH_HASH_KEY` | A distinct random value, at least 32 characters |
-| `algorithm-learning-db-password` | `DATABASE_PASSWORD` | Password of the Neon application role |
+| `algorithm-learning-db-password` | `DATABASE_PASSWORD` | Login secret of the dedicated Neon application role (see "Rotate to the least-privilege role") |
 
 The Cloud Run runtime account can access only these three secrets. The GitHub
 deployer cannot read them directly.
@@ -160,6 +160,76 @@ value into GitHub, a shell history, source control, or this conversation:
    environment.
 7. A reviewer has confirmed the generated workflow contains only SHA-pinned
    actions and no `GCP_SA_KEY`, credential JSON, or secret value.
+
+## Rotate to the least-privilege role
+
+The production delivery must not authenticate as the Neon owner `neondb_owner`.
+Use `infra/gcp/neon-least-privilege-role.sql` to install a dedicated application
+role that owns the application schema, then rotate the credential. The agent
+must never receive, read, echo, or commit the login secret; the operator performs
+every step below.
+
+Boundary:
+
+- The dedicated role is confined to the `neondb` database and its application
+  schema. It is not `neondb_owner` and holds no
+  `SUPERUSER`/`CREATEDB`/`CREATEROLE`/`REPLICATION`/`BYPASSRLS`.
+- Flyway runs DDL, so the role must own the application schema and its existing
+  objects; `ALTER TABLE` requires ownership. Grants alone are insufficient.
+- Only `NEON_DATABASE_USERNAME` (a non-secret variable) and the
+  `algorithm-learning-db-password` Secret Manager version change. The JDBC URLs,
+  WIF, Artifact Registry, Cloud Run, and IAM bindings stay as they are.
+
+First rotation (the current owner credential is `neondb_owner`):
+
+1. Choose a dedicated role name, for example `algorithm_learning_app`.
+2. Open the Neon console for the production project and run
+   `infra/gcp/neon-least-privilege-role.sql` in the SQL editor against the
+   `neondb` database, replacing `<APP_ROLE>` with the chosen name. This creates
+   the role, transfers schema/object ownership, and drops the temporary
+   membership. If the owner session cannot create roles, create the role from
+   the Neon console Roles tab and run only the ownership/grant statements; the
+   SQL editor executes with sufficient privileges.
+3. Confirm the confinement query in the script returns `false` for
+   `rolsuper`, `rolcreatedb`, `rolcreaterole`, `rolreplication`, and
+   `rolbypassrls`.
+4. Reset the role's login secret in the Neon console (Roles -> the role ->
+   Reset) and add it as a new version of the `algorithm-learning-db-password`
+   Secret Manager container. Do not put the value in a shell history, GitHub
+   variable, workflow, source control, or this conversation.
+5. In the GitHub `production` Environment, set `NEON_DATABASE_USERNAME` to the
+   chosen role name. The `NEON_MIGRATION_JDBC_URL` and `NEON_SERVICE_JDBC_URL`
+   variables are unchanged.
+6. Trigger the serialized production workflow on `main` (or via manual dispatch
+   whose ref still satisfies the WIF condition). It runs the migration Job, then
+   redeploys the API.
+
+Later rotations (the role already exists):
+
+1. Reset the role's login secret in the Neon console and add a new
+   `algorithm-learning-db-password` version.
+2. Optionally re-run steps 2 through 5 of the SQL (ownership, membership,
+   confinement) if object ownership may have drifted.
+3. Trigger the workflow again.
+
+Verification after the redeploy:
+
+```sh
+gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait
+SERVICE_URL="$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')"
+curl --fail --retry 12 --retry-delay 5 "${SERVICE_URL}/actuator/health/readiness"
+gcloud run services describe algorithm-learning-api --region=asia-east1 \
+  --format='value(spec.template.spec.containers[0].env)'
+```
+
+The environment output must show `DATABASE_USERNAME` as the dedicated role, not
+`neondb_owner`.
+
+Rollback: if the new credential is faulty, restore the previous
+`algorithm-learning-db-password` version and `NEON_DATABASE_USERNAME` value and
+trigger the workflow again, or return serving traffic to the previously recorded
+known-good Cloud Run revision. Never reverse a Flyway migration as the rollback;
+the change is credential-only and forward-compatible.
 
 ## Rollout, verification, and rollback
 

@@ -426,3 +426,44 @@ tasks:
     verification:
       - test ! -d apps/learning_app || test -f apps/learning_app/ARCHIVED.md
       - git diff --check
+  - id: NLP-001
+    title: Add the password-free Neon role ownership/rotation artifact and runbook
+    status: completed
+    depends_on: []
+    parallel_group: neon-role-tooling
+    spec_refs: ["2", "3", "4", "5", "AC-NLP-01", "AC-NLP-03", "AC-NLP-05", "AC-NLP-06", "6", "7"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add a password-free infra/gcp/neon-least-privilege-role.sql template that
+      creates/rotates the dedicated role, transfers ownership of the application
+      schema and objects from neondb_owner, and confines the role (no
+      SUPERUSER/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS). Extend the
+      infra/gcp/README.md rotation runbook. Never accept, print, or embed the
+      password; no workflow or application change.
+    verification:
+      - test -f infra/gcp/neon-least-privilege-role.sql
+      - >-
+        python3 -c "from pathlib import Path; t = Path('infra/gcp/neon-least-privilege-role.sql').read_text().lower(); assert 'reassign owned' in t and 'nosuperuser' in t and 'nocreatedb' in t and 'nocreaterole' in t and 'noreplication' in t and ('password' + ' ') not in t and ('password' + '=') not in t"
+      - git diff --check
+  - id: NLP-002
+    title: Rotate the production Neon credential and verify readiness
+    status: ready
+    depends_on: [NLP-001]
+    parallel_group: neon-role-release
+    spec_refs: ["1", "3", "4", "5", "AC-NLP-02", "AC-NLP-04", "AC-NLP-07", "6"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Operator-gated release: the operator creates the dedicated role and
+      transfers ownership per NLP-001, sets the new
+      algorithm-learning-db-password version, and updates the GitHub production
+      NEON_DATABASE_USERNAME. Then migrate once and redeploy the API, proving
+      readiness under the new credential and that DATABASE_USERNAME is no longer
+      neondb_owner. The agent never handles the password.
+    verification:
+      - gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait
+      - gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'
+      - >-
+        curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"
+      - >-
+        python3 -c "import subprocess; out = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'neondb_owner' not in out"
+      - git diff --check
