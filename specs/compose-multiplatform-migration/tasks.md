@@ -60,7 +60,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### CMP-005 — Build adaptive browse and staged Review Mode UI
 

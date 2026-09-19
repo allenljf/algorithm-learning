@@ -2,6 +2,60 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-004 closeout — 2026-09-19
+
+- Implemented the auth and problem-management Compose experience in
+  `composeApp` `commonMain`: `App.kt` restores the session behind
+  `AuthSessionHolder`, shows a localized `AuthScreen` (sign-in/register) until a
+  session exists, and renders the signed-in scaffold with the problem screen
+  plus Settings session identity and sign-out.
+- Presentation layer: `AuthViewModel` (`AuthFormState`, `AuthErrorKind`) and
+  `ProblemsViewModel` (`ProblemsUiState`, sealed `ProblemListState`,
+  `ProblemEditorState`, `ProblemDetailState`, `ProblemsMessage`). Screens are
+  stateless: `AuthScreen` takes state plus callbacks, and `ProblemsScreen` takes
+  state plus a `ProblemsActions` callback object. No composable reads a
+  repository, `HttpClient`, or `AppContainer` other than the `App` root.
+- Problem management mirrors ALG-013: search, difficulty/platform/review/tag
+  filters, pagination, distinct loading/failed/empty/content states with retry,
+  create/edit with a locally required title, retained drafts and server
+  `fieldErrors`, confirmed delete, ordered detail sections, and independent
+  solution create/delete. Tags load and can be created and assigned.
+- Localization (`update-docs`): extended `AppStrings`/`StringCatalog` with the
+  auth and problem strings in English and Traditional Chinese, and added
+  `Labels.kt` mapping domain enums and failure kinds to catalog fields.
+- `update-docs`: documented the presentation layer, DI flow, and testing seams
+  as `COMPOSE_GUIDE.md` section 11, plus the experience test target in section 6.
+- Added state-holder tests under `composeApp/src/commonTest` with fakes and
+  Compose structure tests under `composeApp/src/wasmJsTest`. `composeApp` now
+  depends on `kotlinx-coroutines-core`, `kotlinx-coroutines-test`, and, for the
+  Wasm test target only, `org.jetbrains.compose.ui:ui-test`.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :composeApp:allTests` (Android
+  `testDebugUnitTest` 16 tests; Wasm `wasmJsBrowserTest` 23 tests, including 7
+  Compose structure tests) and `git diff --check` clean.
+- Evaluator conclusions: composables render state and emit events only; every
+  user-visible string resolves through `AppStrings`; no DTO, Ktor, or domain
+  data-layer type reaches a screen; the closeout commit is local only.
+- `CMP-004` is completed. `CMP-005` and `CMP-006` remain ready in the same
+  Phase 3 `cmp-experiences` group.
+
+## CMP-004 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-002` and `CMP-003` are completed;
+  `CMP-004` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `tdd` / `update-docs` / `infer`.
+- Planner boundary: one Compose experience for auth (login/register/session)
+  plus problem list/search/filter/create/edit/delete with solutions and tags,
+  rendering shared `AuthSessionHolder` and library repositories through a thin
+  presentation layer; the REST contract and data layers are unchanged.
+  Implementer boundary: `apps/multiplatform/composeApp` and the Compose guide.
+  Evaluator boundary: composables receive state and callbacks only (no
+  repository access), all user-visible strings resolve through `AppStrings`,
+  and the exact task verification passes.
+- `update-docs`: extend `COMPOSE_GUIDE.md` with the presentation layer and its
+  testing seams.
+
 ## CMP-003 closeout — 2026-09-19
 
 - Pushed the deferred NEO-003 closeout and the CMP-002 closeout to `main`

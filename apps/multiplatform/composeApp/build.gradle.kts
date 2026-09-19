@@ -24,14 +24,22 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":shared"))
+            implementation(libs.kotlinx.coroutines.core)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.uiToolingPreview)
         }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+        }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+        }
+        wasmJsTest.dependencies {
+            implementation(libs.compose.uiTest)
         }
     }
 }

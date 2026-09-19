@@ -361,7 +361,7 @@ tasks:
       - git diff --check
   - id: CMP-004
     title: Build auth and problem management UI
-    status: ready
+    status: completed
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-03", "AC-CMP-04", "5-6"]

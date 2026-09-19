@@ -111,7 +111,7 @@ flowchart TD
   C3[CMP-003 Library/review/dashboard data\ncompleted]
   A5[ALG-005 Auth API\ncompleted]
   A7[ALG-007..010 Library APIs\ncompleted]
-  C4[CMP-004 Auth + problem UI\nready]
+  C4[CMP-004 Auth + problem UI\ncompleted]
   C5[CMP-005 Browse + Review Mode UI\nready]
   C6[CMP-006 Dashboard/home UI\nready]
   C7[CMP-007 Cross-platform acceptance\npending]

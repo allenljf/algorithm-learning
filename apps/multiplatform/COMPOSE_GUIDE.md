@@ -84,6 +84,12 @@ Chinese. Do not hard-code display strings in composables; add them to
 - Keep tests deterministic: no sleeps, no network, no clock dependence.
 - Verification for foundation work is:
   `./gradlew :shared:allTests` and `./gradlew :composeApp:assembleDebug`.
+- Experience verification is `./gradlew :composeApp:allTests`. Plain state
+  holder tests live in `composeApp/src/commonTest` and run on Android and Wasm.
+  Compose structure tests that render a screen live in
+  `composeApp/src/wasmJsTest` and run under `wasmJsBrowserTest`, because Compose
+  Multiplatform cannot run common UI tests through the Android local test
+  configuration; they must not be placed in `commonTest`.
 
 ## 7. Versions and build
 
@@ -226,3 +232,52 @@ Testing seams:
 - `MockEngine` drives every Ktor remote: path, method, query parameters, body,
   bearer header, DTO mapping, and status-to-`ApiFailureKind` mapping.
 - Library data-flow tests run under `:shared:allTests` on Android and Wasm.
+
+## 11. Auth and problem-management presentation
+
+CMP-004 adds the first experience layer. It keeps the UI thin by separating a
+presentation state holder from stateless composables:
+
+```text
+composeApp/
+  commonMain/kotlin/com/algorithmlearning/app/
+    App.kt                 # composition root wiring + auth gate + navigation
+    Labels.kt              # enum/error-kind -> AppStrings resolvers
+    auth/
+      AuthViewModel.kt     # AuthFormState + AuthErrorKind
+      AuthScreen.kt        # stateless login/register form
+    problems/
+      ProblemsViewModel.kt # ProblemsUiState + ProblemsMessage
+      ProblemsScreen.kt    # stateless list/editor/detail + ProblemsActions
+  commonTest/kotlin/...    # state-holder behavior (Android + Wasm)
+  wasmJsTest/kotlin/...    # Compose structure tests (wasmJsBrowserTest)
+```
+
+Rules:
+
+1. `App` is the only composable that constructs `AppContainer`. It builds each
+   view model from the container's repositories and collects its `StateFlow`.
+   Screens receive an immutable state object and a callback object
+   (`ProblemsActions`) — never a repository, `HttpClient`, or container.
+2. `ProblemsViewModel` owns all list/editor/detail state and maps `ApiFailure`
+   to `ApiFailureKind`; `AuthViewModel` delegates the session lifecycle to
+   `AuthSessionHolder` and maps `AuthFailure` to `AuthErrorKind`. View models
+   never render text.
+3. The auth gate renders `AuthScreen` until a session exists, a restoring notice
+   during app-start `restore()`, and the signed-in scaffold afterwards. Session
+   identity and sign-out live in the Settings tab.
+4. Every user-visible string resolves through `AppStrings` and both catalog
+   branches; `Labels.kt` maps domain enums and failure kinds to catalog fields.
+5. The editor validates the required title locally and otherwise surfaces server
+   `fieldErrors`, retaining the draft. Deleting a problem requires confirmation.
+   Solutions are created and deleted independently of the problem.
+
+Testing seams:
+
+- `FakeAuthRepository`, `FakeProblemRepository`, `FakeTagRepository`, and
+  `FakeSolutionRepository` (commonTest) record calls and script results or
+  failures. Presentation tests drive view models with a test coroutine scope.
+- `ProblemListState` is a sealed loading/content/failed state, so the distinct
+  list states are asserted without a UI host.
+- Compose structure tests render the stateless screens with fixed state and
+  callback recorders under `wasmJsBrowserTest`.
