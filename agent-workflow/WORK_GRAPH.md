@@ -78,14 +78,61 @@ flowchart TD
   G1[GCP-001 Bootstrap tooling and runbook\ncompleted]
   G2[GCP-002 Migration-only API mode\ncompleted]
   G3[GCP-003 OIDC deployment workflow\ncompleted]
-  G4[GCP-004 First controlled GCP release\nready after user setup]
+  G4[GCP-004 First controlled GCP release\nblocked: superseded by NEO-003]
 
   G1 --> G3
   G2 --> G3
   G3 --> G4
 ```
 
-`GCP-001`, `GCP-002`, and `GCP-003` are completed. `GCP-004` is the sole
-GCP-mutating task; it becomes ready only after the user has privately configured
-the approved GCP and GitHub Environment values. Its execution must not expose a
-secret value in source control, logs, or this conversation.
+`GCP-001`, `GCP-002`, and `GCP-003` are completed. `GCP-004` is blocked: it is
+superseded by the Neon delivery path below and must not run.
+
+# Neon Cloud Run Delivery — Dependency Graph
+
+```mermaid
+flowchart TD
+  N1[NEO-001 Neon bootstrap and runbook\ncompleted]
+  N2[NEO-002 Neon deploy workflow\ncompleted]
+  G2[GCP-002 Migration-only API mode\ncompleted]
+  N3[NEO-003 First Neon release\nready]
+
+  N1 --> N2
+  G2 --> N2
+  N2 --> N3
+```
+
+# Compose Multiplatform Migration — Dependency Graph
+
+```mermaid
+flowchart TD
+  C1[CMP-001 Compose MP root + guide\ncompleted]
+  C2[CMP-002 Auth/session data\nready]
+  C3[CMP-003 Library/review/dashboard data\npending]
+  A5[ALG-005 Auth API\ncompleted]
+  A7[ALG-007..010 Library APIs\ncompleted]
+  C4[CMP-004 Auth + problem UI\npending]
+  C5[CMP-005 Browse + Review Mode UI\npending]
+  C6[CMP-006 Dashboard/home UI\npending]
+  C7[CMP-007 Cross-platform acceptance\npending]
+  C8[CMP-008 Retire Flutter client\npending]
+
+  C1 --> C2
+  A5 --> C2
+  C1 --> C3
+  C2 --> C3
+  A7 --> C3
+  C2 --> C4
+  C3 --> C4
+  C2 --> C5
+  C3 --> C5
+  C2 --> C6
+  C3 --> C6
+  C4 --> C7
+  C5 --> C7
+  C6 --> C7
+  C7 --> C8
+```
+
+Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
+not authorization to begin a task without `$execution-strategy`.

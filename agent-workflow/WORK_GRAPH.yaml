@@ -258,14 +258,171 @@ tasks:
     verification: ["python3 -c \"from pathlib import Path; text = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'id-token: write' in text and 'GCP_SA_KEY' not in text and 'concurrency:' in text and 'SPRING_FLYWAY_ENABLED=false' in text\"", "git diff --check"]
   - id: GCP-004
     title: Provision and verify the first GCP production release
-    status: pending
+    status: blocked
     depends_on: [GCP-003]
     parallel_group: production-release
     spec_refs: ["2", "4", "AC-GCP-01..07", "6-8"]
     execution_contract: null
     implementation_strategy: >-
-      Only after the user has configured GitHub Environment variables and
-      created Secret Manager values privately, apply the reviewed bootstrap,
-      execute exactly one migration Job, deploy the service, collect readiness
-      evidence, and record a revision-based rollback path.
+      Superseded by the Neon delivery path. This Cloud SQL first-release task
+      must not run; NEO-003 is the replacement production-release task. Keep this
+      node blocked for history only.
     verification: ["bash infra/gcp/bootstrap.sh --apply", "gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait", "gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'", "curl --fail --retry 12 --retry-delay 5 \"$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness\""]
+  - id: NEO-001
+    title: Replace Cloud SQL bootstrap with a Neon-compatible GCP bootstrap and runbook
+    status: completed
+    depends_on: []
+    parallel_group: neon-delivery-foundations
+    spec_refs: ["2", "3", "4.1-4.2", "AC-NEO-01", "AC-NEO-02", "AC-NEO-05", "AC-NEO-07", "6-8"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Remove every Cloud SQL/VPC/private-service-access/cloudsql.client step from
+      infra/gcp/bootstrap.sh while keeping API enablement, Artifact Registry,
+      Secret Manager containers, service accounts, WIF, and IAM. Update
+      infra/gcp/README.md for Neon connection variables and the operator
+      checklist. Never read or print a secret value.
+    verification:
+      - bash -n infra/gcp/bootstrap.sh
+      - bash infra/gcp/bootstrap.sh --help
+      - "python3 -c \"from pathlib import Path; t = Path('infra/gcp/bootstrap.sh').read_text().lower(); assert 'cloudsql' not in t and 'sqladmin' not in t and 'private-services' not in t\""
+      - git diff --check
+  - id: NEO-002
+    title: Retarget the production workflow from Cloud SQL to Neon
+    status: completed
+    depends_on: [NEO-001, GCP-002]
+    parallel_group: neon-delivery-foundations
+    spec_refs: ["2", "3", "4.1-4.2", "AC-NEO-02", "AC-NEO-03", "AC-NEO-04", "AC-NEO-06", "6-8"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Keep SHA-pinned actions, serialized OIDC deployment, and immutable images.
+      Build the migration Job from NEON_MIGRATION_JDBC_URL and the service from
+      NEON_SERVICE_JDBC_URL (with prepareThreshold=0), both with
+      NEON_DATABASE_USERNAME, and remove Cloud SQL connector flags and the
+      postgres-socket-factory dependency.
+    verification:
+      - "python3 -c \"from pathlib import Path; t = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'id-token: write' in t and 'GCP_SA_KEY' not in t and 'concurrency:' in t and 'SPRING_FLYWAY_ENABLED=false' in t and 'NEON_MIGRATION_JDBC_URL' in t and 'NEON_SERVICE_JDBC_URL' in t and 'cloudSqlInstance' not in t and 'add-cloudsql-instances' not in t and 'prepareThreshold=0' in t\""
+      - "python3 -c \"from pathlib import Path; t = Path('services/api/pom.xml').read_text(); assert 'postgres-socket-factory' not in t\""
+      - git diff --check
+  - id: NEO-003
+    title: Provision and verify the first Neon-backed GCP production release
+    status: in_progress
+    depends_on: [NEO-002]
+    parallel_group: neon-production-release
+    spec_refs: ["2", "4", "AC-NEO-01..07", "6-8"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: ask-with-options}
+    implementation_strategy: >-
+      Only after private Secret Manager and Environment setup: apply the reviewed
+      Neon bootstrap, run exactly one migration Job against the direct endpoint,
+      deploy the service on the pooled endpoint, collect readiness evidence, and
+      record a revision-based rollback path.
+    verification: ["bash infra/gcp/bootstrap.sh --apply", "gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait", "gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'", "curl --fail --retry 12 --retry-delay 5 \"$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness\""]
+  - id: CMP-001
+    title: Establish the Compose Multiplatform project and engineering guide
+    status: completed
+    depends_on: []
+    parallel_group: cmp-foundation
+    spec_refs: ["2", "3", "4", "AC-CMP-01", "AC-CMP-02", "5-7"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Create apps/multiplatform with composeApp and shared modules, Android and
+      Web (Wasm) targets, a version catalog, theme/navigation/localization, a DI
+      composition root, a smoke test, and a Compose-specific engineering guide.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - test -f apps/multiplatform/COMPOSE_GUIDE.md
+      - git diff --check
+  - id: CMP-002
+    title: Implement shared auth/session data flow
+    status: ready
+    depends_on: [CMP-001, ALG-005]
+    parallel_group: cmp-data
+    spec_refs: ["3", "4", "AC-CMP-03", "5-6"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Ktor auth remote contract, auth/session repository, in-memory access token,
+      single-flight refresh, and session state holder in commonMain with fakes.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - git diff --check
+  - id: CMP-003
+    title: Implement shared problem-library, review, and dashboard data flows
+    status: pending
+    depends_on: [CMP-001, CMP-002, ALG-007, ALG-008, ALG-009, ALG-010]
+    parallel_group: cmp-data
+    spec_refs: ["3", "4", "AC-CMP-04..06", "5-6"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Typed remote contracts and repositories for problems, tags, solutions,
+      reviews, and dashboard in commonMain with immutable domain models and no
+      DTO leakage.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - git diff --check
+  - id: CMP-004
+    title: Build auth and problem management UI
+    status: pending
+    depends_on: [CMP-002, CMP-003]
+    parallel_group: cmp-experiences
+    spec_refs: ["3", "4", "AC-CMP-03", "AC-CMP-04", "5-6"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Compose screens for register/login/session and problem
+      list/search/filter/create/edit/delete with solutions and tags, matching
+      ALG-013 behavior.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: CMP-005
+    title: Build adaptive browse and staged Review Mode UI
+    status: pending
+    depends_on: [CMP-002, CMP-003]
+    parallel_group: cmp-experiences
+    spec_refs: ["3", "4", "AC-CMP-05", "5-6"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Adaptive browse and staged Problem to Think to Hint to My Approach to
+      Solution to confidence disclosure with submit gating, matching ALG-014.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: CMP-006
+    title: Build dashboard and home UI
+    status: pending
+    depends_on: [CMP-002, CMP-003]
+    parallel_group: cmp-experiences
+    spec_refs: ["3", "4", "AC-CMP-06", "5-6"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Dashboard/home states for loading, retry, empty, totals, difficulty
+      distribution, and due-review count, matching ALG-015.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: CMP-007
+    title: Run cross-platform acceptance for the Compose client
+    status: pending
+    depends_on: [CMP-004, CMP-005, CMP-006]
+    parallel_group: cmp-release
+    spec_refs: ["4", "AC-CMP-01..06"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Acceptance suite and evidence that exercises the four experiences against a
+      controlled API adapter on Android and Web.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: CMP-008
+    title: Retire the Flutter client and record migration notes
+    status: pending
+    depends_on: [CMP-007]
+    parallel_group: cmp-release
+    spec_refs: ["4", "AC-CMP-07", "7"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Remove or explicitly archive apps/learning_app, update entry READMEs and the
+      requirement baseline, and record parity/migration notes.
+    verification:
+      - test ! -d apps/learning_app || test -f apps/learning_app/ARCHIVED.md
+      - git diff --check

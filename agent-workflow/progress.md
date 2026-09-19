@@ -2,6 +2,132 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NEO-003 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `NEO-002` is completed; `NEO-003` advanced
+  from `ready` to `in_progress`.
+- The user authorized the real first release (recorded in conversation).
+- Selected contract: `three-perspectives` / `test-candidates` / `update-docs` /
+  `ask-with-options`.
+- Planner boundary: apply the Neon-compatible GCP bootstrap, then let the pushed
+  `main` workflow run exactly one migration before the service deploy.
+  Implementer boundary: bootstrap execution, the release commit/push, and the
+  workflow run. Evaluator boundary: record the deployed Git SHA, the new and
+  prior known-good revisions, readiness evidence, and a revision-based rollback;
+  never read, print, or store a secret value.
+- Material decision open: `NEON_DATABASE_USERNAME` is the Neon owner
+  `neondb_owner`. The runbook first-deploy checklist expects a least-privilege
+  role, but no Neon CLI or `psql` is installed locally and the agent must not
+  handle the role password, so creating a dedicated role is an operator-only
+  step.
+
+## CMP-001 closeout — 2026-09-19
+
+- Established `apps/multiplatform` as a Gradle/Kotlin-DSL project with modules
+  `:shared` and `:composeApp` and a single pinned version catalog: Kotlin
+  2.4.10, Compose Multiplatform 1.11.1, AGP 9.1.1, Gradle wrapper 9.7.1 (SHA-256
+  pinned). `:shared` targets Android and Wasm and holds the domain placeholder,
+  `AppLanguage`/`StringCatalog` localization, the `Navigator` state holder, and
+  the manual DI root `AppContainer`; `:composeApp` holds the shared Compose UI
+  (`App`, `AlgorithmLearningTheme`, a Material 3 navigation bar) with an Android
+  `MainActivity`/manifest and a Wasm `ComposeViewport` entry plus `index.html`.
+- Added `apps/multiplatform/COMPOSE_GUIDE.md` covering architecture, layer
+  responsibilities, DI, state/data flow, localization, testing, versions, and
+  guardrails. Recorded the AGP 9 compatibility decision: `com.android.application`
+  cannot be combined with the Kotlin Multiplatform plugin under AGP 9 defaults,
+  so `gradle.properties` opts into the documented `android.builtInKotlin=false`
+  and `android.newDsl=false` flags; splitting `composeApp` is a future change.
+- Ignored `local.properties`, `.kotlin/`, and heap dumps in the root `.gitignore`.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :shared:allTests` (includes the
+  `wasmJsBrowserTest` run); `cd apps/multiplatform && ./gradlew
+  :composeApp:assembleDebug` (produced `composeApp-debug.apk`);
+  `test -f apps/multiplatform/COMPOSE_GUIDE.md`; `git diff --check`.
+- `CMP-001` is completed; `CMP-002` (shared auth/session data flow) is now ready.
+  The closeout commit was not created in this pass because the working tree
+  still contains the uncommitted `NEO-001`/`NEO-002` artifacts, and mixing them
+  into a CMP commit was avoided.
+
+## CMP-001 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-001` has no dependencies; it advanced
+  from `ready` to `in_progress`.
+- Selected contract (already recorded by `$work-graph`): `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Planner boundary: one Compose Multiplatform foundation whose `commonMain` UI
+  builds for Android and Web. Implementer boundary: `apps/multiplatform` and the
+  Compose guide only. Evaluator boundary: no DTO or repository reaches a
+  composable, versions are pinned, and the exact four verification commands pass.
+
+## NEO-002 closeout — 2026-09-19
+
+- Retargeted `.github/workflows/gcp-production-deploy.yml` from Cloud SQL to
+  Neon: the migration Job now uses `NEON_MIGRATION_JDBC_URL` and the service
+  uses `NEON_SERVICE_JDBC_URL` with `&prepareThreshold=0`, both with
+  `NEON_DATABASE_USERNAME`. Removed `--add-cloudsql-instances`, `--network`,
+  `--subnet`, `--vpc-egress`, and the Cloud SQL socket factory; all SHA-pinned
+  OIDC/serialization/immutable-image behavior is unchanged.
+- Removed `com.google.cloud.sql:postgres-socket-factory` from
+  `services/api/pom.xml`; it was runtime-scoped and unused by any source.
+- Task-limited verification passed: the workflow static assertion, the pom
+  assertion, and `git diff --check`. `NEO-002` is completed; `NEO-003` (first
+  Neon release) is now ready but remains blocked on private operator setup.
+
+## NEO-001 closeout — 2026-09-19
+
+- Rewrote `infra/gcp/bootstrap.sh` to drop every Cloud SQL, VPC, subnet,
+  private-service-access, and `roles/cloudsql.client` step while keeping API
+  enablement, Artifact Registry, Secret Manager containers, the runtime/deploy
+  service accounts, WIF, and least-privilege IAM. Rewrote `infra/gcp/README.md`
+  for Neon connection variables, the pooled/direct endpoint split, and the
+  first-deploy/rollback checklist.
+- Task-limited verification passed: `bash -n infra/gcp/bootstrap.sh`,
+  `--help`, the no-CloudSQL static assertion, and `git diff --check`. `NEO-001`
+  is completed.
+
+## Neon delivery work graph — 2026-09-19
+
+- `$work-graph` created `specs/neon-cloud-run-delivery/plan.md` and `tasks.md`
+  and appended `NEO-001`..`NEO-003` to `agent-workflow/WORK_GRAPH.yaml` with a
+  readable graph in `WORK_GRAPH.md`.
+- Superseded the Cloud SQL `GCP-004` first-release task: it is marked `blocked`
+  and must not run; `NEO-003` is the replacement production-release task.
+
+## Neon delivery spec governance — 2026-09-19
+
+- `$spec-governance` selected `update-docs + infer` and created
+  `specs/neon-cloud-run-delivery/spec.md` at intake mode `quick-analysis`.
+- Locked the split: the serving API uses the Neon pooled endpoint, the Flyway
+  migration Job uses the direct endpoint, and Cloud Run reaches Neon over public
+  TLS with no VPC or Cloud SQL. Acceptance criteria `AC-NEO-01..07` cover the
+  bootstrap, workflow, pooling constraint, IAM, readiness, and rollback.
+
+## Neon credential incident and wizard fix — 2026-09-19
+
+- The first wizard run accepted full Neon connection strings in the hostname
+  fields, producing doubled `jdbc:postgresql://postgresql://...` URLs that
+  embedded the Neon role password in GitHub production Variables. The two
+  variables were overwritten with password-free host-only URL values.
+- The user rotated the Neon role password and re-created the Secret Manager
+  value. The stray repo-root `.env` that held the leaked value was removed.
+- Hardened `scripts/neon-cloud-run-setup-wizard.sh`: hostname/identifier
+  validators reject any scheme, credential, port, or path; empty values delete
+  the GitHub variable instead of hanging on `gh`'s hidden prompt; and the
+  `ENV_FILE` default bug that wrote to repo-root `.env` was fixed so it writes
+  `infra/env/.env.neon`. A re-run completed without hanging and produced the
+  correct file.
+
+## Compose Multiplatform migration intake and governance — 2026-09-19
+
+- Created `specs/compose-multiplatform-migration/spec.md`, `plan.md`, and
+  `tasks.md` to replace the Flutter client with a Kotlin Compose Multiplatform
+  client on Android/Web (then iOS/Desktop), mirroring the ALG-011..015 behavior.
+- Appended `CMP-001`..`CMP-008` to `agent-workflow/WORK_GRAPH.yaml` and
+  `WORK_GRAPH.md`; `CMP-001` is ready. A Compose-specific engineering guide is
+  an explicit prerequisite deliverable (`AC-CMP-02`). No Compose code was
+  written in this pass.
+
+
 ## GCP-003 closeout — 2026-09-10
 
 - Added `.github/workflows/gcp-production-deploy.yml`: a SHA-pinned,
