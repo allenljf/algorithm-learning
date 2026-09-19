@@ -2,6 +2,46 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NEO-003 closeout — 2026-09-19
+
+- Provisioned the GCP foundation in `alert-study-508214-s5`: enabled the
+  Artifact Registry, IAM, IAM Credentials, Cloud Run, Secret Manager, and STS
+  APIs; created the `algorithm-learning` Artifact Registry repository, the
+  `algorithm-learning-runtime` and `algorithm-learning-deployer` service
+  accounts, the `github-actions` WIF pool with a `main`/`production`-restricted
+  provider, and the least-scope IAM bindings. No VPC, subnet,
+  private-service-access range, or Cloud SQL resource exists (AC-NEO-01,
+  AC-NEO-05).
+- Pushed `main` to `allenljf/algorithm-learning`; workflow run `35410591526`
+  passed: the OIDC deploy job published
+  `asia-east1-docker.pkg.dev/alert-study-508214-s5/algorithm-learning/api:323544a2ecc771bbe3ed806c525553879c27d8aa`,
+  deployed `algorithm-learning-migrate`, ran exactly one Flyway migration
+  against the Neon direct endpoint, then deployed the Flyway-disabled
+  `algorithm-learning-api` on the pooled endpoint, and verified readiness
+  (AC-NEO-02, AC-NEO-03, AC-NEO-04, AC-NEO-06).
+- Task-limited verification passed exactly as contracted:
+  `bash infra/gcp/bootstrap.sh --apply`; `gcloud run jobs execute
+  algorithm-learning-migrate --region=asia-east1 --wait` (execution
+  `algorithm-learning-migrate-wsn48` completed); `gcloud run services describe
+  algorithm-learning-api --region=asia-east1 --format='value(status.url)'`
+  returned `https://algorithm-learning-api-qvepavg7qa-de.a.run.app`; and
+  `curl --fail .../actuator/health/readiness` returned `{"status":"UP"}`.
+- Release evidence for rollback (AC-NEO-07): image
+  `api:323544a2ecc771bbe3ed806c525553879c27d8aa`; service revision
+  `algorithm-learning-api-00001-c6z` (the first revision, so there is no prior
+  known-good revision to return to yet). Future rollbacks select a recorded
+  revision with `gcloud run services update-traffic` and never reverse Flyway
+  migrations.
+- Recorded deviation: `NEON_DATABASE_USERNAME` remains the Neon owner
+  `neondb_owner`. The governed spec (section 7) permits this for the deployment
+  path, but the runbook checklist prefers a least-privilege role; a follow-up
+  should create a dedicated Neon role, update
+  `algorithm-learning-db-password` and the GitHub `production` variable, and
+  redeploy.
+- `NEO-003` is completed and the `neon-cloud-run-delivery` feature is complete.
+  The closeout commit is local only: pushing documentation-only commits to
+  `main` would trigger another production deploy, so the push is deferred.
+
 ## NEO-003 recovery evidence — 2026-09-19
 
 - Round 1 (bootstrap): `bash infra/gcp/bootstrap.sh --apply` failed creating the

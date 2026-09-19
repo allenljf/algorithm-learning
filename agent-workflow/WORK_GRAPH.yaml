@@ -305,7 +305,7 @@ tasks:
       - git diff --check
   - id: NEO-003
     title: Provision and verify the first Neon-backed GCP production release
-    status: in_progress
+    status: completed
     depends_on: [NEO-002]
     parallel_group: neon-production-release
     spec_refs: ["2", "4", "AC-NEO-01..07", "6-8"]

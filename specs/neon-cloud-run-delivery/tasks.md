@@ -54,4 +54,4 @@ human-readable execution contract.
 - Parallel group: `neon-production-release`
 - Spec refs: 2, 4, 5 AC-NEO-01..07, 6-8
 - Verification: `bash infra/gcp/bootstrap.sh --apply`; `gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait`; `gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'`; `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`
-- Status: pending
+- Status: completed

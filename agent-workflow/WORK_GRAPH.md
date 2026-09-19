@@ -95,7 +95,7 @@ flowchart TD
   N1[NEO-001 Neon bootstrap and runbook\ncompleted]
   N2[NEO-002 Neon deploy workflow\ncompleted]
   G2[GCP-002 Migration-only API mode\ncompleted]
-  N3[NEO-003 First Neon release\nready]
+  N3[NEO-003 First Neon release\ncompleted]
 
   N1 --> N2
   G2 --> N2
