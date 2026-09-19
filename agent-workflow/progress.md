@@ -2,6 +2,61 @@
 
 The Flutter application root and backend composition root are complete.
 
+## CMP-005 closeout — 2026-09-19
+
+- Implemented the review experience in `composeApp` `commonMain` under
+  `com.algorithmlearning.app.review`: `ReviewViewModel` (monotonic
+  `ReviewStage`, `DueReviewState`, `ReviewSessionState`, `ReviewUiState`) and
+  the stateless `ReviewScreen` plus a `ReviewActions` callback object.
+- Adaptive browse and staged Review Mode match ALG-014: the Review tab lists
+  due problems (`ReviewRepository.due`) with loading/failed/empty/content
+  states and retry; selecting one loads its detail and starts at the Problem
+  stage. Reveal advances only Problem → Think → Hint → My Approach → Solution →
+  Mark confidence, so confidence is unreachable before the solution is shown.
+  The Solution stage switches among solutions; the confidence stage accepts
+  `0...4` and an optional trimmed note, and submission is gated on a chosen
+  confidence.
+- Adaptive layout: `App` measures width with `BoxWithConstraints` and passes
+  `twoPane = maxWidth >= 840.dp`; the wide layout shows the due list beside the
+  session (or a select prompt) and the narrow layout swaps between them, both
+  rendering the same state. The problem detail now exposes a "Review problem"
+  action that opens the session and switches to the Review destination.
+- `update-docs`: added `COMPOSE_GUIDE.md` section 12 covering the review
+  presentation, disclosure gating, adaptive layout, entry points, and testing
+  seams; extended `AppStrings` with the review strings in both languages.
+- Tests: `ReviewViewModelTest` (commonTest) proves failed/empty/content due
+  states, ordered disclosure, confidence bounds and gating, note trimming,
+  solution switching, exit, and failure handling. `ReviewScreenUiTest`
+  (wasmJsTest) drives the real view model through the UI to prove the ordered
+  reveal, gated submit, and the two-pane/narrow layouts.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :composeApp:allTests` (Android
+  `testDebugUnitTest` 25 tests; Wasm `wasmJsBrowserTest` 36 tests) and
+  `git diff --check` clean.
+- Evaluator conclusions: no composable reads a repository; the disclosure order
+  and `0...4` confidence bound hold in presentation state; every user-visible
+  string resolves through `AppStrings`; the closeout commit is local only.
+- `CMP-005` is completed. `CMP-006` (dashboard and home UI) remains ready in the
+  same Phase 3 `cmp-experiences` group.
+
+## CMP-005 execution strategy — 2026-09-19
+
+- Dependency reconciliation confirmed `CMP-002` and `CMP-003` are completed;
+  `CMP-005` advanced from `ready` to `in_progress`.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `tdd` / `update-docs` / `infer`.
+- Planner boundary: one Review experience built on the shared
+  `ReviewRepository` and `ProblemRepository` — an adaptive Today's Review browse
+  list plus a staged Review Mode session (Problem → Think → Hint → My Approach →
+  Solution → Mark confidence) with confidence gating, populated by the frozen
+  REST contract. Implementer boundary: `apps/multiplatform/composeApp` and the
+  Compose guide. Evaluator boundary: no composable reads a repository, the
+  disclosure order and confidence gating hold in presentation state, every
+  user-visible string resolves through `AppStrings`, and the exact task
+  verification passes.
+- `update-docs`: extend `COMPOSE_GUIDE.md` with the review presentation layer
+  and its testing seams.
+
 ## CMP-004 closeout — 2026-09-19
 
 - Implemented the auth and problem-management Compose experience in

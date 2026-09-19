@@ -11,6 +11,8 @@ import com.algorithmlearning.shared.library.ProblemQuery
 import com.algorithmlearning.shared.library.ProblemRepository
 import com.algorithmlearning.shared.library.ProblemSummary
 import com.algorithmlearning.shared.library.ProblemWrite
+import com.algorithmlearning.shared.library.Review
+import com.algorithmlearning.shared.library.ReviewRepository
 import com.algorithmlearning.shared.library.ReviewStatus
 import com.algorithmlearning.shared.library.ReviewSummary
 import com.algorithmlearning.shared.library.Solution
@@ -54,18 +56,30 @@ fun problemDetail(
     id: String,
     title: String,
     notes: String? = null,
+    keyInsight: String? = null,
     tags: List<Tag> = emptyList(),
+    solutions: List<Solution> = emptyList(),
 ): ProblemDetail = ProblemDetail(
     summary = problemSummary(id = id, title = title, tags = tags),
     externalUrl = null,
     description = null,
     notes = notes,
-    keyInsight = null,
+    keyInsight = keyInsight,
     timeComplexity = null,
     spaceComplexity = null,
     mistakes = null,
     interviewNotes = null,
-    solutions = emptyList(),
+    solutions = solutions,
+)
+
+fun review(problemId: String, confidence: Int, notes: String? = null): Review = Review(
+    id = "review-1",
+    problemId = problemId,
+    confidence = confidence,
+    reviewedAt = testInstant,
+    nextReviewAt = testInstant,
+    notes = notes,
+    policyVersion = "adaptive-v1",
 )
 
 fun problemSolution(
@@ -165,6 +179,22 @@ class FakeTagRepository : TagRepository {
         created += name
         return createHandler(name)
     }
+}
+
+class FakeReviewRepository : ReviewRepository {
+    var dueHandler: suspend () -> List<ProblemSummary> = { emptyList() }
+    var submitHandler: suspend (String, Int, String?) -> Review =
+        { problemId, confidence, notes -> review(problemId, confidence, notes) }
+    val submitted = mutableListOf<Triple<String, Int, String?>>()
+
+    override suspend fun submit(problemId: String, confidence: Int, notes: String?): Review {
+        submitted += Triple(problemId, confidence, notes)
+        return submitHandler(problemId, confidence, notes)
+    }
+
+    override suspend fun due(page: Int, pageSize: Int): List<ProblemSummary> = dueHandler()
+
+    override suspend fun history(problemId: String, page: Int, pageSize: Int): List<Review> = emptyList()
 }
 
 class FakeSolutionRepository : SolutionRepository {

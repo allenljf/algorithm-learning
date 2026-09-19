@@ -67,6 +67,7 @@ data class ProblemsActions(
     val cancelDeleteProblem: () -> Unit = {},
     val confirmDeleteProblem: () -> Unit = {},
     val backToList: () -> Unit = {},
+    val reviewProblem: (String) -> Unit = {},
     val solutionLanguageChanged: (SolutionLanguage) -> Unit = {},
     val solutionCodeChanged: (String) -> Unit = {},
     val solutionExplanationChanged: (String) -> Unit = {},
@@ -478,6 +479,12 @@ private fun ProblemDetailPane(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(strings.solutionsTitle, style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.weight(1f))
+            TextButton(
+                onClick = { actions.reviewProblem(detail.detail.summary.id) },
+                modifier = Modifier.testTag("problem-review"),
+            ) {
+                Text(strings.problemReviewAction)
+            }
             TextButton(
                 onClick = actions.editProblem,
                 modifier = Modifier.testTag("problem-edit"),

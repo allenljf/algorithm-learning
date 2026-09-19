@@ -375,7 +375,7 @@ tasks:
       - git diff --check
   - id: CMP-005
     title: Build adaptive browse and staged Review Mode UI
-    status: ready
+    status: completed
     depends_on: [CMP-002, CMP-003]
     parallel_group: cmp-experiences
     spec_refs: ["3", "4", "AC-CMP-05", "5-6"]

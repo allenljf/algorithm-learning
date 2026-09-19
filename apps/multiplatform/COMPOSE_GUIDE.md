@@ -281,3 +281,43 @@ Testing seams:
   list states are asserted without a UI host.
 - Compose structure tests render the stateless screens with fixed state and
   callback recorders under `wasmJsBrowserTest`.
+
+## 12. Review presentation
+
+CMP-005 adds the adaptive browse and staged Review Mode experience, built on the
+same thin-presentation pattern:
+
+```text
+composeApp/src/commonMain/kotlin/com/algorithmlearning/app/review/
+  ReviewViewModel.kt   # ReviewStage, DueReviewState, ReviewSessionState, ReviewUiState
+  ReviewScreen.kt      # due browse list + staged session + ReviewActions
+```
+
+Rules:
+
+1. `ReviewViewModel` depends on `ReviewRepository` and `ProblemRepository`; the
+   problem detail (with its solutions) is loaded through the problem repository,
+   and review submission through the review repository. It never touches HTTP.
+2. `ReviewStage` is monotonic. Each reveal action advances only from its
+   predecessor (`startThinking`, `revealHint`, `revealApproach`, `revealSolution`,
+   `rateConfidence`), so the confidence stage is unreachable until the solution
+   is shown. `submitReview` additionally requires the `CONFIDENCE` stage and a
+   `0...4` confidence; out-of-range values are ignored.
+3. Adaptive layout: `App` measures the available width with `BoxWithConstraints`
+   and renders `ReviewScreen(twoPane = maxWidth >= 840.dp)`. The two-pane layout
+   shows the Today's Review list beside the session (or a select prompt); the
+   single-pane layout swaps between them. Both render the same state.
+4. The Review tab is the browse entry (Today's Review due list, via
+   `ReviewRepository.due`). The problem detail's review action opens the same
+   session by calling `openProblem` and switching the navigator to the Review
+   destination.
+5. Every user-visible string resolves through `AppStrings`; `Labels.kt` maps the
+   library enums and failure kinds to catalog fields.
+
+Testing seams:
+
+- `FakeReviewRepository` scripts the due list and submission and records calls.
+- `ReviewViewModelTest` proves ordered disclosure, confidence bounds, submission
+  gating, notes trimming, solution switching, and failure handling.
+- `ReviewScreenUiTest` drives the real view model through the stateless UI to
+  prove the ordered reveal, gated submit, and the adaptive two-pane layout.

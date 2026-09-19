@@ -2,6 +2,7 @@ package com.algorithmlearning.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,9 @@ import com.algorithmlearning.app.auth.AuthViewModel
 import com.algorithmlearning.app.problems.ProblemsActions
 import com.algorithmlearning.app.problems.ProblemsScreen
 import com.algorithmlearning.app.problems.ProblemsViewModel
+import com.algorithmlearning.app.review.ReviewActions
+import com.algorithmlearning.app.review.ReviewScreen
+import com.algorithmlearning.app.review.ReviewViewModel
 import com.algorithmlearning.shared.AppContainer
 import com.algorithmlearning.shared.AppDestination
 import com.algorithmlearning.shared.AppLanguage
@@ -114,10 +118,23 @@ private fun SignedInApp(
     }
     LaunchedEffect(problemsViewModel) { problemsViewModel.initialize() }
 
+    val reviewViewModel = remember(container) {
+        ReviewViewModel(
+            reviews = container.reviewRepository,
+            problems = container.problemRepository,
+            scope = scope,
+        )
+    }
+
     val problemsState by problemsViewModel.state.collectAsState()
+    val reviewState by reviewViewModel.state.collectAsState()
     val backStack by container.navigator.backStack.collectAsState()
     val current = backStack.last()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(current) {
+        if (current == AppDestination.Review) reviewViewModel.initialize()
+    }
 
     LaunchedEffect(problemsState.message) {
         problemsState.message?.let { message ->
@@ -154,9 +171,22 @@ private fun SignedInApp(
                 AppDestination.Problems -> ProblemsScreen(
                     state = problemsState,
                     strings = strings,
-                    actions = problemsActions(problemsViewModel),
+                    actions = problemsActions(
+                        viewModel = problemsViewModel,
+                        onReviewProblem = { id ->
+                            reviewViewModel.openProblem(id)
+                            container.navigator.resetTo(AppDestination.Review)
+                        },
+                    ),
                 )
-                AppDestination.Review -> Placeholder(strings.reviewTitle)
+                AppDestination.Review -> BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    ReviewScreen(
+                        state = reviewState,
+                        strings = strings,
+                        actions = reviewActions(reviewViewModel),
+                        twoPane = maxWidth >= 840.dp,
+                    )
+                }
                 AppDestination.Settings -> SettingsContent(
                     strings = strings,
                     email = email,
@@ -168,7 +198,10 @@ private fun SignedInApp(
     }
 }
 
-private fun problemsActions(viewModel: ProblemsViewModel): ProblemsActions = ProblemsActions(
+private fun problemsActions(
+    viewModel: ProblemsViewModel,
+    onReviewProblem: (String) -> Unit,
+): ProblemsActions = ProblemsActions(
     refresh = viewModel::refresh,
     searchChanged = viewModel::searchChanged,
     search = viewModel::search,
@@ -199,6 +232,22 @@ private fun problemsActions(viewModel: ProblemsViewModel): ProblemsActions = Pro
     solutionExplanationChanged = viewModel::solutionExplanationChanged,
     saveSolution = viewModel::saveSolution,
     deleteSolution = viewModel::deleteSolution,
+    reviewProblem = onReviewProblem,
+)
+
+private fun reviewActions(viewModel: ReviewViewModel): ReviewActions = ReviewActions(
+    refreshDue = viewModel::refreshDue,
+    openProblem = viewModel::openProblem,
+    exitReview = viewModel::exitReview,
+    startThinking = viewModel::startThinking,
+    revealHint = viewModel::revealHint,
+    revealApproach = viewModel::revealApproach,
+    revealSolution = viewModel::revealSolution,
+    rateConfidence = viewModel::rateConfidence,
+    selectSolution = viewModel::selectSolution,
+    confidenceSelected = viewModel::confidenceSelected,
+    notesChanged = viewModel::notesChanged,
+    submitReview = viewModel::submitReview,
 )
 
 @Composable

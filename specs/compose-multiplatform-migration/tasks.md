@@ -72,7 +72,7 @@ human-readable execution contract.
 - Execution contract: `three-perspectives` analysis; `tdd` test approach;
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### CMP-006 — Build dashboard and home UI
 
