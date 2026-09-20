@@ -2,6 +2,57 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NLP-002 closeout — 2026-09-20
+
+- Operator-side setup (user, agent never handled a value): dedicated Neon role
+  `algorithm_learning_app` created with ownership of the application schema, and
+  a new `algorithm-learning-db-password` version 3
+  (`2026-09-20T06:53:16Z`, enabled) holding its login secret.
+- Agent-side: set the non-secret GitHub `production` variable
+  `NEON_DATABASE_USERNAME=algorithm_learning_app`
+  (`2026-09-20T06:53:51Z`) and triggered the serialized production workflow with
+  `gh workflow run gcp-production-deploy.yml --ref main`.
+- Workflow run `35495425841` succeeded: Verify API, migration Job, service
+  deploy, and the in-workflow readiness check all passed.
+- Task-limited verification passed exactly as contracted:
+  `gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait`
+  (execution `algorithm-learning-migrate-657tm` succeeded);
+  `gcloud run services describe ... --format='value(status.url)'` returned
+  `https://algorithm-learning-api-qvepavg7qa-de.run.app`;
+  `curl .../actuator/health/readiness` returned `{"status":"UP"}`; the service
+  env assertion confirmed `DATABASE_USERNAME=algorithm_learning_app` and no
+  `neondb_owner`; `git diff --check` clean.
+- Release evidence for rollback: new revision `algorithm-learning-api-00004-vhf`
+  serving image
+  `asia-east1-docker.pkg.dev/alert-study-508214-s5/algorithm-learning/api:738b195284c3e47875e30afcb553c3d4a58cc962`
+  (origin/main `738b195`); previous known-good revision
+  `algorithm-learning-api-00003-6xp`. Rollback is credential/revision-only and
+  never reverses Flyway migrations.
+- Executed via `workflow_dispatch` on `main`, so the earlier local closeout
+  commits remain unpushed; the deployed image content is unchanged by them
+  (no `services/api` change).
+- Evaluator conclusions: the API and migration Job authenticate as
+  `algorithm_learning_app`, not the Neon owner; no secret value was read,
+  printed, or committed; the agent boundary held. `NLP-002` and the
+  `neon-least-privilege-role` feature are completed. The split into separate DDL
+  migration and DML-only runtime roles remains the recorded future hardening
+  option.
+
+## NLP-002 execution strategy — 2026-09-20
+
+- Dependency reconciliation confirmed `NLP-001` is completed; `NLP-002`
+  advanced from `ready` to `in_progress`.
+- The user confirmed the operator setup: dedicated Neon role
+  `algorithm_learning_app` created, and a new `algorithm-learning-db-password`
+  version 3 (`2026-09-20T06:53:16Z`, enabled) holds its login secret. The agent
+  never read the value.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Boundary: update the non-secret GitHub `production` `NEON_DATABASE_USERNAME`,
+  trigger the serialized production workflow, and verify readiness and that the
+  served `DATABASE_USERNAME` is no longer `neondb_owner`. No secret value is
+  handled.
+
 ## NLP-001 closeout — 2026-09-19
 
 - Added `infra/gcp/neon-least-privilege-role.sql`, a password-free template that

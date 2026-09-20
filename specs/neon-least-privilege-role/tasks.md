@@ -47,4 +47,4 @@ human-readable execution contract.
   `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`;
   `python3 -c "import subprocess; out = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'neondb_owner' not in out"`;
   `git diff --check`
-- Status: ready
+- Status: completed

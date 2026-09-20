@@ -447,7 +447,7 @@ tasks:
       - git diff --check
   - id: NLP-002
     title: Rotate the production Neon credential and verify readiness
-    status: ready
+    status: completed
     depends_on: [NLP-001]
     parallel_group: neon-role-release
     spec_refs: ["1", "3", "4", "5", "AC-NLP-02", "AC-NLP-04", "AC-NLP-07", "6"]

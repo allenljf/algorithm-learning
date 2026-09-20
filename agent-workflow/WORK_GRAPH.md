@@ -139,7 +139,7 @@ flowchart TD
 ```mermaid
 flowchart TD
   L1[NLP-001 Role rotation artifact + runbook\ncompleted]
-  L2[NLP-002 Rotate credential + verify readiness\nready]
+  L2[NLP-002 Rotate credential + verify readiness\ncompleted]
 
   L1 --> L2
 ```
