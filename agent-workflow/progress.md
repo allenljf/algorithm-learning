@@ -115,6 +115,14 @@ The Flutter application root and backend composition root are complete.
   `algorithm_learning_app` own every application object (at minimum `reviews`,
   plus `users`, `problems`, `solutions`, `tags`, `problem_tags`, `auth_sessions`,
   and `flyway_schema_history`), then the workflow can be re-run.
+- Round 5: the operator's `GRANT algorithm_learning_app TO neondb_owner` failed
+  with `permission denied to grant role` (SQLSTATE 42501). Neon roles created
+  through the Console/CLI/API are not Postgres superusers and `neondb_owner` has
+  no admin option on them, so the original `neon-least-privilege-role.sql`
+  ownership approach cannot work as written. Rewrote the artifact and runbook to
+  use Neon's documented shared-group-role workaround: create
+  `table_owners NOLOGIN`, grant it to both roles, and transfer `public` and every
+  application object to it, so `<APP_ROLE>` inherits ownership for Flyway DDL.
 
 ## SR-004 recovery evidence — 2026-09-20
 

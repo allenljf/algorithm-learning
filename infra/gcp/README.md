@@ -185,14 +185,18 @@ First rotation (the current owner credential is `neondb_owner`):
 1. Choose a dedicated role name, for example `algorithm_learning_app`.
 2. Open the Neon console for the production project and run
    `infra/gcp/neon-least-privilege-role.sql` in the SQL editor against the
-   `neondb` database, replacing `<APP_ROLE>` with the chosen name. This creates
-   the role, transfers schema/object ownership, and drops the temporary
-   membership. If the owner session cannot create roles, create the role from
-   the Neon console Roles tab and run only the ownership/grant statements; the
-   SQL editor executes with sufficient privileges.
+   `neondb` database, replacing `<APP_ROLE>` with the chosen name. Neon roles
+   created through the Console/CLI/API are not Postgres superusers and
+   `neondb_owner` has no admin option on them, so the script uses a shared
+   `table_owners` group role: both roles are granted membership, and ownership
+   of `public` and every application object is transferred to that group. Flyway
+   then runs DDL as `<APP_ROLE>` through inherited ownership. If the owner
+   session cannot create roles, create the role from the Neon console Roles tab
+   and run only the group/ownership statements.
 3. Confirm the confinement query in the script returns `false` for
    `rolsuper`, `rolcreatedb`, `rolcreaterole`, `rolreplication`, and
-   `rolbypassrls`.
+   `rolbypassrls`, and the ownership query shows every application object owned
+   by `table_owners`.
 4. Reset the role's login secret in the Neon console (Roles -> the role ->
    Reset) and add it as a new version of the `algorithm-learning-db-password`
    Secret Manager container. Do not put the value in a shell history, GitHub

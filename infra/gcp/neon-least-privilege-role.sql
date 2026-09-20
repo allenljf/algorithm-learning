@@ -23,26 +23,36 @@ CREATE ROLE <APP_ROLE> LOGIN
   NOREPLICATION
   NOBYPASSRLS;
 
--- 2. The owner session needs membership in the target role to hand over object
---    ownership; PostgreSQL requires this to change an object's owner.
-GRANT <APP_ROLE> TO neondb_owner;
+-- 2. Neon roles created through the Console, CLI, or API are not Postgres
+--    superusers, and neondb_owner has no admin option on them, so
+--    `GRANT <APP_ROLE> TO neondb_owner` fails with "permission denied to grant
+--    role" and a direct ownership transfer is not possible. Use a shared group
+--    role that owns the application objects; both roles inherit ownership
+--    through membership, so Flyway DDL works without owner-level attributes.
+CREATE ROLE table_owners NOLOGIN;
+GRANT USAGE, CREATE ON SCHEMA public TO table_owners;
+GRANT table_owners TO neondb_owner;
+GRANT table_owners TO <APP_ROLE>;
 
--- 3. The application schema must be owned by the role because Flyway runs DDL
---    (ALTER TABLE requires object ownership) in the migration Job.
-ALTER SCHEMA public OWNER TO <APP_ROLE>;
+-- 3. The application schema is owned by the group.
+ALTER SCHEMA public OWNER TO table_owners;
 
--- 4. Transfer every existing application object created by prior Flyway runs
---    as neondb_owner. Scoped to the current database.
-REASSIGN OWNED BY neondb_owner TO <APP_ROLE>;
+-- 4. Transfer every existing application object (tables, sequences, and the
+--    Flyway history table) created by prior runs as neondb_owner to the group.
+--    Scoped to the current database.
+REASSIGN OWNED BY neondb_owner TO table_owners;
 
--- 5. Drop the temporary membership; the role stays confined on its own.
-REVOKE <APP_ROLE> FROM neondb_owner;
-
--- 6. Confinement check: every column must return false.
+-- 5. Confinement check: every column must return false.
 --    SELECT rolsuper, rolcreatedb, rolcreaterole, rolreplication, rolbypassrls
 --      FROM pg_roles WHERE rolname = '<APP_ROLE>';
 
+-- 6. Ownership check: every application object must be owned by table_owners.
+--    SELECT c.relname, pg_get_userbyid(c.relowner) AS owner
+--      FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+--     WHERE n.nspname = 'public' AND c.relkind IN ('r', 'S', 'p')
+--     ORDER BY c.relname;
+
 COMMIT;
 
--- Later rotations of the same role do not repeat step 1. Reset the login secret
--- as above, and, if ownership may have drifted, re-run steps 2 through 5.
+-- Later rotations of the same role do not repeat steps 1 and 2. Reset the login
+-- secret as above, and, if ownership may have drifted, re-run step 4.
