@@ -164,8 +164,8 @@ flowchart TD
 ```mermaid
 flowchart TD
   R1[NRS-001 Split-role SQL artifact + runbook\ncompleted]
-  R2[NRS-002 Bootstrap + workflow split identity\nready]
-  R3[NRS-003 Apply split roles + verify readiness\npending]
+  R2[NRS-002 Bootstrap + workflow split identity\ncompleted]
+  R3[NRS-003 Apply split roles + verify readiness\nready]
 
   R1 --> R3
   R2 --> R3

@@ -51,7 +51,7 @@ human-readable execution contract.
   `python3 -c "from pathlib import Path; t = Path('infra/gcp/bootstrap.sh').read_text(); assert 'algorithm-learning-db-migration-password' in t"`;
   `python3 -c "from pathlib import Path; t = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'id-token: write' in t and 'GCP_SA_KEY' not in t and 'concurrency:' in t and 'NEON_MIGRATION_DATABASE_USERNAME' in t and 'algorithm-learning-db-migration-password' in t and 'NEON_DATABASE_USERNAME' in t and 'algorithm-learning-db-password' in t"`;
   `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 2 — Split release
 
@@ -78,4 +78,4 @@ human-readable execution contract.
   `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`;
   `python3 -c "import subprocess; svc = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; job = subprocess.run(['gcloud','run','jobs','describe','algorithm-learning-migrate','--region=asia-east1','--format=value(spec.template.spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'algorithm_learning_app' in svc and 'algorithm_learning_migrate' not in svc and 'algorithm_learning_migrate' in job"`;
   `git diff --check`
-- Status: pending
+- Status: ready

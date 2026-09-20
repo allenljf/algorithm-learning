@@ -112,6 +112,7 @@ ensure_bootstrap_resources() {
   ensure_secret_container algorithm-learning-jwt-key
   ensure_secret_container algorithm-learning-refresh-hash-key
   ensure_secret_container algorithm-learning-db-password
+  ensure_secret_container algorithm-learning-db-migration-password
 
   ensure_service_account "$RUNTIME_SERVICE_ACCOUNT" 'Algorithm Learning Cloud Run runtime'
   ensure_service_account "$DEPLOY_SERVICE_ACCOUNT" 'Algorithm Learning GitHub deployer'
@@ -132,6 +133,7 @@ ensure_bootstrap_resources() {
   ensure_secret_role algorithm-learning-jwt-key "$runtime_member" roles/secretmanager.secretAccessor
   ensure_secret_role algorithm-learning-refresh-hash-key "$runtime_member" roles/secretmanager.secretAccessor
   ensure_secret_role algorithm-learning-db-password "$runtime_member" roles/secretmanager.secretAccessor
+  ensure_secret_role algorithm-learning-db-migration-password "$runtime_member" roles/secretmanager.secretAccessor
 
   gcloud artifacts repositories add-iam-policy-binding "$ARTIFACT_REPOSITORY" --location="$REGION" --member="$deploy_member" --role=roles/artifactregistry.writer --quiet >/dev/null
   ensure_project_role "$deploy_member" roles/run.admin
@@ -143,7 +145,7 @@ if [[ "$MODE" == "plan" ]]; then
   plan "GCP project: ${PROJECT_ID} (${PROJECT_NUMBER})"
   plan "Region: ${REGION}; Artifact Registry: ${ARTIFACT_REPOSITORY}"
   plan "Database: Neon Serverless Postgres reached over public TLS; no VPC, subnet, private-service range, or Cloud SQL resource is created."
-  plan "Create empty Secret Manager containers only: algorithm-learning-jwt-key, algorithm-learning-refresh-hash-key, algorithm-learning-db-password."
+  plan "Create empty Secret Manager containers only: algorithm-learning-jwt-key, algorithm-learning-refresh-hash-key, algorithm-learning-db-password, algorithm-learning-db-migration-password."
   plan "Create runtime and GitHub deploy service accounts; bind runtime secret access, Artifact Registry writer, Cloud Run admin, and service-account-user permissions."
   plan "Create WIF pool ${WIF_POOL} and provider ${WIF_PROVIDER}, restricted to ${GITHUB_REPOSITORY} ${GITHUB_BRANCH} environment ${GITHUB_ENVIRONMENT}."
   plan "No secret value is requested, read, printed, or created by this script."

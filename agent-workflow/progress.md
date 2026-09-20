@@ -2,6 +2,32 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NRS-002 closeout — 2026-09-20
+
+- `infra/gcp/bootstrap.sh` now creates the
+  `algorithm-learning-db-migration-password` Secret Manager container and grants
+  the `algorithm-learning-runtime` account Secret Accessor on it; the `--plan`
+  output lists the fourth container. No secret value is read or created.
+- `.github/workflows/gcp-production-deploy.yml` now binds the migration Job to
+  `NEON_MIGRATION_DATABASE_USERNAME` and the
+  `algorithm-learning-db-migration-password` secret, while the serving revision
+  keeps `NEON_DATABASE_USERNAME` and the `algorithm-learning-db-password` secret.
+  SHA-pinned actions, OIDC (`id-token: write`), serialized concurrency, the
+  pooled/direct endpoint split, and `prepareThreshold=0` are unchanged.
+- Task-limited verification passed exactly as contracted:
+  `bash -n infra/gcp/bootstrap.sh`; `bash infra/gcp/bootstrap.sh --help`; the
+  static assertion that `bootstrap.sh` names the migration secret; the static
+  assertion that the workflow contains `id-token: write`, no `GCP_SA_KEY`,
+  `concurrency:`, both usernames, and both secrets; `git diff --check` clean. The
+  workflow also parses as YAML, and the Job/service bindings were inspected.
+- Evaluator conclusions: the migration Job and the service use distinct database
+  identities; no credential value is present; the change is config-only and does
+  not alter the endpoint split, the image, or the migration order.
+- `NRS-002` is completed. Phase 1 — Split tooling is complete, so `NRS-003`
+  (operator-gated split release) advanced to `ready` and opens Phase 2 — Split
+  release, which requires a new conversation per the workflow continuation
+  contract.
+
 ## NRS-001 closeout — 2026-09-20
 
 - Added `infra/gcp/neon-role-separation.sql`, a password-free template with two

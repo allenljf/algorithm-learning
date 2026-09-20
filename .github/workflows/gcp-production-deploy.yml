@@ -70,7 +70,7 @@ jobs:
           GCP_REGION: ${{ vars.GCP_REGION }}
           GCP_CORS_ALLOWED_ORIGINS: ${{ vars.GCP_CORS_ALLOWED_ORIGINS }}
           NEON_MIGRATION_JDBC_URL: ${{ vars.NEON_MIGRATION_JDBC_URL }}
-          NEON_DATABASE_USERNAME: ${{ vars.NEON_DATABASE_USERNAME }}
+          NEON_MIGRATION_DATABASE_USERNAME: ${{ vars.NEON_MIGRATION_DATABASE_USERNAME }}
         run: |
           runtime_service_account="algorithm-learning-runtime@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
           gcloud run jobs deploy algorithm-learning-migrate \
@@ -79,8 +79,8 @@ jobs:
             --service-account="${runtime_service_account}" \
             --max-retries=0 \
             --task-timeout=10m \
-            --set-env-vars="^|^DATABASE_URL=${NEON_MIGRATION_JDBC_URL}|DATABASE_USERNAME=${NEON_DATABASE_USERNAME}|APP_CORS_ALLOWED_ORIGINS=${GCP_CORS_ALLOWED_ORIGINS}|APP_JWT_ISSUER=algorithm-learning-api|APP_JWT_AUDIENCE=algorithm-learning-client|APP_MIGRATION_ONLY=true|SPRING_FLYWAY_ENABLED=true" \
-            --set-secrets="^|^APP_JWT_KEY=algorithm-learning-jwt-key:latest|APP_REFRESH_HASH_KEY=algorithm-learning-refresh-hash-key:latest|DATABASE_PASSWORD=algorithm-learning-db-password:latest"
+            --set-env-vars="^|^DATABASE_URL=${NEON_MIGRATION_JDBC_URL}|DATABASE_USERNAME=${NEON_MIGRATION_DATABASE_USERNAME}|APP_CORS_ALLOWED_ORIGINS=${GCP_CORS_ALLOWED_ORIGINS}|APP_JWT_ISSUER=algorithm-learning-api|APP_JWT_AUDIENCE=algorithm-learning-client|APP_MIGRATION_ONLY=true|SPRING_FLYWAY_ENABLED=true" \
+            --set-secrets="^|^APP_JWT_KEY=algorithm-learning-jwt-key:latest|APP_REFRESH_HASH_KEY=algorithm-learning-refresh-hash-key:latest|DATABASE_PASSWORD=algorithm-learning-db-migration-password:latest"
           gcloud run jobs execute algorithm-learning-migrate --region="${GCP_REGION}" --wait
       - name: Deploy the Flyway-disabled API service
         env:
