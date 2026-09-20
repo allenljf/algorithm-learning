@@ -2,6 +2,163 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NRS-003 progress — migration role password via SQL — 2026-09-20
+
+- The Neon Console Roles list shows only `algorithm_learning_app` and
+  `neondb_owner`; Neon does not list SQL-created roles there. Console-created
+  roles also receive `neon_superuser`, which this migration role must not have, so
+  `algorithm_learning_migrate` stays SQL-managed.
+- Set its password with
+  `ALTER ROLE algorithm_learning_migrate WITH PASSWORD '<value>';` from the Neon
+  SQL Editor as `neondb_owner` (it holds ADMIN OPTION and CREATEROLE on the role),
+  then add that value as a new version of
+  `algorithm-learning-db-migration-password` in GCP Secret Manager. The Console
+  "Reset password" action is unavailable for this role.
+- Confirm the SQL Editor session targets the production branch whose compute
+  endpoint host is `ep-odd-dream-b33qkix1`.
+
+## NRS-003 recovery resolved — split roles applied — 2026-09-20
+
+- Operator applied the split successfully. Part A ran after `CREATE ROLE` was
+  made idempotent with guarded `DO` blocks; Part B ran after
+  `GRANT algorithm_learning_migrate TO neondb_owner WITH SET TRUE, INHERIT TRUE;`
+  plus `SET ROLE algorithm_learning_migrate`. The operator reports both parts
+  succeeded.
+- `update-docs`: `infra/gcp/neon-role-separation.sql` and the "Split the migration
+  and runtime roles" runbook now document the working recipe and the two Neon
+  failure modes (`42501` when the owner has not switched into the role, `0LP01`
+  when re-granting `ADMIN OPTION`), and note that Part A is safe to re-run.
+- Re-ran the NRS-001 static verification after the doc edits: passed;
+  `git diff --check` clean; `bash -n infra/gcp/bootstrap.sh` ok.
+- Remaining before the release: create the `algorithm-learning-db-migration-password`
+  Secret Manager container and accessor (`bash infra/gcp/bootstrap.sh --apply`),
+  add the migration role's password as a version of that secret, set the GitHub
+  `production` `NEON_MIGRATION_DATABASE_USERNAME`, then authorize `push main` and
+  the serialized workflow. The runtime secret needs no rotation because the
+  runtime role's password is unchanged. `NRS-003` stays `blocked` until the
+  operator adds the migration secret version and authorizes the deploy.
+
+## NRS-003 recovery — Part B defaults still absent — 2026-09-20
+
+- The four `ALTER DEFAULT PRIVILEGES` statements failed again, and
+  `pg_default_acl` contains no rows for `algorithm_learning_migrate` or
+  `table_owners` (only Neon's `cloud_admin` entries), so the defaults are not
+  installed.
+- Membership query: `algorithm_learning_migrate -> neondb_owner` exists,
+  `table_owners -> algorithm_learning_migrate` exists, `table_owners -> neondb_owner`
+  appears twice, and `table_owners -> algorithm_learning_app` is correctly absent.
+  The migration-role membership for `neondb_owner` lacks `SET`, so `neondb_owner`
+  cannot act as the role; the `WITH ADMIN OPTION` retry hit `0LP01` because admin
+  is already held.
+- Change (recovery round 4): set the membership options explicitly with the
+  documented PostgreSQL 16 syntax `GRANT role TO grantee WITH SET TRUE,
+  INHERIT TRUE;` (multiple options are allowed), then `SET ROLE
+  algorithm_learning_migrate` and run Part B. This avoids re-granting ADMIN while
+  enabling both `SET ROLE` and the schema `CREATE` that `IN SCHEMA public`
+  requires.
+
+## NRS-003 recovery — Part B admin grant rejected — 2026-09-20
+
+- Retrying with `GRANT algorithm_learning_migrate TO neondb_owner WITH ADMIN OPTION`
+  produced `ERROR: ADMIN option cannot be granted back to your own grantor
+  (SQLSTATE 0LP01)`. That confirms `neondb_owner` already holds an ADMIN
+  membership on the migration role (created automatically when Part A's
+  `CREATE ROLE` ran) and cannot be granted admin again; on Neon/PG16 that
+  auto-grant does not include `SET`/`INHERIT`, so `SET ROLE` and
+  `ALTER DEFAULT PRIVILEGES FOR ROLE` as `neondb_owner` remain denied (the
+  earlier 42501).
+- Change (recovery round 3): stop administering the role through `neondb_owner`.
+  Run Part B connected as `algorithm_learning_migrate` itself (its own connection
+  string), where altering its own default privileges needs no membership. The
+  operator resets that role's password, which is also needed for the migration
+  Secret Manager version.
+- Next: operator connects as the migration role, runs the four
+  `ALTER DEFAULT PRIVILEGES` statements, and confirms with `pg_default_acl` and
+  the membership query.
+
+## NRS-003 recovery — operator Part B denied default privileges — 2026-09-20
+
+- Operator ran Part B and received
+  `ERROR: permission denied to change default privileges (SQLSTATE 42501)`.
+- Diagnosis: Part B's `ALTER DEFAULT PRIVILEGES FOR ROLE algorithm_learning_migrate`
+  requires the executing role to be a member of (or administer) the migration
+  role, and `ALTER DEFAULT PRIVILEGES ... IN SCHEMA public` also requires CREATE
+  on `public`. If `algorithm_learning_migrate` was created through the Neon
+  Console, `neondb_owner` has no admin option on it (the same Neon constraint
+  recorded in NLP-001/SR-004), so running Part B as `neondb_owner` cannot set the
+  migration role's defaults.
+- Next: operator either (a) runs, as `neondb_owner`,
+  `GRANT algorithm_learning_migrate TO neondb_owner WITH ADMIN OPTION;` then
+  `SET ROLE algorithm_learning_migrate;` and the four Part B statements, or
+  (b) connects as `algorithm_learning_migrate` directly and runs Part B there.
+  The exact failing statement is still needed to confirm the cause.
+
+## NRS-003 recovery — operator Part A failed — 2026-09-20
+
+- Operator ran Part A of `infra/gcp/neon-role-separation.sql` as `neondb_owner`
+  in the Neon SQL editor and received the Neon UI message "Failed transaction:
+  ROLLBACK required"; the transaction aborted and rolled back.
+- Diagnosis: Part A runs as a single transaction and used unconditional
+  `CREATE ROLE` statements. `table_owners` already exists from the NLP-001/SR-004
+  shared-group-role workaround, so `CREATE ROLE table_owners` raises
+  "role \"table_owners\" already exists" and aborts the whole transaction. The
+  artifact's "skip if it exists" comment cannot be honored inside one transaction.
+- Change (recovery round 1): made role creation idempotent. The migration and
+  group roles are now created inside `DO` blocks guarded by
+  `IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = ...)`; the grants,
+  `REVOKE`, ownership, confinement, and default-privilege statements are
+  unchanged.
+- Re-ran the NRS-001 static verification after the edit: passed; `git diff --check`
+  clean.
+- Next: the operator re-runs the corrected Part A. If a different error appears,
+  its exact text is required to continue.
+
+## NRS-003 blocker (operator setup pending) — 2026-09-20
+
+- `$execution-strategy` confirmed the recorded contract for `NRS-003`:
+  `three-perspectives` / `test-candidates` / `update-docs` / `infer`. It is the
+  operator-gated Phase 2 split release and the only task in that phase.
+- `$task-execute` preflight passed (`NRS-001`/`NRS-002` completed), but read-only
+  production checks show the operator setup has not been performed, so no
+  production change was made and `main` was not pushed:
+  - `gcloud secrets versions list algorithm-learning-db-migration-password`
+    returns `NOT_FOUND`; the container does not exist, so no migration secret
+    version is set.
+  - `gh variable list --env production` has no `NEON_MIGRATION_DATABASE_USERNAME`.
+  - The `algorithm-learning-migrate` Job and the `algorithm-learning-api` service
+    both still set `DATABASE_USERNAME=algorithm_learning_app` and read
+    `algorithm-learning-db-password`, i.e. the pre-split identity from NLP-002.
+- Blocker: the operator must, without exposing any value to the agent,
+  (1) create `algorithm_learning_migrate` and reconcile `algorithm_learning_app`
+  by running Parts A and B of `infra/gcp/neon-role-separation.sql`;
+  (2) run `bash infra/gcp/bootstrap.sh --apply` so the
+  `algorithm-learning-db-migration-password` container and its Secret Accessor
+  exist, reset both role login secrets, and add them as new
+  `algorithm-learning-db-password` (runtime) and
+  `algorithm-learning-db-migration-password` (migration) Secret Manager versions;
+  and (3) set the GitHub `production` variables `NEON_DATABASE_USERNAME` and
+  `NEON_MIGRATION_DATABASE_USERNAME`.
+- After that the user must authorize pushing `main` (`7f4fb25`, `ff7189f`) and
+  triggering the serialized production workflow; the operator then runs the
+  runtime-role DDL-denial probe and records the attestation so `NRS-003` can close
+  out. The agent never receives, reads, prints, or commits a password.
+- `NRS-003` set from `ready` to `blocked` in `WORK_GRAPH.yaml`, `WORK_GRAPH.md`,
+  and `tasks.md`; no code or config was changed.
+
+## NRS-003 execution strategy — 2026-09-20
+
+- Dependency reconciliation confirmed `NRS-001` and `NRS-002` are completed, so
+  `NRS-003` is the only eligible task and opens Phase 2 — Split release.
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Planner boundary: one operator-gated split release — the operator applies the
+  split roles and sets both secrets and the GitHub variables, then the serialized
+  workflow migrates once as `algorithm_learning_migrate` and serves readiness as
+  `algorithm_learning_app`. Implementer boundary: no repository files; only the
+  operator's Neon/Secret Manager/GitHub setup and the release trigger. Evaluator
+  boundary: the migration Job binds the migration identity, the service binds the
+  runtime identity, readiness is `UP`, and the operator attests DDL denial.
+
 ## NRS-002 closeout — 2026-09-20
 
 - `infra/gcp/bootstrap.sh` now creates the

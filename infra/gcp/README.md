@@ -275,14 +275,20 @@ Procedure:
    database as `neondb_owner`. It creates `algorithm_learning_migrate`, keeps
    `table_owners` as the owner, revokes `table_owners` membership and `CREATE`
    from `algorithm_learning_app`, and grants the runtime DML on the current
-   objects. If the owner session cannot create roles, create
+   objects. Role creation is guarded, so Part A is safe to re-run after a partial
+   attempt. If the owner session cannot create roles, create
    `algorithm_learning_migrate` from the Neon console Roles tab with the same
    confinement and run only the membership/grant statements.
 2. Run Part B while connected as `algorithm_learning_migrate` (its own connection
-   string), or as `neondb_owner` after
-   `GRANT algorithm_learning_migrate TO neondb_owner; SET ROLE algorithm_learning_migrate;`
-   when the owner administers that role. It installs the default privileges so
-   future Flyway objects are DML-usable by the runtime role.
+   string). When running it as `neondb_owner` instead, first enable the membership
+   options and switch into the role:
+   `GRANT algorithm_learning_migrate TO neondb_owner WITH SET TRUE, INHERIT TRUE;`
+   then `SET ROLE algorithm_learning_migrate;` and `RESET ROLE;` afterwards. On
+   Neon, `neondb_owner` already holds an ADMIN membership on that role, so
+   re-granting `ADMIN OPTION` fails with SQLSTATE `0LP01`, and running the
+   statements without switching fails with SQLSTATE `42501`. Part B installs the
+   default privileges so future Flyway objects are DML-usable by the runtime
+   role.
 3. Confirm the confinement query in the script returns `false` for `rolsuper`,
    `rolcreatedb`, `rolcreaterole`, `rolreplication`, and `rolbypassrls` for both
    roles, and the ownership query shows every application object owned by

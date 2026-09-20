@@ -21,22 +21,35 @@
 
 BEGIN;
 
--- 1. Migration role: DDL for Flyway. First rotation only; skip if it exists.
---    It is not a superuser and holds no
+-- 1. Migration role: DDL for Flyway. Created only when absent so the script is
+--    safe to re-run after a partial attempt. It is not a superuser and holds no
 --    CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS.
-CREATE ROLE algorithm_learning_migrate LOGIN
-  NOSUPERUSER
-  NOCREATEDB
-  NOCREATEROLE
-  NOREPLICATION
-  NOBYPASSRLS;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'algorithm_learning_migrate') THEN
+    CREATE ROLE algorithm_learning_migrate LOGIN
+      NOSUPERUSER
+      NOCREATEDB
+      NOCREATEROLE
+      NOREPLICATION
+      NOBYPASSRLS;
+  END IF;
+END
+$$;
 
--- 2. Shared group role owns the application schema and its objects. First
---    rotation only; skip if it exists. Neon roles created through the
---    Console/CLI/API are not Postgres superusers and neondb_owner has no admin
---    option on them, so ownership is inherited through this group instead of a
---    direct transfer.
-CREATE ROLE table_owners NOLOGIN;
+-- 2. Shared group role owns the application schema and its objects. It already
+--    exists from the least-privilege rotation, so it is created only when
+--    absent. Neon roles created through the Console/CLI/API are not Postgres
+--    superusers and neondb_owner has no admin option on them, so ownership is
+--    inherited through this group instead of a direct transfer.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'table_owners') THEN
+    CREATE ROLE table_owners NOLOGIN;
+  END IF;
+END
+$$;
+
 GRANT USAGE, CREATE ON SCHEMA public TO table_owners;
 GRANT table_owners TO neondb_owner;
 GRANT table_owners TO algorithm_learning_migrate;
@@ -70,10 +83,13 @@ COMMIT;
 -- =====================================================================
 -- Future Flyway objects are created by the migration role, so its defaults
 -- govern them. Connect as algorithm_learning_migrate (its own connection
--- string), or as neondb_owner after
---   GRANT algorithm_learning_migrate TO neondb_owner;
+-- string). On Neon, neondb_owner already holds an ADMIN membership on that role
+-- without SET/INHERIT, so it can act as the role without re-granting ADMIN:
+--   GRANT algorithm_learning_migrate TO neondb_owner WITH SET TRUE, INHERIT TRUE;
 --   SET ROLE algorithm_learning_migrate;
--- when the owner administers that role.
+-- then run the statements below and RESET ROLE. Re-granting ADMIN fails with
+-- SQLSTATE 0LP01, and ALTER DEFAULT PRIVILEGES as the un-switched owner fails
+-- with SQLSTATE 42501.
 
 ALTER DEFAULT PRIVILEGES FOR ROLE algorithm_learning_migrate IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO algorithm_learning_app;
