@@ -96,6 +96,42 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-004 recovery evidence — 2026-09-20
+
+- Round 1: pushed `98f114f`; the CI Verify API job failed on
+  `ReviewAcceptanceIntegrationTest` with `Can't infer the SQL type to use for an
+  instance of java.time.Instant` while seeding via `NamedParameterJdbcTemplate`.
+  The `V2` migration itself applied cleanly in CI. The deploy job never ran, so
+  production was not migrated.
+- Round 2: bound the seed `Instant` as `java.sql.Timestamp` in the test, and
+  found the same class of defect in production code: `JpaReviewRepository.save`
+  passed `java.time.Instant` through `BeanPropertySqlParameterSource`, which
+  pgjdbc cannot type. This was a latent defect in the delivered review
+  submission path, surfaced by the new integration test. Replaced the bean
+  parameter source with an explicit `MapSqlParameterSource` binding
+  `reviewedAt`/`nextReviewAt` as `OffsetDateTime` (UTC).
+- Round 3: `dueProblemIds` bound `now` as `Instant`; bound it as
+  `OffsetDateTime` too. Corrected the acceptance expectation (the fixed-v1
+  history problem is due at `AT`, so the due list is `[NEVER, FIXED_HISTORY]`).
+- Local verification with Docker
+  (`DOCKER_HOST=unix:///Users/allen/.colima/default/docker.sock`):
+  `./mvnw -o verify` → 34 tests, 0 failures, 0 skipped (all Testcontainers
+  integration tests ran, including `V2` migration and the review acceptance
+  suite). The local Docker socket is colima; the default run skips Docker tests.
+
+## SR-004 execution strategy — 2026-09-20
+
+- Dependency reconciliation confirmed `SR-003` is completed; `SR-004` advanced
+  from `ready` to `in_progress`.
+- The user authorized the push and the production migration (recorded in
+  conversation).
+- Confirmed the contract recorded by `$work-graph`: `three-perspectives` /
+  `test-candidates` / `update-docs` / `infer`.
+- Boundary: push `main` so the serialized workflow verifies the API (with Docker,
+  so the `V2` migration integration tests run), migrates once, redeploys, and
+  checks readiness; then collect revision/readiness evidence and a revision-based
+  rollback. No secret value is read or printed.
+
 ## SR-003 closeout — 2026-09-20
 
 - Added server acceptance `ReviewAcceptanceIntegrationTest` (Testcontainers

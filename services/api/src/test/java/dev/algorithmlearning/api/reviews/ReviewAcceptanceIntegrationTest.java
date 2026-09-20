@@ -65,7 +65,7 @@ class ReviewAcceptanceIntegrationTest {
         assertThat(summary.intervalDays()).isEqualTo(4);
         assertThat(summary.scheduleExplanationKey()).isEqualTo("schedule.adaptive.rated");
 
-        assertThat(reviews.dueProblemIds(USER, AT, 10, 0)).containsExactly(NEVER);
+        assertThat(reviews.dueProblemIds(USER, AT, 10, 0)).containsExactly(NEVER, FIXED_HISTORY);
         assertThat(reviews.dueProblemIds(USER, AT.plus(Duration.ofDays(5)), 10, 0))
                 .containsExactly(NEVER, FIXED_HISTORY, REVIEWED);
 
@@ -85,14 +85,15 @@ class ReviewAcceptanceIntegrationTest {
     private static void seed(NamedParameterJdbcTemplate jdbc) {
         jdbc.update("insert into users (id, email, password_hash) values (:id, 'owner@example.test', 'x')",
                 new MapSqlParameterSource().addValue("id", USER));
+        var at = java.sql.Timestamp.from(AT);
         for (var id : List.of(REVIEWED, NEVER, FIXED_HISTORY)) {
             jdbc.update("insert into problems (id, user_id, title, platform, difficulty, created_at) "
                     + "values (:id, :user, 'Two Sum', 'leetcode', 'easy', :at)",
-                    new MapSqlParameterSource().addValue("id", id).addValue("user", USER).addValue("at", AT));
+                    new MapSqlParameterSource().addValue("id", id).addValue("user", USER).addValue("at", at));
         }
         jdbc.update("insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, policy_version) "
                 + "values ('00000000-0000-0000-0000-0000000000c1', :problem, 4, :at, :at, 'fixed-v1')",
-                new MapSqlParameterSource().addValue("problem", FIXED_HISTORY).addValue("at", AT));
+                new MapSqlParameterSource().addValue("problem", FIXED_HISTORY).addValue("at", at));
     }
 
     private static final class StubProblemRepository implements ProblemRepository {

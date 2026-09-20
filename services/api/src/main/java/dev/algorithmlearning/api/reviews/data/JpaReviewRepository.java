@@ -4,6 +4,8 @@ import dev.algorithmlearning.api.reviews.application.ProblemReviewState;
 import dev.algorithmlearning.api.reviews.application.Review;
 import dev.algorithmlearning.api.reviews.application.ReviewRepository;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -45,11 +46,26 @@ public class JpaReviewRepository implements ReviewRepository {
 
     @Override
     public Review save(Review review) {
+        // Instants must be bound as OffsetDateTime: pgjdbc cannot infer a type
+        // for java.time.Instant, so a bean parameter source fails at runtime.
+        var params = new MapSqlParameterSource()
+                .addValue("id", review.id())
+                .addValue("problemId", review.problemId())
+                .addValue("confidence", review.confidence())
+                .addValue("reviewedAt", OffsetDateTime.ofInstant(review.reviewedAt(), ZoneOffset.UTC))
+                .addValue("nextReviewAt", OffsetDateTime.ofInstant(review.nextReviewAt(), ZoneOffset.UTC))
+                .addValue("notes", review.notes())
+                .addValue("policyVersion", review.policyVersion())
+                .addValue("previousIntervalDays", review.previousIntervalDays())
+                .addValue("previousEaseFactor", review.previousEaseFactor())
+                .addValue("intervalDays", review.intervalDays())
+                .addValue("easeFactor", review.easeFactor())
+                .addValue("repetitions", review.repetitions());
         jdbc.update("insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, notes, policy_version, "
                         + "previous_interval_days, previous_ease_factor, interval_days, ease_factor, repetitions) values "
                         + "(:id, :problemId, :confidence, :reviewedAt, :nextReviewAt, :notes, :policyVersion, "
                         + ":previousIntervalDays, :previousEaseFactor, :intervalDays, :easeFactor, :repetitions)",
-                new BeanPropertySqlParameterSource(review));
+                params);
         return review;
     }
 
@@ -64,7 +80,10 @@ public class JpaReviewRepository implements ReviewRepository {
     @Override
     public List<UUID> dueProblemIds(UUID userId, Instant now, int limit, int offset) {
         var params = new MapSqlParameterSource()
-                .addValue("u", userId).addValue("now", now).addValue("l", limit).addValue("o", offset);
+                .addValue("u", userId)
+                .addValue("now", OffsetDateTime.ofInstant(now, ZoneOffset.UTC))
+                .addValue("l", limit)
+                .addValue("o", offset);
         return jdbc.query("select p.id from problems p "
                         + "left join lateral (select r.next_review_at from reviews r where r.problem_id = p.id "
                         + "order by r.reviewed_at desc, r.id desc limit 1) latest on true "
