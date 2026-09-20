@@ -584,7 +584,7 @@ tasks:
       - git diff --check
   - id: NRS-003
     title: Apply the split roles and verify readiness with DDL denial
-    status: ready
+    status: in_progress
     depends_on: [NRS-001, NRS-002]
     parallel_group: neon-split-release
     spec_refs: ["1", "6 AC-NRS-04/05/06/07", "7", "9 decisions 1/4/5"]
