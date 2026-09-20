@@ -96,6 +96,34 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-003 closeout — 2026-09-20
+
+- Added server acceptance `ReviewAcceptanceIntegrationTest` (Testcontainers
+  PostgreSQL): applies the `V2` migration, proves adaptive-v1 persistence
+  (bootstrap interval 4, ease 2.50, reps 1; repeat interval 11, ease 2.65),
+  fixed-v1-history bootstrap, latest-event due derivation (never-reviewed due
+  from `createdAt`, reviewed problem due only after its next review), and the
+  derived summary (`scheduled`, `intervalDays`, `schedule.adaptive.rated`).
+- Extended the Compose acceptance: `ControlledApiAdapter.submit` now applies the
+  same adaptive-v1 progression and attaches `intervalDays`/`easeFactor`/
+  `repetitions`/`scheduleExplanationKey`; `ComposeAcceptanceTest` asserts the
+  submitted review's schedule (confidence 4 → 7 days, reps 1) and
+  `AcceptanceUiTest` asserts the rendered `schedule-context`.
+- `update-docs`: added the spaced-repetition acceptance boundary and evidence
+  table to `infra/acceptance/README.md`.
+- Task-limited verification passed exactly as contracted:
+  `cd services/api && ./mvnw -q verify` (BUILD SUCCESSFUL; Testcontainers
+  integration tests skipped locally without Docker);
+  `cd apps/multiplatform && ./gradlew :composeApp:allTests` (Android 29, Wasm
+  48, 0 failures); `git diff --check` clean.
+- Evaluator conclusions: the adaptive schedule is proven end to end; fixed-v1
+  history is compatible and never rewritten; due derivation uses the latest
+  event; the Compose schedule context is localized and render-only; the closeout
+  commit is local only.
+- `SR-003` is completed. `SR-004` (operator-gated production migration) advanced
+  to `ready`; it requires the user's authorization to push/deploy, which will
+  run the `V2` migration against production.
+
 ## SR-002 closeout — 2026-09-20
 
 - Compose client: added nullable schedule metadata to `ReviewSummary`/`Review`

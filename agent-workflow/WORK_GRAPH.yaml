@@ -504,7 +504,7 @@ tasks:
       - git diff --check
   - id: SR-003
     title: Run cross-platform acceptance for adaptive scheduling
-    status: ready
+    status: completed
     depends_on: [SR-001, SR-002]
     parallel_group: sr-release
     spec_refs: ["4", "AC-SR-01", "AC-SR-02", "AC-SR-03", "AC-SR-04", "AC-SR-05", "AC-SR-06", "AC-SR-07", "AC-SR-08", "5.4"]
@@ -519,7 +519,7 @@ tasks:
       - git diff --check
   - id: SR-004
     title: Apply the production migration and verify readiness
-    status: pending
+    status: ready
     depends_on: [SR-003]
     parallel_group: sr-release
     spec_refs: ["1", "5.1", "5.4"]

@@ -216,14 +216,19 @@ class ControlledApiAdapter {
         override suspend fun submit(problemId: String, confidence: Int, notes: String?): Review {
             requireProblem(problemId)
             reviewSequence++
+            val schedule = adaptiveSchedule(reviewsByProblem[problemId]?.lastOrNull(), confidence)
             val created = Review(
                 id = "review-$reviewSequence",
                 problemId = problemId,
                 confidence = confidence,
                 reviewedAt = now,
-                nextReviewAt = now + INTERVAL_DAYS[confidence].days,
+                nextReviewAt = now + schedule.intervalDays.days,
                 notes = notes,
                 policyVersion = "adaptive-v1",
+                intervalDays = schedule.intervalDays,
+                easeFactor = schedule.easeFactor,
+                repetitions = schedule.repetitions,
+                scheduleExplanationKey = "schedule.adaptive.rated",
             )
             reviewsByProblem.getOrPut(problemId) { mutableListOf() } += created
             return created
@@ -367,14 +372,46 @@ class ControlledApiAdapter {
         ProblemSort.UPDATED_DESC -> compareByDescending { it.updatedAt }
     }
 
+    /**
+     * The same deterministic adaptive-v1 progression the server applies, so the
+     * acceptance journey can assert the schedule the client renders.
+     */
+    private fun adaptiveSchedule(previous: Review?, confidence: Int): Schedule {
+        val bootstrap = previous?.intervalDays == null
+        val priorInterval = previous?.intervalDays ?: 0
+        val priorEase = previous?.easeFactor ?: 2.50
+        val priorRepetitions = previous?.repetitions ?: 0
+        val intervalDays: Int
+        val repetitions: Int
+        val delta: Double
+        when (confidence) {
+            0 -> { intervalDays = 1; repetitions = 0; delta = -0.20 }
+            1 -> { intervalDays = 1; repetitions = 0; delta = -0.15 }
+            2 -> {
+                repetitions = maxOf(priorRepetitions, 1)
+                intervalDays = maxOf(2, kotlin.math.round(priorInterval * 1.20).toInt())
+                delta = -0.05
+            }
+            3 -> {
+                repetitions = priorRepetitions + 1
+                intervalDays = if (bootstrap) 4 else maxOf(4, kotlin.math.round(priorInterval * priorEase).toInt())
+                delta = 0.0
+            }
+            else -> {
+                repetitions = priorRepetitions + 1
+                intervalDays = if (bootstrap) 7 else maxOf(7, kotlin.math.round(priorInterval * (priorEase + 0.15)).toInt())
+                delta = 0.15
+            }
+        }
+        return Schedule(intervalDays, (priorEase + delta).coerceIn(1.30, 3.00), repetitions)
+    }
+
+    private data class Schedule(val intervalDays: Int, val easeFactor: Double, val repetitions: Int)
+
     private data class StoredProblem(
         val id: String,
         val write: ProblemWrite,
         val createdAt: Instant,
         val updatedAt: Instant,
     )
-
-    private companion object {
-        val INTERVAL_DAYS = listOf(1, 2, 4, 7, 14)
-    }
 }

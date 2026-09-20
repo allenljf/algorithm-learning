@@ -64,6 +64,26 @@ code.
 | `apps/multiplatform && ./gradlew :composeApp:assembleDebug` | The shared `commonMain` Compose client builds for Android. |
 | `apps/multiplatform/COMPOSE_GUIDE.md` | The client follows its architecture, DI, data, and testing contract (AC-CMP-02). |
 
+## Spaced-repetition acceptance boundary
+
+`spaced-repetition` adds the `adaptive-v1` scheduler. Acceptance proves the
+schedule end to end across the server and the Compose client.
+
+- `ReviewAcceptanceIntegrationTest` (`services/api`, Testcontainers PostgreSQL,
+  `disabledWithoutDocker`) applies the `V2` migration and proves adaptive-v1
+  persistence, the fixed-v1-history bootstrap, the previous-interval
+  progression, and latest-event due derivation.
+- `AdaptiveReviewPolicyReviewPolicyTest` and `ReviewServiceReviewTest` prove the
+  algorithm and service behavior without a database.
+- `ComposeAcceptanceTest` (commonTest) drives the adaptive schedule through the
+  controlled API adapter on Android and Web; `AcceptanceUiTest` (wasmJsTest)
+  renders the `schedule-context` on Review completion.
+
+| Evidence | Acceptance covered |
+|---|---|
+| `services/api && ./mvnw -q verify` | Adaptive policy, V2 migration, latest-event due, fixed-v1 compatibility, and the existing API suites. |
+| `apps/multiplatform && ./gradlew :composeApp:allTests` | Schedule metadata mapping and the rendered, localized schedule context on Android and Web. |
+
 ## Required release commands
 
 The ALG-018 Flutter commands are historical; the current client release checks

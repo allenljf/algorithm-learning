@@ -120,6 +120,9 @@ class ComposeAcceptanceTest {
         val storedReview = api.reviews.history(savedId).single()
         assertEquals(4, storedReview.confidence)
         assertEquals("recursion plus memo", storedReview.notes)
+        assertEquals(7, storedReview.intervalDays)
+        assertEquals("schedule.adaptive.rated", storedReview.scheduleExplanationKey)
+        assertEquals(1, storedReview.repetitions)
 
         // 4. Dashboard: the aggregate reflects the journey that just ran.
         val dashboard = DashboardViewModel(api.dashboard, backgroundScope)

@@ -130,6 +130,7 @@ class AcceptanceUiTest {
         onNodeWithTag("review-submit").performClick()
 
         onNodeWithTag("review-submitted").assertIsDisplayed()
+        onNodeWithTag("schedule-context").assertIsDisplayed()
         assertEquals(1, api.recordedReviews(problemId).size)
     }
 

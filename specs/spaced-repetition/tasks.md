@@ -58,7 +58,7 @@ human-readable execution contract.
   approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd services/api && ./mvnw -q verify`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### SR-004 — Apply the production migration and verify readiness
 
@@ -74,4 +74,4 @@ human-readable execution contract.
   `gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'`;
   `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`;
   `git diff --check`
-- Status: pending
+- Status: ready
