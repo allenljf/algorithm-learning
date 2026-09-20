@@ -96,6 +96,26 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-004 recovery evidence (blocked on operator) — 2026-09-20
+
+- Round 4: pushed `f54d131`. CI Verify API passed (34 tests with Docker,
+  including the `V2` migration and review acceptance). The migration Job
+  execution `algorithm-learning-migrate-bqvcp` then failed with
+  `ERROR: must be owner of table reviews` (SQLSTATE 42501) on the first `V2`
+  statement. The service deploy was skipped, so the API stayed on revision
+  `algorithm-learning-api-00005-vw6` and `/actuator/health/readiness` is `UP`.
+- Root cause: the `algorithm_learning_app` role does not own the `reviews`
+  table, so it cannot `ALTER TABLE` it. The operator's ownership transfer
+  (`infra/gcp/neon-least-privilege-role.sql` step 4, `REASSIGN OWNED BY
+  neondb_owner TO algorithm_learning_app`) did not cover `reviews`. PostgreSQL
+  DDL is transactional and Flyway wraps the migration, so the failure rolled
+  back with no schema change; the database remains at `V1`.
+- Blocker: transferring ownership requires the Neon owner credential, which the
+  agent must not handle. The operator must, as the Neon owner, make
+  `algorithm_learning_app` own every application object (at minimum `reviews`,
+  plus `users`, `problems`, `solutions`, `tags`, `problem_tags`, `auth_sessions`,
+  and `flyway_schema_history`), then the workflow can be re-run.
+
 ## SR-004 recovery evidence — 2026-09-20
 
 - Round 1: pushed `98f114f`; the CI Verify API job failed on

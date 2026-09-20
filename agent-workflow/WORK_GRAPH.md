@@ -151,7 +151,7 @@ flowchart TD
   S1[SR-001 adaptive-v1 policy + V2 migration\ncompleted]
   S2[SR-002 Compose schedule context + due contract\ncompleted]
   S3[SR-003 cross-platform acceptance\ncompleted]
-  S4[SR-004 production migration + readiness\nready]
+  S4[SR-004 production migration + readiness\nblocked: reviews ownership]
 
   S1 --> S2
   S1 --> S3

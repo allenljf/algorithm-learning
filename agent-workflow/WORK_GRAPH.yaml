@@ -519,7 +519,7 @@ tasks:
       - git diff --check
   - id: SR-004
     title: Apply the production migration and verify readiness
-    status: ready
+    status: blocked
     depends_on: [SR-003]
     parallel_group: sr-release
     spec_refs: ["1", "5.1", "5.4"]
