@@ -27,6 +27,8 @@ class SchemaMigrationTest {
             assertThat(tableNames(connection)).contains(
                     "auth_sessions", "problem_tags", "problems", "reviews", "solutions", "tags", "users");
             assertThat(connection.getMetaData().getColumns(null, "public", "users", "email").next()).isTrue();
+            assertThat(connection.getMetaData().getColumns(null, "public", "reviews", "interval_days").next()).isTrue();
+            assertThat(connection.getMetaData().getColumns(null, "public", "reviews", "ease_factor").next()).isTrue();
 
             var userId = "00000000-0000-0000-0000-000000000001";
             execute(connection, "insert into users (id, email, password_hash) values ('" + userId
@@ -55,6 +57,20 @@ class SchemaMigrationTest {
                     "insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, policy_version) values "
                             + "('00000000-0000-0000-0000-000000000004', "
                             + "'00000000-0000-0000-0000-000000000002', 4, now(), now(), 'fixed-v1')");
+            execute(connection,
+                    "insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, policy_version, interval_days, ease_factor, repetitions) values "
+                            + "('00000000-0000-0000-0000-000000000005', "
+                            + "'00000000-0000-0000-0000-000000000002', 3, now(), now(), 'adaptive-v1', 4, 2.50, 1)");
+            assertThatThrownBy(() -> execute(connection,
+                    "insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, policy_version) values "
+                            + "('00000000-0000-0000-0000-000000000006', "
+                            + "'00000000-0000-0000-0000-000000000002', 3, now(), now(), 'adaptive-v1')"))
+                    .isInstanceOf(SQLException.class);
+            assertThatThrownBy(() -> execute(connection,
+                    "insert into reviews (id, problem_id, confidence, reviewed_at, next_review_at, policy_version, interval_days, ease_factor, repetitions) values "
+                            + "('00000000-0000-0000-0000-000000000007', "
+                            + "'00000000-0000-0000-0000-000000000002', 3, now(), now(), 'adaptive-v1', 4, 3.50, 1)"))
+                    .isInstanceOf(SQLException.class);
             execute(connection, "delete from users where id = '" + userId + "'");
 
             assertThat(rowCount(connection, "problems")).isZero();

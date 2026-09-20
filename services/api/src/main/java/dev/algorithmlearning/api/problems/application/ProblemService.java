@@ -23,6 +23,11 @@ public class ProblemService {
     }
     public Optional<Problem> findById(UUID userId, UUID id) { return problems.findByIdAndUserId(id, userId); }
     public List<Problem> list(UUID userId) { return problems.findAllByUserId(userId); }
+    public java.util.Map<UUID, Problem> findByIds(UUID userId, java.util.List<UUID> ids) {
+        var byId = new java.util.LinkedHashMap<UUID, Problem>();
+        for (var problem : problems.findAllByIdsAndUserId(userId, ids)) byId.put(problem.id(), problem);
+        return byId;
+    }
     public ProblemPage search(UUID userId, ProblemSearch search) { return problems.search(userId, search); }
     @Transactional public boolean delete(UUID userId, UUID id) { if (problems.findByIdAndUserId(id, userId).isEmpty()) return false; problems.deleteByIdAndUserId(id, userId); return true; }
 

@@ -59,6 +59,24 @@ whitespace-collapsed, and case-folded for owner-local idempotency. A new tag
 returns `201` with `Location`; a normalized duplicate returns the existing tag
 with `200`. `GET /api/v1/tags?q=...` searches only the caller's tags.
 
+## Review scheduling API
+
+`POST /api/v1/reviews` records `{ problemId, confidence 0..4, notes }` as an
+append-only event and returns it with `policyVersion` plus nullable
+`intervalDays`, `easeFactor`, `repetitions`, and `scheduleExplanationKey`. New
+events use the deterministic `adaptive-v1` policy (`AdaptiveReviewPolicy`),
+which persists the previous schedule and its result; historical `fixed-v1`
+events keep their stored `nextReviewAt` and null adaptive columns.
+
+`GET /api/v1/reviews/today` returns due **problem summaries** derived from each
+problem's latest event (a never-reviewed problem is due from `createdAt`),
+ordered oldest-due first. `GET /api/v1/reviews/history?problemId=...` returns the
+problem's review events, newest first. Problem list/detail responses carry the
+latest review summary, including the derived `status`
+(`neverReviewed|due|scheduled`) and the schedule metadata. The `V2` Flyway
+migration adds the snapshot columns and relaxes the `policy_version` check to
+`fixed-v1`/`adaptive-v1`.
+
 ## Docker Compose
 
 For the full local API and PostgreSQL lifecycle, follow the instructions in

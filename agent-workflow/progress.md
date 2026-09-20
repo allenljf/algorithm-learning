@@ -96,6 +96,37 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-001 closeout — 2026-09-20
+
+- Added the `adaptive-v1` server scheduling stack in `services/api`:
+  `AdaptiveReviewPolicy` (deterministic confidence transitions, bootstrap
+  reps=0/interval=0/ease=2.50 for fixed-v1 history, ease clamp `[1.30, 3.00]`,
+  half-up rounding, UTC), the `V2__adaptive_review_schedule.sql` migration that
+  adds the snapshot columns and replaces the `V1` `reviews_policy_version_check`
+  with `fixed-v1`/`adaptive-v1`, and `ReviewService` selecting `adaptive-v1` for
+  new events with persisted snapshot fields. Historical `fixed-v1` rows keep
+  null adaptive columns and their stored `nextReviewAt`.
+- Reconciled the latest-review read model (Option A): `ReviewRepository`
+  exposes `latest`, `dueProblemIds` (latest event per problem, never-reviewed
+  due from `createdAt`, oldest-due first), and `reviewStates`;
+  `ReviewService.summaries` derives `neverReviewed|due|scheduled` plus schedule
+  metadata; `ProblemsController` now returns the real latest review summary on
+  list/detail; `ReviewsController` `GET /reviews/today` returns due problem
+  summaries and `POST /reviews` keeps returning the created event with schedule
+  metadata.
+- `update-docs`: added the "Review scheduling API" section to
+  `services/api/README.md`.
+- Task-limited verification passed exactly as contracted:
+  `cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest,*SchemaMigrationTest'`
+  (12 run, 0 failures, 1 skipped: Testcontainers without Docker);
+  `cd services/api && ./mvnw -q test` (33 run, 0 failures, 2 skipped Docker
+  integration tests); `./mvnw -q package -DskipTests`; `git diff --check` clean.
+- Evaluator conclusions: the policy is reproducible from persisted inputs;
+  fixed-v1 history is never rewritten; due derivation uses the latest event;
+  `/reviews/today` matches the Compose `ReviewRepository.due` problem-summary
+  contract; no DTO or HTTP type leaks; the closeout commit is local only.
+- `SR-001` is completed. `SR-002` (Compose schedule context) advanced to `ready`.
+
 ## Spaced-repetition work graph — 2026-09-20
 
 - `$work-graph` selected `three-perspectives` because the feature crosses a

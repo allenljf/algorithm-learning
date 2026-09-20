@@ -23,7 +23,7 @@ human-readable execution contract.
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest,*SchemaMigrationTest'`;
   `cd services/api && ./mvnw -q test`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 2 — Compose client
 
@@ -41,7 +41,7 @@ human-readable execution contract.
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ## Phase 3 — Acceptance and release
 

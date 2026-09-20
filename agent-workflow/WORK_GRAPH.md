@@ -148,8 +148,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  S1[SR-001 adaptive-v1 policy + V2 migration\nready]
-  S2[SR-002 Compose schedule context + due contract\npending]
+  S1[SR-001 adaptive-v1 policy + V2 migration\ncompleted]
+  S2[SR-002 Compose schedule context + due contract\nready]
   S3[SR-003 cross-platform acceptance\npending]
   S4[SR-004 production migration + readiness\npending]
 
