@@ -467,3 +467,71 @@ tasks:
       - >-
         python3 -c "import subprocess; out = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'neondb_owner' not in out"
       - git diff --check
+  - id: SR-001
+    title: Implement the adaptive-v1 policy, V2 migration, and latest-event due derivation
+    status: ready
+    depends_on: []
+    parallel_group: sr-server
+    spec_refs: ["2", "3.1", "3.2", "4", "AC-SR-01", "AC-SR-02", "AC-SR-03", "AC-SR-04", "AC-SR-05", "AC-SR-07", "AC-SR-08", "5.1", "5.2", "5.4"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add the adaptive-v1 review policy with an injected Clock and persisted
+      snapshot fields, the V2 Flyway migration that adds the nullable snapshot
+      columns and replaces the V1 reviews_policy_version_check, ReviewService
+      selecting adaptive-v1 for new events, and the reconciled GET
+      /reviews/today returning owned problem summaries from each problem's
+      latest event. Keep fixed-v1 history immutable.
+    verification:
+      - cd services/api && ./mvnw -q test -Dtest='*ReviewPolicyTest,*ReviewTest,*ReviewControllerTest,*SchemaMigrationTest'
+      - cd services/api && ./mvnw -q test
+      - git diff --check
+  - id: SR-002
+    title: Add Compose schedule context and align the due contract
+    status: pending
+    depends_on: [SR-001]
+    parallel_group: sr-client
+    spec_refs: ["2", "3.3", "4", "AC-SR-04", "AC-SR-06", "5.2", "5.3"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Map the new review schedule metadata through Ktor DTOs and the repository
+      into immutable domain models, consume the reconciled problem-summary due
+      contract, and render localized schedule context on problem detail and
+      Review completion through AppStrings. No composable calculates dates or
+      holds writable schedule copies.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: SR-003
+    title: Run cross-platform acceptance for adaptive scheduling
+    status: pending
+    depends_on: [SR-001, SR-002]
+    parallel_group: sr-release
+    spec_refs: ["4", "AC-SR-01", "AC-SR-02", "AC-SR-03", "AC-SR-04", "AC-SR-05", "AC-SR-06", "AC-SR-07", "AC-SR-08", "5.4"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Prove the adaptive schedule end to end across the server policy/migration
+      and the Compose schedule context, including fixed-v1 compatibility and
+      latest-event due derivation, and update the reviewer documentation.
+    verification:
+      - cd services/api && ./mvnw -q verify
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: SR-004
+    title: Apply the production migration and verify readiness
+    status: pending
+    depends_on: [SR-003]
+    parallel_group: sr-release
+    spec_refs: ["1", "5.1", "5.4"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Operator-gated release: push triggers the serialized workflow, which runs
+      the V2 migration once and redeploys the API. Verify readiness and that
+      fixed-v1 history is intact; rollback is revision/credential-only and never
+      reverses the migration.
+    verification:
+      - gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait
+      - gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'
+      - >-
+        curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"
+      - git diff --check

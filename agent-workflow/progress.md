@@ -96,6 +96,43 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## Spaced-repetition work graph — 2026-09-20
+
+- `$work-graph` selected `three-perspectives` because the feature crosses a
+  forward-only migration, server scheduling, the frozen REST contract, and the
+  Compose client, ending in a production migration.
+- Created `specs/spaced-repetition/plan.md` and `tasks.md` and appended
+  `SR-001`..`SR-004` to `agent-workflow/WORK_GRAPH.yaml` with a readable graph in
+  `WORK_GRAPH.md` (`SR-001` server scheduling → `SR-002` Compose client →
+  `SR-003` acceptance → `SR-004` operator-gated production migration).
+- `SR-001` (adaptive-v1 policy, `V2` migration, latest-event due derivation, API
+  schedule metadata) is `ready`; `SR-002`..`SR-004` are sequential.
+
+## Spaced-repetition spec governance — 2026-09-20
+
+- `$spec-governance` selected `update-docs + infer` and advanced
+  `spaced-repetition` to governed, ready for `$work-graph`.
+- Client ruling: the spec predated the Compose migration, so all client
+  boundaries are now the Compose Multiplatform app `apps/multiplatform`
+  (`COMPOSE_GUIDE.md`); the Flutter client is archived.
+- Migration ruling: `V2` adds the nullable adaptive snapshot columns and
+  replaces the `V1` `reviews_policy_version_check` (`policy_version =
+  'fixed-v1'`) with a check allowing `fixed-v1`/`adaptive-v1`; historical rows
+  stay valid.
+- Due-contract ruling: the delivered `ReviewsController` returns review events
+  for `GET /reviews/today`, but the ALG MVP spec (`AC-REV-04`) and the Compose
+  `ReviewRepository.due` both define due **problem summaries** from the latest
+  event. Governance resolves in favor of the MVP spec/client and adds `AC-SR-08`
+  to reconcile the endpoint as part of the due change; `POST /reviews` keeps
+  returning the created event. `policyVersion` on the wire is `fixed-v1` (the
+  `mvp-1` value is only a Compose test fixture).
+- Locked `adaptive-v1` (section 3.2 algorithm, bootstrap reps=0/interval=0/
+  ease=2.50, UTC injected clock, clamp `[1.30, 3.00]`) and `AC-SR-01..08`;
+  non-goals preserved (no user-configurable policy, notifications, ML, offline,
+  confidence-scale change, or history rewrite).
+- `plan.md`, `tasks.md`, and the `WORK_GRAPH.yaml` node do not exist yet;
+  `$work-graph` is the next phase.
+
 ## Neon least-privilege role work graph — 2026-09-19
 
 - `$work-graph` selected `three-perspectives` because the change crosses Neon

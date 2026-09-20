@@ -144,5 +144,20 @@ flowchart TD
   L1 --> L2
 ```
 
+# Spaced Repetition — Dependency Graph
+
+```mermaid
+flowchart TD
+  S1[SR-001 adaptive-v1 policy + V2 migration\nready]
+  S2[SR-002 Compose schedule context + due contract\npending]
+  S3[SR-003 cross-platform acceptance\npending]
+  S4[SR-004 production migration + readiness\npending]
+
+  S1 --> S2
+  S1 --> S3
+  S2 --> S3
+  S3 --> S4
+```
+
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.
