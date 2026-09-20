@@ -96,6 +96,37 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-004 closeout — 2026-09-20
+
+- After the operator applied the shared-group-role ownership fix, the production
+  workflow was re-run (`gh workflow run gcp-production-deploy.yml --ref main`,
+  run `35514942600`) and succeeded: Verify API (34 tests with Docker), migration
+  Job, service deploy, and the in-workflow readiness check.
+- Task-limited verification passed exactly as contracted:
+  `gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait`
+  (execution `algorithm-learning-migrate-p4986` succeeded; logs show
+  `Current version of schema "public": 2` and `Schema "public" is up to date`);
+  `gcloud run services describe ...` returned
+  `https://algorithm-learning-api-qvepavg7qa-de.run.app`;
+  `curl .../actuator/health/readiness` returned `{"status":"UP"}`;
+  `git diff --check` clean.
+- Release evidence: new revision `algorithm-learning-api-00007-jpn` serving image
+  `asia-east1-docker.pkg.dev/alert-study-508214-s5/algorithm-learning/api:f54d13176d5029f747ab50198d2739e3274ae75d`;
+  previous known-good `algorithm-learning-api-00005-vw6`. The service still
+  authenticates as `algorithm_learning_app`. Rollback is revision/credential-only
+  and never reverses the `V2` migration.
+- Fixed a real latent defect along the way: `JpaReviewRepository.save` bound
+  `java.time.Instant` through a bean parameter source, which pgjdbc cannot type;
+  review submission would have failed at runtime. It now binds `OffsetDateTime`.
+- Corrected `infra/gcp/neon-least-privilege-role.sql` and its runbook to use
+  Neon's shared-group-role ownership workaround (`table_owners`), because Neon
+  roles are not Postgres superusers and `neondb_owner` cannot grant or directly
+  own them.
+- Evaluator conclusions: `V2` is applied and validated; `fixed-v1` history is
+  intact (additive columns only); the API serves under the least-privilege role;
+  the spaced-repetition feature is complete and every local commit is pushed.
+- `SR-004` is completed; `spaced-repetition` has no remaining tasks.
+
 ## SR-004 recovery evidence (blocked on operator) — 2026-09-20
 
 - Round 4: pushed `f54d131`. CI Verify API passed (34 tests with Docker,

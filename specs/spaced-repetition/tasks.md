@@ -74,4 +74,4 @@ human-readable execution contract.
   `gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)'`;
   `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`;
   `git diff --check`
-- Status: blocked (operator must make `algorithm_learning_app` own the `reviews` table; the migration Job failed with `must be owner of table reviews`)
+- Status: completed
