@@ -57,19 +57,21 @@ human-readable execution contract.
 
 ### NRS-003 — Apply the split roles and verify readiness with DDL denial
 
-- Deliverable: the operator-gated split release. The operator creates/resets
-  `algorithm_learning_migrate` and reconciles `algorithm_learning_app` per
-  `NRS-001`, transfers/verifies membership and default privileges, sets the
-  `algorithm-learning-db-migration-password` and `algorithm-learning-db-password`
-  Secret Manager versions, and updates the GitHub `production`
+- Deliverable: the operator-gated split release. The operator recreates the
+  runtime role `algorithm_learning_app` **with SQL**, after deleting the
+  Console-created role (spec section 10: a Console/CLI/API role keeps an
+  un-removable `neon_superuser` membership), recreates/verifies
+  `algorithm_learning_migrate` per `NRS-001`, transfers/verifies membership and
+  default privileges, rotates the `algorithm-learning-db-password` value and sets
+  `algorithm-learning-db-migration-password`, and updates the GitHub `production`
   `NEON_MIGRATION_DATABASE_USERNAME` and `NEON_DATABASE_USERNAME`; the serialized
   workflow then migrates once as the migration role and redeploys the API, which
-  must report ready as the runtime role with the operator attesting that DDL is
-  denied and DML succeeds for the runtime role. The agent never handles a
-  password.
+  must report ready as the runtime role with the operator attesting that the role
+  is not a member of `neon_superuser`, that DDL is denied, and that DML succeeds.
+  The agent never handles a password.
 - Depends on: NRS-001, NRS-002
 - Parallel group: `neon-split-release`
-- Spec refs: 1, 6 AC-NRS-04/05/06/07, 7, 9 decisions 1/4/5
+- Spec refs: 1, 6 AC-NRS-04/05/06/07/09, 7, 9 decisions 1/4/5, 10
 - Execution contract: `three-perspectives` analysis; `test-candidates` test
   approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `gcloud run jobs describe algorithm-learning-migrate --region=asia-east1 --format='value(spec.template.spec.containers[0].env)'`;

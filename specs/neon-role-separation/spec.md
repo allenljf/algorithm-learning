@@ -3,7 +3,8 @@
 ## Document status
 
 - Feature ID: `neon-role-separation`
-- Status: governed; ready for `$work-graph`
+- Status: governed; revision 2026-09-21 requires a SQL-created runtime role
+  (section 10)
 - Requirement baseline: [`../../requirement.md`](../../requirement.md), sections 7
   and 8
 - Relates to: the future hardening option recorded in
@@ -12,8 +13,8 @@
   runtime roles"), and the `NLP-002` closeout in
   [`../../agent-workflow/progress.md`](../../agent-workflow/progress.md)
 - Intake mode: `brainstorm`
-- Updated: 2026-09-20
-- Governance mode: `update-docs + infer`
+- Updated: 2026-09-21
+- Governance mode: `update-docs + ask-with-options` (revision, section 10)
 - Execution contract: not selected; chosen per ready task after planning
 
 This feature splits the single dedicated Neon application role into two roles so
@@ -68,7 +69,10 @@ Design decisions (governed; rulings in section 9):
 1. **Two login roles.** `algorithm_learning_migrate` owns/uses `table_owners` for
    DDL; `algorithm_learning_app` is confined to DML and is not a member of
    `table_owners`. Neither is `neondb_owner` nor a superuser, and neither holds
-   `CREATEDB`/`CREATEROLE`/`REPLICATION`/`BYPASSRLS`.
+   `CREATEDB`/`CREATEROLE`/`REPLICATION`/`BYPASSRLS`. **Revision (section 10):**
+   both roles must be created with SQL, because a role created through the Neon
+   Console/CLI/API keeps an un-removable `neon_superuser` membership that defeats
+   the runtime confinement.
 2. **Role reuse.** `algorithm_learning_app` stays the **runtime** role (the
    serving identity and `algorithm-learning-db-password` remain stable), and a new
    `algorithm_learning_migrate` role owns the migration workload with a new secret.
@@ -203,6 +207,10 @@ or owner credential appears in source, a GitHub variable, or the workflow.
 - Deployment stays serialized: one migration Job, then the service deploy.
 - The change is credential/config-only; the deployed image content is unaffected,
   so a rollback can be revision- or secret-only.
+- **Revision (section 10):** a role created through the Neon Console/CLI/API is
+  permanently a member of `neon_superuser` (`CREATEDB`, `CREATEROLE`, `BYPASSRLS`,
+  `REPLICATION`, and broad table/sequence grants), and this membership cannot be
+  revoked, so the DML-only runtime role must be created with SQL.
 
 ## 8. Governed assumptions
 
@@ -269,3 +277,62 @@ or owner credential appears in source, a GitHub variable, or the workflow.
 - Non-goals are preserved and `AC-NRS-01..08` are the executable contract for
   `$work-graph`. `plan.md`, `tasks.md`, and the `WORK_GRAPH.yaml` node do not exist
   yet; `$work-graph` creates them next.
+
+## 10. Revision 2026-09-21 — runtime role must be SQL-created
+
+### Trigger
+
+The `NRS-003` split released the two roles and moved the serving API to
+`algorithm_learning_app`, but the runtime-role probe showed the role still had
+broad capability. Production diagnostics established:
+
+- `algorithm_learning_app` is a member of `neon_superuser` (`inherit=t`,
+  `set=t`) because it was created through the Neon Console in `NLP-001`.
+- Neon automatically grants `neon_superuser` to every Console/CLI/API role and
+  cannot revoke it: `neondb_owner` has no admin option on it, and Neon documents
+  the membership as not user-modifiable.
+- `neon_superuser` carries `CREATEDB`, `CREATEROLE`, `REPLICATION`, `BYPASSRLS`,
+  and broad table/sequence grants in `public`. The runtime role could therefore
+  `SET ROLE neon_superuser` and held table privileges beyond
+  `SELECT`/`INSERT`/`UPDATE`/`DELETE`, including `flyway_schema_history`.
+
+This invalidates the assumption in section 3 decision 1 that the existing Console
+role can be confined by revoking `table_owners` and `CREATE`. The delivered
+workflow and secret contract are unaffected; only the runtime role's Neon
+identity changes.
+
+### Ruling
+
+The runtime (DML-only) role **must be created with SQL** (`CREATE ROLE`), never
+through the Neon Console/CLI/API, so it never receives `neon_superuser`. The
+migration role already satisfies this because `NRS-001` creates it with SQL.
+
+### New acceptance criterion
+
+- **AC-NRS-09:** The runtime role is a SQL-created login role that is not a
+  member of `neon_superuser` (or any other Neon control-plane role), directly
+  holds none of `CREATEDB`/`CREATEROLE`/`REPLICATION`/`BYPASSRLS` and does not
+  inherit them, and a live probe as that role denies `CREATE TABLE`/`ALTER TABLE`
+  while normal reads and writes succeed.
+
+### Material decision (ask-with-options)
+
+How to replace the Console-created runtime role:
+
+1. **Reuse the name `algorithm_learning_app`.** Delete it in the Neon Console,
+   create it again with SQL with the same confinement and DML grants, rotate the
+   `algorithm-learning-db-password` value, and redeploy. `NEON_DATABASE_USERNAME`
+   and the secret/artifact wiring stay unchanged; there is a brief serving outage
+   between the delete and the redeploy (the running revision loses its login).
+2. **New SQL-created name (for example `algorithm_learning_runtime`).** Create it
+   with SQL, grant DML, add a new `algorithm-learning-db-password` version, set
+   `NEON_DATABASE_USERNAME` to the new name, redeploy, then delete or invalidate
+   the Console role. No serving outage; the runtime username changes.
+
+Option 1 keeps the governed names and is recommended for a low-traffic service;
+option 2 avoids downtime at the cost of a config/name change. Keeping the
+Console role as the runtime is not viable (AC-NRS-09 cannot be met).
+
+**Decision (2026-09-21):** option 1 — reuse `algorithm_learning_app`. The operator
+deletes the Console-created role, `NRS-001`'s artifact recreates it with SQL, the
+runtime secret is rotated, and the release is redeployed.

@@ -2,6 +2,142 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NRS-003 recovery — runtime role is Console-created again — 2026-09-21
+
+- `pg_has_role('algorithm_learning_app','neon_superuser','MEMBER')` now returns
+  `t` (it returned `f` for the earlier SQL attempt). Combined with the missing
+  ADMIN grant, the `42501` on `GRANT`/`ALTER`/`DROP`, and the Console listing it,
+  the current runtime role is **Console-created** and therefore cannot be
+  confined.
+- Fix: delete it in the Neon Console, then recreate it with a **top-level**
+  `CREATE ROLE ... LOGIN ... PASSWORD` (never a `DO` block, and never via the
+  Console/CLI/API), and verify `neondb_owner` gets `admin_option=t` while
+  `pg_has_role(...,'neon_superuser','MEMBER')` is `f`.
+
+## NRS-003 recovery — runtime role not administrable — 2026-09-21
+
+- `DROP ROLE algorithm_learning_app` also returned SQLSTATE `42501`. The
+  membership dump shows no ADMIN grant for the runtime role, unlike
+  `algorithm_learning_migrate`, which has the automatic `cloud_admin` ADMIN grant
+  (plus the `neondb_owner` SET/INHERIT grant we added).
+- Consequence: the current `algorithm_learning_app` cannot be altered, granted,
+  or dropped by any role we can use. It has no password and is inert (it is not a
+  member of `neon_superuser`), so it is unusable but harmless.
+- Suspected cause: a role created inside the `DO ... CREATE ROLE ... $$` block did
+  not receive the automatic creator ADMIN grant that a top-level `CREATE ROLE`
+  receives (the migration role, created top-level, did). This must be confirmed
+  before changing the artifact.
+- Next: confirm whether the Neon Console lists the role (and how it was created);
+  then either delete and recreate it with a plain top-level `CREATE ROLE` carrying
+  the password, or fall back to a new SQL runtime role name (spec section 10
+  option 2).
+
+## NRS-003 recovery — runtime role administration denied — 2026-09-21
+
+- After recreating `algorithm_learning_app` with SQL (no `neon_superuser`; the
+  operator confirmed `pg_has_role(...,'neon_superuser','MEMBER') = false`),
+  `GRANT algorithm_learning_app TO neondb_owner WITH SET TRUE, INHERIT TRUE` and
+  `ALTER ROLE algorithm_learning_app WITH PASSWORD ...` both returned SQLSTATE
+  `42501`.
+- PostgreSQL 16+ automatically grants the creating role `ADMIN` on a role it
+  creates (`GRANT created TO creator WITH ADMIN TRUE, SET FALSE, INHERIT FALSE`),
+  so an `ALTER ROLE` denial means the session running the commands is not the role
+  that created the runtime role. The SQL Editor's active role and branch, and the
+  membership grantors, must be confirmed before continuing.
+- Production readiness is still HTTP 200 on revision `algorithm-learning-api-00009-fhk`,
+  which is inconclusive: pooled sessions can keep serving after a role change while
+  new logins would fail.
+- Next: confirm `current_user`, the SQL Editor branch versus `ep-odd-dream-b33qkix1`,
+  and the membership grantor/options for both roles; if the creator cannot be
+  identified, recreate the runtime role with `SET createrole_self_grant = 'set,
+  inherit'` and set the password in the `CREATE ROLE` statement so no `ALTER` is
+  needed.
+
+## Neon role separation revision decision — 2026-09-21
+
+- Decision (spec section 10): reuse the `algorithm_learning_app` name — delete the
+  Console-created role, recreate it with SQL.
+- Updated `infra/gcp/neon-role-separation.sql` so Part A creates **both** login
+  roles with SQL (guarded `DO` blocks); the runtime step no longer assumes a
+  pre-existing Console role. Re-ran the NRS-001 static check: pass.
+- Updated `infra/gcp/README.md`: both roles must be SQL-created; the runbook now
+  says to delete the Console role first, and the DDL-denial probe must use a real
+  `algorithm_learning_app` login (psql), not the SQL Editor, and assert
+  `pg_has_role('algorithm_learning_app','neon_superuser','MEMBER') = false`.
+- Updated `specs/neon-role-separation/plan.md`, `tasks.md`, and the `NRS-003`
+  graph node with `AC-NRS-09` and spec section 10.
+- Next: operator deletes the Console runtime role and re-runs Parts A and B, sets
+  the runtime password and its Secret Manager version; then redeploy and re-run
+  the probe.
+
+## Neon role separation spec revision — SQL-created runtime role — 2026-09-21
+
+- The NRS-003 runtime probe could not prove confinement. Production diagnostics
+  show `algorithm_learning_app` is a member of `neon_superuser` (`inherit=t`,
+  `set=t`); the role effectively holds broad table privileges and can
+  `SET ROLE neon_superuser` to reach `CREATEDB`/`CREATEROLE`/`BYPASSRLS`. Neon
+  documents this membership as un-removable for Console/CLI/API roles, so the
+  Console-created runtime role cannot meet AC-NRS-01/02. (The failing `CREATE
+  TABLE` probe was most likely run as `neondb_owner`; the app role itself has no
+  `CREATE` on `public`.)
+- `$spec-governance` selected `update-docs + ask-with-options` and amended
+  `specs/neon-role-separation/spec.md`: section 3 decision 1 and section 7 now
+  require a SQL-created runtime role, and the new section 10 records the trigger,
+  the ruling, `AC-NRS-09`, and two remediation options.
+- Material decision pending: reuse the `algorithm_learning_app` name (delete it in
+  the Neon Console, recreate with SQL; brief serving outage) versus a new
+  SQL-created name (zero downtime; runtime username changes).
+- `NRS-003` stays `in_progress`; the release is not accepted until `AC-NRS-09`
+  holds and the DDL-denial probe passes as the SQL-created runtime role.
+
+## NRS-003 recovery — runtime DDL-denial probe failed — 2026-09-20
+
+- Operator ran the runtime-role probe as `algorithm_learning_app`:
+  `SELECT count(*) FROM problems` succeeded, but `CREATE TABLE ddl_probe (id int)`
+  **also succeeded**. The runtime role therefore still holds `CREATE` capability,
+  so AC-NRS-02/AC-NRS-05 are not met and the release is not accepted.
+- Leading diagnosis: `algorithm_learning_app` was created through the Neon Console
+  in NLP-001, so Neon granted it membership in `neon_superuser` (CREATEDB,
+  CREATEROLE, BYPASSRLS, REPLICATION, and broad object access). Revoking
+  `table_owners` and `CREATE` in Part A does not remove privileges inherited from
+  `neon_superuser`, so the effective DDL capability survives. Consequence: the
+  static confinement query (role attributes false) passes while effective
+  privileges are broader.
+- A stray `ddl_probe` table now exists, owned by `algorithm_learning_app`.
+- Next: confirm the privilege source and remove it (revoke `neon_superuser`
+  membership, or recreate the runtime role as a SQL-created role without
+  `neon_superuser`), then re-run the probe. `NRS-003` remains `in_progress`.
+
+## NRS-003 release — serialized workflow and identity split — 2026-09-20
+
+- Pushed the NRS-001/NRS-002 closeout commits plus the recovery fixes to `main`
+  (`4e13491..f7f2def`); the serialized workflow run `35520018112` completed
+  successfully (verify → migration Job → service deploy → in-workflow readiness).
+- Task-limited verification passed exactly as contracted:
+  - `gcloud run jobs describe algorithm-learning-migrate` shows
+    `DATABASE_USERNAME=algorithm_learning_migrate` and `DATABASE_PASSWORD` from
+    `algorithm-learning-db-migration-password`. (The shallow
+    `spec.template.spec.containers[0].env` path returns empty for a Job; the Job
+    env lives at `spec.template.spec.template.spec.containers[0].env`, which is
+    the path the contracted Python assertion uses.)
+  - `gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait`
+    → execution `algorithm-learning-migrate-6mhxz` succeeded (schema was already at
+    `V2`, so this was an idempotent re-run).
+  - `gcloud run services describe algorithm-learning-api` →
+    `https://algorithm-learning-api-qvepavg7qa-de.run.app`;
+    `curl .../actuator/health/readiness` → `{"status":"UP"}`.
+  - The identity assertion passed: the service env has `algorithm_learning_app`
+    and no `algorithm_learning_migrate`; the Job env has
+    `algorithm_learning_migrate`.
+  - `git diff --check` clean.
+- Release evidence: new revision `algorithm-learning-api-00009-fhk` serving image
+  `api:f7f2defe80350db1c75285906db0d9a9bdc6ea6f`; previous known-good revision
+  `algorithm-learning-api-00008-xwq`. Rollback is credential/revision-only and
+  never reverses Flyway migrations.
+- Remaining for closeout: the operator's runtime-role DDL-denial attestation
+  (`SELECT count(*) FROM problems` succeeds; `CREATE TABLE ddl_probe (id int)`
+  is denied). `NRS-003` stays `in_progress` until the attestation is recorded.
+
 ## NRS-003 progress — migration role password via SQL — 2026-09-20
 
 - The Neon Console Roles list shows only `algorithm_learning_app` and

@@ -257,6 +257,12 @@ Boundary:
 - `algorithm_learning_app` is the runtime (DML-only) role: it is not a member of
   `table_owners`, keeps `USAGE` but not `CREATE` on `public`, and has no access to
   `flyway_schema_history`.
+- Both roles must be **created with SQL**. A role created through the Neon
+  Console/CLI/API keeps a `neon_superuser` membership that cannot be revoked and
+  restores `CREATEDB`/`CREATEROLE`/`BYPASSRLS` plus broad table grants, so it
+  cannot serve as the DML-only runtime role. If `algorithm_learning_app` already
+  exists as a Console role, delete it in the Console Roles tab first (it must own
+  no objects), then let Part A recreate it with SQL.
 - `algorithm_learning_migrate` is the migration (DDL) role and the only member of
   `table_owners`; it runs Flyway only in the migration Job on the direct endpoint.
 - `table_owners` stays the owner of `public` and the existing objects, so Flyway
@@ -270,15 +276,22 @@ Boundary:
 
 Procedure:
 
-1. Open the Neon console for the production project. Run Part A of
+1. If a Console-created `algorithm_learning_app` exists, delete it in the Neon
+   Console Roles tab first (it must own no objects), so it can be recreated with
+   SQL. Open the Neon console for the production project and run Part A of
    `infra/gcp/neon-role-separation.sql` in the SQL editor against the `neondb`
-   database as `neondb_owner`. It creates `algorithm_learning_migrate`, keeps
-   `table_owners` as the owner, revokes `table_owners` membership and `CREATE`
-   from `algorithm_learning_app`, and grants the runtime DML on the current
-   objects. Role creation is guarded, so Part A is safe to re-run after a partial
-   attempt. If the owner session cannot create roles, create
-   `algorithm_learning_migrate` from the Neon console Roles tab with the same
-   confinement and run only the membership/grant statements.
+   database as `neondb_owner`. It creates both login roles with **top-level**
+   `CREATE ROLE` statements (skip any `CREATE ROLE` line whose role already
+   exists), keeps `table_owners` as the owner, removes any `table_owners`
+   membership and `CREATE` from the runtime role, and grants the runtime DML on
+   the current objects. Never create either role from the Neon Console, CLI, or
+   API (those roles keep `neon_superuser`), and never create them inside a `DO`
+   block (such a role does not receive the creator's automatic `ADMIN` grant, so
+   it cannot be administered). After Part A, confirm for each role that
+   `pg_has_role('<role>','neon_superuser','MEMBER')` is `false` and that
+   `pg_auth_members` shows the creating role with `admin_option = true`. Set each
+   login secret with `ALTER ROLE <role> WITH PASSWORD '<value>'`; Neon rejects a
+   weak value, so use a long random value with mixed case, digits, and symbols.
 2. Run Part B while connected as `algorithm_learning_migrate` (its own connection
    string). When running it as `neondb_owner` instead, first enable the membership
    options and switch into the role:
@@ -328,6 +341,16 @@ succeeds while DDL fails:
 ```sql
 SELECT count(*) FROM problems;         -- must succeed
 CREATE TABLE ddl_probe (id int);       -- must fail: permission denied for schema public
+```
+
+Run this probe with a real `algorithm_learning_app` login (for example
+`psql "postgresql://algorithm_learning_app@<host>/neondb?sslmode=require"` and the
+password at the prompt), not from the SQL Editor, which connects as
+`neondb_owner` and would make both statements succeed. Also confirm the role
+carries no `neon_superuser` membership:
+
+```sql
+SELECT pg_has_role('algorithm_learning_app','neon_superuser','MEMBER');  -- must be false
 ```
 
 Rollback: if the runtime credential is faulty, restore the previous

@@ -21,56 +21,60 @@
 
 BEGIN;
 
--- 1. Migration role: DDL for Flyway. Created only when absent so the script is
---    safe to re-run after a partial attempt. It is not a superuser and holds no
---    CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS.
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'algorithm_learning_migrate') THEN
-    CREATE ROLE algorithm_learning_migrate LOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      NOREPLICATION
-      NOBYPASSRLS;
-  END IF;
-END
-$$;
+-- These roles must be created at top level with SQL: never through the Neon
+-- Console/CLI/API (those roles keep an un-removable neon_superuser membership),
+-- and never inside a DO block (a role created that way did not receive the
+-- automatic ADMIN grant that lets the creating role administer it). Setting
+-- createrole_self_grant also lets the creating role SET ROLE to them.
+SET createrole_self_grant = 'set, inherit';
 
--- 2. Shared group role owns the application schema and its objects. It already
---    exists from the least-privilege rotation, so it is created only when
---    absent. Neon roles created through the Console/CLI/API are not Postgres
---    superusers and neondb_owner has no admin option on them, so ownership is
---    inherited through this group instead of a direct transfer.
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'table_owners') THEN
-    CREATE ROLE table_owners NOLOGIN;
-  END IF;
-END
-$$;
+-- 1. Migration role: DDL for Flyway. Run once; skip these statements if the role
+--    already exists. It is not a superuser and holds no
+--    CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS.
+CREATE ROLE algorithm_learning_migrate LOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  NOREPLICATION
+  NOBYPASSRLS;
+
+-- 2. Shared group role owns the application schema and its objects. Run once;
+--    skip this statement if the role already exists. Neon roles created through
+--    the Console/CLI/API are not Postgres superusers and neondb_owner has no
+--    admin option on them, so ownership is inherited through this group instead
+--    of a direct transfer.
+CREATE ROLE table_owners NOLOGIN;
 
 GRANT USAGE, CREATE ON SCHEMA public TO table_owners;
 GRANT table_owners TO neondb_owner;
 GRANT table_owners TO algorithm_learning_migrate;
 
--- 3. Runtime role: DML only. It already exists from the least-privilege
---    rotation, so remove its inherited ownership instead of recreating it. It
---    must NOT be a member of table_owners.
+-- 3. Runtime role: DML only. Run once; skip this statement if the role already
+--    exists. It must be created with SQL at top level (see the note above);
+--    delete any Console-created role of this name first, then set its login
+--    secret separately with ALTER ROLE (section 10 of the spec).
+CREATE ROLE algorithm_learning_app LOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  NOREPLICATION
+  NOBYPASSRLS;
+
+-- 4. It must NOT be a member of table_owners.
 REVOKE table_owners FROM algorithm_learning_app;
 
--- 4. The application schema is owned by the group; every existing object created
+-- 5. The application schema is owned by the group; every existing object created
 --    by prior runs is transferred to it so Flyway DDL works through inherited
 --    ownership.
 ALTER SCHEMA public OWNER TO table_owners;
 REASSIGN OWNED BY neondb_owner TO table_owners;
 
--- 5. Runtime confinement on the schema: usage without create. The direct grants
+-- 6. Runtime confinement on the schema: usage without create. The direct grants
 --    keep the runtime role working after its group membership is revoked.
 REVOKE CREATE ON SCHEMA public FROM algorithm_learning_app;
 GRANT USAGE ON SCHEMA public TO algorithm_learning_app;
 
--- 6. Runtime DML on the current application objects. flyway_schema_history is
+-- 7. Runtime DML on the current application objects. flyway_schema_history is
 --    not part of the serving surface and is revoked.
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO algorithm_learning_app;
 REVOKE ALL ON flyway_schema_history FROM algorithm_learning_app;

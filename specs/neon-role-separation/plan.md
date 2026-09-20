@@ -67,3 +67,9 @@ verification, the operator has created/reset both roles and set both secrets
 without exposing a password, and a serialized release migrates once as
 `algorithm_learning_migrate` and serves `/actuator/health/readiness` as
 `algorithm_learning_app` with a proven DDL denial.
+
+Revision 2026-09-21 (spec section 10): the runtime role must be SQL-created so it
+never inherits Neon's `neon_superuser` membership. Completion additionally
+requires `AC-NRS-09`: the runtime role has no `neon_superuser` membership, no
+inherited `CREATEDB`/`CREATEROLE`/`REPLICATION`/`BYPASSRLS`, and a live probe as
+that role denies DDL while DML succeeds.

@@ -587,17 +587,20 @@ tasks:
     status: in_progress
     depends_on: [NRS-001, NRS-002]
     parallel_group: neon-split-release
-    spec_refs: ["1", "6 AC-NRS-04/05/06/07", "7", "9 decisions 1/4/5"]
+    spec_refs: ["1", "6 AC-NRS-04/05/06/07/09", "7", "9 decisions 1/4/5", "10"]
     execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
     implementation_strategy: >-
-      Operator-gated split release: the operator creates/resets
-      algorithm_learning_migrate and reconciles algorithm_learning_app per NRS-001,
-      verifies membership and default privileges, sets both Secret Manager versions,
-      and updates the GitHub production NEON_MIGRATION_DATABASE_USERNAME and
-      NEON_DATABASE_USERNAME. The serialized workflow migrates once as the migration
-      role and redeploys the API, which must report ready as the runtime role; the
-      operator attests that DDL is denied and DML succeeds for the runtime role. The
-      agent never handles a password.
+      Operator-gated split release: the operator deletes the Console-created
+      runtime role and recreates algorithm_learning_app with SQL (spec section 10 —
+      Console/CLI/API roles keep an un-removable neon_superuser membership),
+      creates/resets algorithm_learning_migrate per NRS-001, verifies membership
+      and default privileges, rotates the algorithm-learning-db-password value and
+      sets the migration Secret Manager version, and updates the GitHub production
+      NEON_MIGRATION_DATABASE_USERNAME and NEON_DATABASE_USERNAME. The serialized
+      workflow migrates once as the migration role and redeploys the API, which
+      must report ready as the runtime role; the operator attests that the runtime
+      role is not a member of neon_superuser, that DDL is denied, and that DML
+      succeeds. The agent never handles a password.
     verification:
       - >-
         gcloud run jobs describe algorithm-learning-migrate --region=asia-east1 --format='value(spec.template.spec.containers[0].env)'
