@@ -159,5 +159,17 @@ flowchart TD
   S3 --> S4
 ```
 
+# Neon Migration/Runtime Role Separation — Dependency Graph
+
+```mermaid
+flowchart TD
+  R1[NRS-001 Split-role SQL artifact + runbook\ncompleted]
+  R2[NRS-002 Bootstrap + workflow split identity\nready]
+  R3[NRS-003 Apply split roles + verify readiness\npending]
+
+  R1 --> R3
+  R2 --> R3
+```
+
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

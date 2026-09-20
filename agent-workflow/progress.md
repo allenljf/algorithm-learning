@@ -2,6 +2,60 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NRS-001 closeout — 2026-09-20
+
+- Added `infra/gcp/neon-role-separation.sql`, a password-free template with two
+  parts. Part A (run as `neondb_owner`) creates the `algorithm_learning_migrate`
+  DDL role, keeps `table_owners` as the schema/object owner, grants the migration
+  role membership in `table_owners`, revokes that membership and `CREATE` from the
+  runtime role `algorithm_learning_app` (keeping `USAGE`), and grants the runtime
+  role `SELECT`/`INSERT`/`UPDATE`/`DELETE` on application tables (excluding
+  `flyway_schema_history`) plus `USAGE`/`SELECT` on sequences. Part B (run as the
+  migration role, or as the owner with `SET ROLE` when it administers the role)
+  installs `ALTER DEFAULT PRIVILEGES` for the migration role and `table_owners` as
+  a fallback, so future Flyway objects stay DML-usable by the runtime role.
+- `update-docs`: added the "Split the migration and runtime roles" runbook to
+  `infra/gcp/README.md` covering the two-part procedure, the connection identity
+  for the default-privilege statements, the secret/variable order, redeploy, the
+  DDL-denial probe, and a credential/revision-only rollback. Updated the Secret
+  Manager and GitHub Environment tables with the migration secret/username,
+  updated the workflow description to name the split identities, and marked the
+  single-role rotation section superseded.
+- Task-limited verification passed exactly as contracted:
+  `test -f infra/gcp/neon-role-separation.sql`; the static assertion that the SQL
+  names both roles and `table_owners`, contains `REVOKE`, `CREATE`,
+  `GRANT SELECT`, `ALTER DEFAULT PRIVILEGES`, `NOSUPERUSER`, and no credential
+  assignment; `git diff --check` clean.
+- Evaluator conclusions: the artifact never handles a secret; the runtime role is
+  confined to DML with no ownership and no `flyway_schema_history` access; the
+  migration role is the only `table_owners` member; the default-privilege
+  mechanism and its connection-identity requirement match the governed spec; the
+  runbook preserves the operator-only secret boundary and the forward-only
+  migration rule.
+- `NRS-001` is completed. `NRS-002` (bootstrap second secret container/accessor +
+  workflow split identity) remains `ready` in the same Phase 1
+  `neon-split-foundations` group.
+
+## Neon role separation work graph — 2026-09-20
+
+- `$work-graph` selected `three-perspectives` because the change crosses Neon role
+  ownership/grants, GCP Secret Manager, GitHub Environment variables, the
+  production workflow, and a serialized production release while the agent must
+  never handle a password.
+- Created `specs/neon-role-separation/plan.md` and `tasks.md` and appended
+  `NRS-001`..`NRS-003` to `agent-workflow/WORK_GRAPH.yaml` with a readable graph in
+  `WORK_GRAPH.md`.
+- Phase 1 — Split tooling: `NRS-001` (password-free split-role SQL artifact +
+  runbook) and `NRS-002` (bootstrap second secret container/accessor + workflow
+  split identity) are both `ready` and share the `neon-split-foundations` group.
+  Phase 2 — Split release: `NRS-003` (operator-gated apply + readiness/DDL-denial
+  verification) is `pending` on both.
+- Governed contract: `algorithm_learning_app` is the runtime (DML-only) role and
+  `algorithm_learning_migrate` the migration (DDL) role; new
+  `NEON_MIGRATION_DATABASE_USERNAME` + `algorithm-learning-db-migration-password`
+  bind the migration Job while the service keeps `NEON_DATABASE_USERNAME` +
+  `algorithm-learning-db-password`.
+
 ## NLP-002 closeout — 2026-09-20
 
 - Operator-side setup (user, agent never handled a value): dedicated Neon role

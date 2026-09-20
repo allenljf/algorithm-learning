@@ -53,9 +53,10 @@ workflow, or chat message.
 |---|---|---|
 | `algorithm-learning-jwt-key` | `APP_JWT_KEY` | Random value, at least 32 characters |
 | `algorithm-learning-refresh-hash-key` | `APP_REFRESH_HASH_KEY` | A distinct random value, at least 32 characters |
-| `algorithm-learning-db-password` | `DATABASE_PASSWORD` | Login secret of the dedicated Neon application role (see "Rotate to the least-privilege role") |
+| `algorithm-learning-db-password` | `DATABASE_PASSWORD` | Login secret of the runtime (DML-only) Neon role (see "Split the migration and runtime roles") |
+| `algorithm-learning-db-migration-password` | `DATABASE_PASSWORD` | Login secret of the migration (DDL) Neon role (see "Split the migration and runtime roles") |
 
-The Cloud Run runtime account can access only these three secrets. The GitHub
+The Cloud Run runtime account can access only these four secrets. The GitHub
 deployer cannot read them directly.
 
 ## Required GitHub Environment variables
@@ -72,7 +73,8 @@ writes them to the ignored `infra/env/.env.neon` and can set them through `gh`.
 | `GCP_DEPLOY_SERVICE_ACCOUNT` | `algorithm-learning-deployer@alert-study-508214-s5.iam.gserviceaccount.com` |
 | `GCP_ARTIFACT_REPOSITORY` | `algorithm-learning` |
 | `GCP_CLOUD_RUN_SERVICE` | `algorithm-learning-api` |
-| `NEON_DATABASE_USERNAME` | Neon application role name |
+| `NEON_DATABASE_USERNAME` | Neon runtime (DML-only) application role name |
+| `NEON_MIGRATION_DATABASE_USERNAME` | Neon migration (DDL) role name |
 | `NEON_MIGRATION_JDBC_URL` | `jdbc:postgresql://<direct-host>/<database>?sslmode=require&channelBinding=require` |
 | `NEON_SERVICE_JDBC_URL` | `jdbc:postgresql://<pooled-host>/<database>?sslmode=require&channelBinding=require` |
 
@@ -132,11 +134,14 @@ Secret Manager references by name. They differ in the database endpoint:
   pooled endpoint) plus `prepareThreshold=0`, and `SPRING_FLYWAY_ENABLED=false`;
   Flyway never runs on Cloud Run service startup.
 
-Both set `DATABASE_USERNAME` to `NEON_DATABASE_USERNAME`. The migration uses the
-direct endpoint because PgBouncer transaction pooling does not support the
-session features migrations rely on; the service uses the pooled endpoint
-because Cloud Run scales to many short-lived instances. The service is made
-publicly invokable for the authentication routes, while the Job is never public.
+The migration Job sets `DATABASE_USERNAME` to `NEON_MIGRATION_DATABASE_USERNAME`
+and the `algorithm-learning-db-migration-password` secret; the serving revision
+sets `DATABASE_USERNAME` to `NEON_DATABASE_USERNAME` and the
+`algorithm-learning-db-password` secret. The migration uses the direct endpoint
+because PgBouncer transaction pooling does not support the session features
+migrations rely on; the service uses the pooled endpoint because Cloud Run scales
+to many short-lived instances. The service is made publicly invokable for the
+authentication routes, while the Job is never public.
 
 ## First-deploy checklist
 
@@ -162,6 +167,10 @@ value into GitHub, a shell history, source control, or this conversation:
    actions and no `GCP_SA_KEY`, credential JSON, or secret value.
 
 ## Rotate to the least-privilege role
+
+> Superseded: this single-role rotation is historical. The production delivery
+> now uses the split roles in "Split the migration and runtime roles" below; keep
+> this section for the record of the first least-privilege rotation.
 
 The production delivery must not authenticate as the Neon owner `neondb_owner`.
 Use `infra/gcp/neon-least-privilege-role.sql` to install a dedicated application
@@ -234,6 +243,93 @@ Rollback: if the new credential is faulty, restore the previous
 trigger the workflow again, or return serving traffic to the previously recorded
 known-good Cloud Run revision. Never reverse a Flyway migration as the rollback;
 the change is credential-only and forward-compatible.
+
+## Split the migration and runtime roles
+
+The serving credential must not hold DDL. Split the single application role into
+a migration (DDL) role and a runtime (DML-only) role using
+`infra/gcp/neon-role-separation.sql`, then rotate the two credentials. The agent
+must never receive, read, echo, or commit a login secret; the operator performs
+every step below.
+
+Boundary:
+
+- `algorithm_learning_app` is the runtime (DML-only) role: it is not a member of
+  `table_owners`, keeps `USAGE` but not `CREATE` on `public`, and has no access to
+  `flyway_schema_history`.
+- `algorithm_learning_migrate` is the migration (DDL) role and the only member of
+  `table_owners`; it runs Flyway only in the migration Job on the direct endpoint.
+- `table_owners` stays the owner of `public` and the existing objects, so Flyway
+  DDL works through inherited ownership.
+- `NEON_DATABASE_USERNAME` names the runtime role and
+  `algorithm-learning-db-password` holds its login secret;
+  `NEON_MIGRATION_DATABASE_USERNAME` names the migration role and
+  `algorithm-learning-db-migration-password` holds its login secret. The JDBC
+  URLs, WIF, Artifact Registry, Cloud Run, and IAM bindings are otherwise
+  unchanged.
+
+Procedure:
+
+1. Open the Neon console for the production project. Run Part A of
+   `infra/gcp/neon-role-separation.sql` in the SQL editor against the `neondb`
+   database as `neondb_owner`. It creates `algorithm_learning_migrate`, keeps
+   `table_owners` as the owner, revokes `table_owners` membership and `CREATE`
+   from `algorithm_learning_app`, and grants the runtime DML on the current
+   objects. If the owner session cannot create roles, create
+   `algorithm_learning_migrate` from the Neon console Roles tab with the same
+   confinement and run only the membership/grant statements.
+2. Run Part B while connected as `algorithm_learning_migrate` (its own connection
+   string), or as `neondb_owner` after
+   `GRANT algorithm_learning_migrate TO neondb_owner; SET ROLE algorithm_learning_migrate;`
+   when the owner administers that role. It installs the default privileges so
+   future Flyway objects are DML-usable by the runtime role.
+3. Confirm the confinement query in the script returns `false` for `rolsuper`,
+   `rolcreatedb`, `rolcreaterole`, `rolreplication`, and `rolbypassrls` for both
+   roles, and the ownership query shows every application object owned by
+   `table_owners`.
+4. Reset both role login secrets in the Neon console (Roles -> the role -> Reset)
+   and add each as a new version of its Secret Manager container:
+   `algorithm-learning-db-password` for `algorithm_learning_app` and
+   `algorithm-learning-db-migration-password` for `algorithm_learning_migrate`.
+   Do not put a value in a shell history, GitHub variable, workflow, source
+   control, or this conversation.
+5. In the GitHub `production` Environment, set `NEON_DATABASE_USERNAME` to
+   `algorithm_learning_app` and `NEON_MIGRATION_DATABASE_USERNAME` to
+   `algorithm_learning_migrate`. The JDBC URL variables are unchanged.
+6. Trigger the serialized production workflow on `main` (or via manual dispatch
+   whose ref still satisfies the WIF condition). It runs the migration Job as the
+   migration role, then redeploys the API as the runtime role.
+
+Verification after the redeploy:
+
+```sh
+gcloud run jobs describe algorithm-learning-migrate --region=asia-east1 \
+  --format='value(spec.template.spec.containers[0].env)'
+gcloud run jobs execute algorithm-learning-migrate --region=asia-east1 --wait
+SERVICE_URL="$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')"
+curl --fail --retry 12 --retry-delay 5 "${SERVICE_URL}/actuator/health/readiness"
+gcloud run services describe algorithm-learning-api --region=asia-east1 \
+  --format='value(spec.template.spec.containers[0].env)'
+```
+
+The migration Job environment must show
+`DATABASE_USERNAME=algorithm_learning_migrate` and the service environment must
+show `DATABASE_USERNAME=algorithm_learning_app`.
+
+DDL-denial probe: connect to Neon as `algorithm_learning_app` and confirm a read
+succeeds while DDL fails:
+
+```sql
+SELECT count(*) FROM problems;         -- must succeed
+CREATE TABLE ddl_probe (id int);       -- must fail: permission denied for schema public
+```
+
+Rollback: if the runtime credential is faulty, restore the previous
+`algorithm-learning-db-password` version and `NEON_DATABASE_USERNAME` value and
+trigger the workflow again, or return serving traffic to the previously recorded
+known-good Cloud Run revision. The migration role may be left in place. Never
+reverse a Flyway migration as the rollback; the change is credential-only and
+forward-compatible.
 
 ## Rollout, verification, and rollback
 
