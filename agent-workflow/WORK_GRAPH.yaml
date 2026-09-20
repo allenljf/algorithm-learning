@@ -487,7 +487,7 @@ tasks:
       - git diff --check
   - id: SR-002
     title: Add Compose schedule context and align the due contract
-    status: ready
+    status: completed
     depends_on: [SR-001]
     parallel_group: sr-client
     spec_refs: ["2", "3.3", "4", "AC-SR-04", "AC-SR-06", "5.2", "5.3"]
@@ -504,7 +504,7 @@ tasks:
       - git diff --check
   - id: SR-003
     title: Run cross-platform acceptance for adaptive scheduling
-    status: pending
+    status: ready
     depends_on: [SR-001, SR-002]
     parallel_group: sr-release
     spec_refs: ["4", "AC-SR-01", "AC-SR-02", "AC-SR-03", "AC-SR-04", "AC-SR-05", "AC-SR-06", "AC-SR-07", "AC-SR-08", "5.4"]

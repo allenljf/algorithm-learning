@@ -5,6 +5,7 @@ import com.algorithmlearning.shared.library.ApiFailureKind
 import com.algorithmlearning.shared.library.ProblemDetail
 import com.algorithmlearning.shared.library.ProblemRepository
 import com.algorithmlearning.shared.library.ProblemSummary
+import com.algorithmlearning.shared.library.Review
 import com.algorithmlearning.shared.library.ReviewRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,7 @@ data class ReviewSessionState(
     val notes: String = "",
     val submitting: Boolean = false,
     val submitted: Boolean = false,
+    val submittedReview: Review? = null,
     val error: ApiFailureKind? = null,
 )
 
@@ -123,12 +125,12 @@ class ReviewViewModel(
         updateSession { it.copy(submitting = true, error = null) }
         scope.launch {
             try {
-                reviews.submit(
+                val saved = reviews.submit(
                     problemId = session.problem.summary.id,
                     confidence = confidence,
                     notes = session.notes.trim().ifBlank { null },
                 )
-                updateSession { it.copy(submitting = false, submitted = true) }
+                updateSession { it.copy(submitting = false, submitted = true, submittedReview = saved) }
                 loadDue()
             } catch (failure: ApiFailure) {
                 updateSession { it.copy(submitting = false, error = failure.kind) }

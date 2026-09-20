@@ -107,6 +107,14 @@ data class AppStrings(
     val dashboardDueReviewsLabel: String,
     val dashboardEmptyMessage: String,
     val dashboardLoadFailureMessage: String,
+    val reviewScheduleTitle: String,
+    val reviewScheduleNeverReviewed: String,
+    val reviewScheduleLastReviewedLabel: String,
+    val reviewScheduleNextReviewLabel: String,
+    val reviewScheduleIntervalLabel: String,
+    val reviewScheduleRatedLabel: String,
+    val reviewScheduleNextReviewInLabel: String,
+    val reviewScheduleDaysLabel: String,
 )
 
 object StringCatalog {
@@ -214,6 +222,14 @@ object StringCatalog {
             dashboardDueReviewsLabel = "Due reviews",
             dashboardEmptyMessage = "Add your first problem",
             dashboardLoadFailureMessage = "Unable to load the dashboard",
+            reviewScheduleTitle = "Review schedule",
+            reviewScheduleNeverReviewed = "Not reviewed yet",
+            reviewScheduleLastReviewedLabel = "Last reviewed",
+            reviewScheduleNextReviewLabel = "Next review",
+            reviewScheduleIntervalLabel = "Interval (days)",
+            reviewScheduleRatedLabel = "Rated",
+            reviewScheduleNextReviewInLabel = "next review in",
+            reviewScheduleDaysLabel = "days",
         )
         AppLanguage.TRADITIONAL_CHINESE -> AppStrings(
             appName = "演算法學習",
@@ -318,6 +334,14 @@ object StringCatalog {
             dashboardDueReviewsLabel = "待複習",
             dashboardEmptyMessage = "新增第一道題目",
             dashboardLoadFailureMessage = "無法載入儀表板",
+            reviewScheduleTitle = "複習排程",
+            reviewScheduleNeverReviewed = "尚未複習",
+            reviewScheduleLastReviewedLabel = "上次複習",
+            reviewScheduleNextReviewLabel = "下次複習",
+            reviewScheduleIntervalLabel = "間隔（天）",
+            reviewScheduleRatedLabel = "評分",
+            reviewScheduleNextReviewInLabel = "下次複習於",
+            reviewScheduleDaysLabel = "天",
         )
     }
 }

@@ -393,3 +393,31 @@ Rules:
 
 Verification for this layer is the release task's `./gradlew
 :composeApp:assembleDebug` and `./gradlew :composeApp:allTests`.
+
+## 15. Review schedule context
+
+`spaced-repetition` adds server-side `adaptive-v1` scheduling. The client only
+renders the derived schedule; it never calculates dates.
+
+- `ReviewSummary` and `Review` carry nullable `intervalDays` and
+  `scheduleExplanationKey` (`Review` also carries `easeFactor` and
+  `repetitions`). Historical `fixed-v1` events and never-reviewed problems
+  serialize these as null; the DTOs default them, so the client tolerates the
+  older payloads.
+- The server returns a locale-neutral `scheduleExplanationKey`
+  (`schedule.neverReviewed`, `schedule.fixed.rated`, `schedule.adaptive.rated`).
+  `Labels.kt#scheduleExplanation` resolves it to catalog text; a null or unknown
+  key renders the never-reviewed explanation rather than inventing a value.
+- The shared `ScheduleContext` composable (`com.algorithmlearning.app`) renders
+  the title, the localized explanation, and (when present) the next review time.
+  The problem-detail pane shows the latest summary's schedule and the Review
+  completion state shows the just-submitted review's schedule.
+- `ReviewViewModel.ReviewSessionState.submittedReview` carries the created
+  review so the completion state can render its schedule.
+- The reconciled `GET /reviews/today` returns problem summaries
+  (`ReviewRepository.due`), which the review browse already consumed; the due
+  list gains no new mapping.
+- Testing seams: `KtorReviewRemoteTest`/`KtorProblemRemoteTest` map the new DTO
+  fields with `MockEngine`; `PresentationFakes.review` scripts schedule values;
+  `ReviewScreenUiTest` and `ProblemsScreenUiTest` assert the rendered
+  `schedule-context` through `AppStrings`.

@@ -41,7 +41,7 @@ human-readable execution contract.
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 3 — Acceptance and release
 
@@ -58,7 +58,7 @@ human-readable execution contract.
   approach; `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd services/api && ./mvnw -q verify`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ### SR-004 — Apply the production migration and verify readiness
 

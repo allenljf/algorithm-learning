@@ -82,6 +82,8 @@ data class ReviewSummary(
     val lastReviewedAt: Instant?,
     val nextReviewAt: Instant?,
     val reviewCount: Int,
+    val intervalDays: Int? = null,
+    val scheduleExplanationKey: String? = null,
 )
 
 data class ProblemSummary(
@@ -160,6 +162,10 @@ data class Review(
     val nextReviewAt: Instant,
     val notes: String?,
     val policyVersion: String,
+    val intervalDays: Int? = null,
+    val easeFactor: Double? = null,
+    val repetitions: Int? = null,
+    val scheduleExplanationKey: String? = null,
 )
 
 data class Dashboard(

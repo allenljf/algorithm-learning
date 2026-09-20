@@ -15,6 +15,8 @@ internal data class ReviewSummaryDto(
     val lastReviewedAt: String? = null,
     val nextReviewAt: String? = null,
     val reviewCount: Int,
+    val intervalDays: Int? = null,
+    val scheduleExplanationKey: String? = null,
 )
 
 @Serializable
@@ -110,6 +112,10 @@ internal data class ReviewDto(
     val nextReviewAt: String,
     val notes: String? = null,
     val policyVersion: String,
+    val intervalDays: Int? = null,
+    val easeFactor: Double? = null,
+    val repetitions: Int? = null,
+    val scheduleExplanationKey: String? = null,
 )
 
 @Serializable

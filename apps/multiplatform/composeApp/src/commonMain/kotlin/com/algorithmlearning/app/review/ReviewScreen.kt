@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.algorithmlearning.app.ScheduleContext
 import com.algorithmlearning.app.label
 import com.algorithmlearning.shared.AppStrings
 import com.algorithmlearning.shared.library.ProblemDetail
@@ -259,6 +260,15 @@ private fun ReviewSession(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 16.dp).testTag("review-submitted"),
             )
+            session.submittedReview?.let { review ->
+                ScheduleContext(
+                    key = review.scheduleExplanationKey,
+                    confidence = review.confidence,
+                    intervalDays = review.intervalDays,
+                    nextReviewAt = review.nextReviewAt,
+                    strings = strings,
+                )
+            }
             Button(
                 onClick = actions.exitReview,
                 modifier = Modifier.padding(top = 8.dp),

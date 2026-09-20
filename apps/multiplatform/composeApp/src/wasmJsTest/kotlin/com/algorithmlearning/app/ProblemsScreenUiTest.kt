@@ -92,5 +92,7 @@ class ProblemsScreenUiTest {
         onNodeWithText("Use a hash map").assertIsDisplayed()
         onNodeWithTag("solution-code").assertIsDisplayed()
         onNodeWithTag("problem-delete").assertIsDisplayed()
+        onNodeWithTag("schedule-context").assertIsDisplayed()
+        onNodeWithText(strings.reviewScheduleNeverReviewed).assertIsDisplayed()
     }
 }

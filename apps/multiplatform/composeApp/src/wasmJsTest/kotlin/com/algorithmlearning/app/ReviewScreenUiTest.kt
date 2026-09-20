@@ -110,6 +110,8 @@ class ReviewScreenUiTest {
         onNodeWithTag("review-submit").performClick()
 
         onNodeWithTag("review-submitted").assertIsDisplayed()
+        onNodeWithTag("schedule-context").assertIsDisplayed()
+        onNodeWithText(strings.reviewScheduleTitle).assertIsDisplayed()
         assertEquals(1, reviews.submitted.size)
         assertEquals(3, reviews.submitted.single().second)
     }

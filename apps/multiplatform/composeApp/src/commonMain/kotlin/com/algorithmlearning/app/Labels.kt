@@ -50,3 +50,18 @@ fun ProblemsMessage.label(strings: AppStrings): String = when (this) {
     ProblemsMessage.PROBLEM_DELETED -> strings.problemDeletedMessage
     ProblemsMessage.OPERATION_FAILED -> strings.problemOperationFailedMessage
 }
+
+/**
+ * Resolves the server's locale-neutral schedule key into catalog text. A missing
+ * or unknown key renders the never-reviewed explanation rather than inventing a
+ * schedule value.
+ */
+fun scheduleExplanation(key: String?, confidence: Int?, intervalDays: Int?, strings: AppStrings): String = when (key) {
+    "schedule.adaptive.rated", "schedule.fixed.rated" -> when {
+        confidence == null -> strings.reviewScheduleNeverReviewed
+        intervalDays == null -> "${strings.reviewScheduleRatedLabel} $confidence"
+        else -> "${strings.reviewScheduleRatedLabel} $confidence · " +
+            "${strings.reviewScheduleNextReviewInLabel} $intervalDays ${strings.reviewScheduleDaysLabel}"
+    }
+    else -> strings.reviewScheduleNeverReviewed
+}

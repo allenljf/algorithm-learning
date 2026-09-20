@@ -96,6 +96,34 @@ The Flutter application root and backend composition root are complete.
   Evaluator boundary: the artifact contains no password, includes the ownership
   and confinement clauses, and the exact task verification passes.
 
+## SR-002 closeout — 2026-09-20
+
+- Compose client: added nullable schedule metadata to `ReviewSummary`/`Review`
+  and their DTOs/mappers (`intervalDays`, `scheduleExplanationKey`; `Review`
+  also `easeFactor`, `repetitions`), so the client tolerates both adaptive and
+  historical `fixed-v1` payloads.
+- Added the shared `ScheduleContext` composable and
+  `Labels.kt#scheduleExplanation`, which resolves the server's locale-neutral
+  key (`schedule.neverReviewed|fixed.rated|adaptive.rated`) to catalog text and
+  never invents a value. The problem-detail pane shows the latest summary's
+  schedule and the Review completion shows the just-submitted review's schedule
+  via `ReviewViewModel.ReviewSessionState.submittedReview`.
+- `update-docs`: extended both `AppStrings` catalogs (EN/zh) with the schedule
+  strings and added `COMPOSE_GUIDE.md` section 15 (review schedule context,
+  null-tolerance, testing seams). The due browse already consumed the reconciled
+  problem-summary contract, so no due mapping change was needed.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :shared:allTests` (Android and Wasm: 71
+  tests each, 0 failures) and `./gradlew :composeApp:allTests` (Android 29, Wasm
+  48, 0 failures); `git diff --check` clean. Added `schedule-context` assertions
+  to `ReviewScreenUiTest` and `ProblemsScreenUiTest`.
+- Evaluator conclusions: composables render state only and never calculate
+  dates; every user-visible string resolves through `AppStrings`; no DTO leaks;
+  the reconciled due contract matches `ReviewRepository.due`; the closeout
+  commit is local only.
+- `SR-002` is completed. `SR-003` (cross-platform acceptance) advanced to
+  `ready`.
+
 ## SR-001 closeout — 2026-09-20
 
 - Added the `adaptive-v1` server scheduling stack in `services/api`:

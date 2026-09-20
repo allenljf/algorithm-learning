@@ -82,6 +82,10 @@ fun review(problemId: String, confidence: Int, notes: String? = null): Review = 
     nextReviewAt = testInstant,
     notes = notes,
     policyVersion = "adaptive-v1",
+    intervalDays = 4,
+    easeFactor = 2.50,
+    repetitions = 1,
+    scheduleExplanationKey = "schedule.adaptive.rated",
 )
 
 fun problemSolution(

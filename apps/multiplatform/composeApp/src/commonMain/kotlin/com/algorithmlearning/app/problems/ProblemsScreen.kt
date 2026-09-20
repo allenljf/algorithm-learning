@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.algorithmlearning.app.ScheduleContext
 import com.algorithmlearning.app.label
 import com.algorithmlearning.shared.AppStrings
 import com.algorithmlearning.shared.library.ProblemDifficulty
@@ -461,6 +462,13 @@ private fun ProblemDetailPane(
                 )
             }
         }
+        ScheduleContext(
+            key = detail.detail.summary.review.scheduleExplanationKey,
+            confidence = detail.detail.summary.review.confidence,
+            intervalDays = detail.detail.summary.review.intervalDays,
+            nextReviewAt = detail.detail.summary.review.nextReviewAt,
+            strings = strings,
+        )
         Section(strings.problemDescriptionLabel, detail.detail.description)
         Section(strings.problemNotesLabel, detail.detail.notes)
         Section(strings.problemKeyInsightLabel, detail.detail.keyInsight)

@@ -24,6 +24,8 @@ internal fun ReviewSummaryDto.toDomain(): ReviewSummary = ReviewSummary(
     lastReviewedAt = lastReviewedAt?.let(Instant::parse),
     nextReviewAt = nextReviewAt?.let(Instant::parse),
     reviewCount = reviewCount,
+    intervalDays = intervalDays,
+    scheduleExplanationKey = scheduleExplanationKey,
 )
 
 internal fun ProblemSummaryDto.toDomain(): ProblemSummary = ProblemSummary(
@@ -79,6 +81,10 @@ internal fun ReviewDto.toDomain(): Review = Review(
     nextReviewAt = Instant.parse(nextReviewAt),
     notes = notes,
     policyVersion = policyVersion,
+    intervalDays = intervalDays,
+    easeFactor = easeFactor,
+    repetitions = repetitions,
+    scheduleExplanationKey = scheduleExplanationKey,
 )
 
 internal fun DashboardDto.toDomain(): Dashboard = Dashboard(
