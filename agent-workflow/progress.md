@@ -2,6 +2,85 @@
 
 The Flutter application root and backend composition root are complete.
 
+## NRS-003 closeout — 2026-09-21
+
+- Operator attestation (`AC-NRS-05`/`AC-NRS-09`): connected directly as
+  `algorithm_learning_app` (the SQL-created runtime role) and ran the probe —
+  `SELECT current_user` → `algorithm_learning_app`; `SELECT count(*) FROM problems`
+  → `0` (succeeds); `CREATE TABLE ddl_probe (id int)` →
+  `ERROR: permission denied for schema public`. The role is not a member of
+  `neon_superuser` (`pg_has_role(...,'MEMBER') = false`) and `neondb_owner` holds
+  `admin_option = true` on it.
+- Release evidence: revision `algorithm-learning-api-00010-7k6` serving image
+  `api:7396207879f8a5ccb8d6664f64b8ab514f7c511f`; migration execution
+  `algorithm-learning-migrate-b7dt8` succeeded; previous known-good revision
+  `algorithm-learning-api-00009-fhk`. Rollback is credential/revision-only and
+  never reverses Flyway migrations.
+- The serialized workflow `35523098287` ran exactly one migration as
+  `algorithm_learning_migrate` before deploying the service, which serves as the
+  SQL-created `algorithm_learning_app` with readiness `UP`.
+- Secret hygiene: the agent never read, printed, or committed a secret value. The
+  migration secret's stray v2 was disabled then destroyed (Cloud Run's `latest`
+  resolves to the highest version number even when disabled/destroyed) and
+  replaced with an enabled v3; the runtime secret has an enabled v4.
+- `update-docs`: the artifact creates both roles with top-level SQL
+  (`createrole_self_grant = 'set, inherit'`); the runbook documents the
+  SQL-creation requirement, the Neon password policy, the `latest` resolution
+  quirk, and the direct-login probe; the spec records section 10 and `AC-NRS-09`.
+- Evaluator conclusions: the runtime identity holds no object ownership and no
+  schema `CREATE`; the migration role is the only `table_owners` member; service
+  and Job use distinct database identities; `AC-NRS-01..09` hold; WIF, SHA-pinned
+  actions, serialized deploy, the pooled/direct endpoint split,
+  `prepareThreshold=0`, and forward-only migrations are unchanged.
+- `NRS-003` is completed. `neon-role-separation` (Phase 1 + Phase 2) is complete;
+  no next ready task exists.
+
+## NRS-003 release (attempt 3) — split identity deployed — 2026-09-21
+
+- Added an enabled v3 to `algorithm-learning-db-migration-password` (so `latest`
+  resolves to an enabled version) and re-ran the serialized workflow; run
+  `35523098287` attempt 3 succeeded (verify → migration Job → service deploy →
+  readiness).
+- Verification passed exactly as contracted:
+  - Job env `DATABASE_USERNAME=algorithm_learning_migrate` +
+    `algorithm-learning-db-migration-password`; service env
+    `DATABASE_USERNAME=algorithm_learning_app` + `algorithm-learning-db-password`.
+  - `gcloud run jobs execute` → execution `algorithm-learning-migrate-b7dt8`
+    completed successfully in 29.52s.
+  - `curl .../actuator/health/readiness` → `{"status":"UP"}` at
+    `https://algorithm-learning-api-qvepavg7qa-de.run.app`.
+  - Identity assertion passed; `git diff --check` clean.
+- New revision `algorithm-learning-api-00010-7k6` serving image
+  `api:7396207879f8a5ccb8d6664f64b8ab514f7c511f`; previous known-good revision
+  `algorithm-learning-api-00009-fhk`. Rollback is credential/revision-only.
+- Remaining for closeout: the operator `AC-NRS-09` DDL-denial probe as the
+  SQL-created runtime role via a direct login (not the SQL Editor): DML succeeds,
+  `CREATE TABLE` is denied, and `pg_has_role(...,'neon_superuser','MEMBER')` is
+  `false`.
+
+## NRS-003 recovery — Cloud Run `latest` resolves to a destroyed version — 2026-09-21
+
+- Disabling, then destroying, `algorithm-learning-db-migration-password` v2 did
+  not unblock the Job: Cloud Run resolves `:latest` to the highest version number
+  even when that version is DISABLED/DESTROYED, so both workflow attempts failed
+  with "versions/2 is in DISABLED/DESTROYED state" at the migration Job deploy.
+- Fix: add a new **enabled** version (v3) to
+  `algorithm-learning-db-migration-password` so `latest` resolves to it. Set the
+  migration role's login secret first with
+  `ALTER ROLE algorithm_learning_migrate WITH PASSWORD '<value>'` so v3 is
+  guaranteed to match, then add v3 with that value.
+
+## NRS-003 recovery — runtime secret version added to the wrong secret — 2026-09-21
+
+- The new version landed on `algorithm-learning-db-migration-password` (v2,
+  `2026-09-20T16:31:06`) instead of `algorithm-learning-db-password`, which still
+  has only v1–v3. A deploy now would resolve the migration secret's `:latest` to
+  the wrong value and the migration Job would fail authentication.
+- Next: add the runtime value to `algorithm-learning-db-password`, and disable or
+  destroy the accidental `algorithm-learning-db-migration-password` v2 so its
+  `:latest` resolves back to v1 (the migration role's password). No secret value
+  is read by the agent.
+
 ## NRS-003 recovery — runtime role is Console-created again — 2026-09-21
 
 - `pg_has_role('algorithm_learning_app','neon_superuser','MEMBER')` now returns

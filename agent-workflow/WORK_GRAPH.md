@@ -165,16 +165,16 @@ flowchart TD
 flowchart TD
   R1[NRS-001 Split-role SQL artifact + runbook\ncompleted]
   R2[NRS-002 Bootstrap + workflow split identity\ncompleted]
-  R3[NRS-003 Apply split roles + verify readiness\nin_progress]
+  R3[NRS-003 Apply split roles + verify readiness\ncompleted]
 
   R1 --> R3
   R2 --> R3
 ```
 
-`R1` and `R2` are completed. `R3` is in progress: the operator applied the split
-roles and default privileges, the migration Secret Manager version and the GitHub
-`production` variables are set, and the push and serialized release are
-authorized. Closeout awaits readiness plus the operator's DDL-denial attestation.
+`R1`, `R2`, and `R3` are completed. The runtime role is SQL-created (no
+`neon_superuser`), the serialized release migrated once as
+`algorithm_learning_migrate` and serves readiness as `algorithm_learning_app`,
+and the operator's probe proves DDL is denied while DML succeeds.
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

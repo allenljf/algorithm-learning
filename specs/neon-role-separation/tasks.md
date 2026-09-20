@@ -80,4 +80,4 @@ human-readable execution contract.
   `curl --fail --retry 12 --retry-delay 5 "$(gcloud run services describe algorithm-learning-api --region=asia-east1 --format='value(status.url)')/actuator/health/readiness"`;
   `python3 -c "import subprocess; svc = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; job = subprocess.run(['gcloud','run','jobs','describe','algorithm-learning-migrate','--region=asia-east1','--format=value(spec.template.spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'algorithm_learning_app' in svc and 'algorithm_learning_migrate' not in svc and 'algorithm_learning_migrate' in job"`;
   `git diff --check`
-- Status: in_progress (split roles applied; serialized release authorized)
+- Status: completed (SQL-created runtime role; serialized release verified; DDL denied, DML succeeds)
