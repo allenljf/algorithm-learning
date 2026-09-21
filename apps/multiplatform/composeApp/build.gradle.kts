@@ -1,11 +1,24 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.api.tasks.Copy
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+}
+
+val wasmApiBaseUrl = providers.gradleProperty("apiBaseUrl")
+    .orElse("http://localhost:8080")
+
+tasks.withType<Copy>().configureEach {
+    if (name == "wasmJsProcessResources") {
+        inputs.property("apiBaseUrl", wasmApiBaseUrl)
+        filesMatching("index.html") {
+            expand("apiBaseUrl" to wasmApiBaseUrl.get())
+        }
+    }
 }
 
 kotlin {

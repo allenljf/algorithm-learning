@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -44,11 +45,16 @@ import com.algorithmlearning.shared.AppContainer
 import com.algorithmlearning.shared.AppDestination
 import com.algorithmlearning.shared.AppLanguage
 import com.algorithmlearning.shared.AppStrings
+import com.algorithmlearning.shared.EndpointOverrideStore
+import com.algorithmlearning.shared.EndpointSettings
+import com.algorithmlearning.shared.InvalidApiBaseUrl
 import com.algorithmlearning.shared.StringCatalog
 
 @Composable
-fun App() {
-    val container = remember { AppContainer() }
+fun App(defaultApiBaseUrl: String, endpointStore: EndpointOverrideStore) {
+    val endpointSettings = remember { EndpointSettings(defaultApiBaseUrl, endpointStore) }
+    var effectiveBaseUrl by remember { mutableStateOf(endpointSettings.effectiveBaseUrl) }
+    val container = remember(effectiveBaseUrl) { AppContainer(baseUrl = effectiveBaseUrl) }
     var language by remember { mutableStateOf(container.currentLanguage()) }
     val strings = remember(language) { StringCatalog.of(language) }
     val scope = rememberCoroutineScope()
@@ -71,6 +77,9 @@ fun App() {
                     email = session.user.email,
                     onToggleLanguage = { language = toggleLanguage(language) },
                     onSignOut = authViewModel::logout,
+                    endpointSettings = endpointSettings,
+                    effectiveBaseUrl = effectiveBaseUrl,
+                    onEndpointChanged = { effectiveBaseUrl = endpointSettings.effectiveBaseUrl },
                 )
                 !restored -> RestoringSession(strings)
                 else -> {
@@ -109,6 +118,9 @@ private fun SignedInApp(
     email: String,
     onToggleLanguage: () -> Unit,
     onSignOut: () -> Unit,
+    endpointSettings: EndpointSettings,
+    effectiveBaseUrl: String,
+    onEndpointChanged: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val problemsViewModel = remember(container) {
@@ -214,6 +226,9 @@ private fun SignedInApp(
                     email = email,
                     onToggleLanguage = onToggleLanguage,
                     onSignOut = onSignOut,
+                    endpointSettings = endpointSettings,
+                    effectiveBaseUrl = effectiveBaseUrl,
+                    onEndpointChanged = onEndpointChanged,
                 )
             }
         }
@@ -278,7 +293,12 @@ private fun SettingsContent(
     email: String,
     onToggleLanguage: () -> Unit,
     onSignOut: () -> Unit,
+    endpointSettings: EndpointSettings,
+    effectiveBaseUrl: String,
+    onEndpointChanged: () -> Unit,
 ) {
+    var endpointInput by remember(effectiveBaseUrl) { mutableStateOf(effectiveBaseUrl) }
+    var endpointError by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -289,6 +309,29 @@ private fun SettingsContent(
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
         )
+        OutlinedTextField(
+            value = endpointInput,
+            onValueChange = { endpointInput = it; endpointError = false },
+            label = { Text(strings.settingsApiEndpointLabel) },
+            isError = endpointError,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+        if (endpointError) Text(strings.settingsApiEndpointInvalidMessage)
+        Button(onClick = {
+            try {
+                endpointSettings.save(endpointInput)
+                endpointError = false
+                onEndpointChanged()
+            } catch (_: InvalidApiBaseUrl) {
+                endpointError = true
+            }
+        }) { Text(strings.settingsApiEndpointSaveAction) }
+        Button(onClick = {
+            endpointSettings.reset()
+            endpointInput = endpointSettings.effectiveBaseUrl
+            endpointError = false
+            onEndpointChanged()
+        }) { Text(strings.settingsApiEndpointResetAction) }
         Text(
             text = "${strings.authSignedInAsLabel}: $email",
             modifier = Modifier.padding(top = 12.dp),

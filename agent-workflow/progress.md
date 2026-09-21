@@ -1,6 +1,55 @@
 # Progress
 
+## Client distribution governance and work graph — 2026-09-21
+
+- CDS-001 closed: added a tested shared endpoint-selection boundary, persistent
+  Android/Wasm overrides, endpoint Settings UI/localization, fresh container
+  creation on origin changes, Android debug/release defaults, and the Wasm
+  `-PapiBaseUrl` build-time production override. Contracted verification passed:
+  `:shared:allTests`, `:composeApp:allTests`, `:composeApp:assembleDebug`, and
+  `git diff --check`.
+
+- CDS-001 is `in_progress` under `three-perspectives` / `tdd` / `update-docs` /
+  `infer`. Completion checklist: build defaults are non-secret and not localhost
+  in production; override validation/persistence/reset is shared and testable;
+  a changed origin rebuilds the container/session; Settings strings/UI are fully
+  localized; only the four CDS-001 verification commands will be run.
+
+- `$spec-governance` selected `update-docs + infer` and governed
+  `specs/client-distribution/spec.md`. The resolved contract is both a per-build
+  local/production default and a validated persisted user override; an endpoint
+  switch constructs a fresh dependency graph and does not reuse prior-origin
+  session state.
+- Distribution decisions: direct signed Android release APK (not a Play track),
+  TestFlight external testing (not an App Store submission), and production Web
+  hosting deferred. `GCP_CORS_ALLOWED_ORIGINS` stays absent: native clients do
+  not need CORS, and no owned HTTPS Web origin currently exists.
+- Android signing material, Apple Developer/App Store Connect identity,
+  certificates, profiles, and TestFlight release/invitations are operator-only.
+  The agent may only implement non-secret wiring, examples, and runbooks.
+- `$work-graph` created `specs/client-distribution/plan.md`,
+  `specs/client-distribution/tasks.md`, and CDS-001..005 in
+  `agent-workflow/WORK_GRAPH.yaml` / `WORK_GRAPH.md`. `CDS-001` is the sole
+  ready task; its execution contract has not yet been selected.
+
 The Flutter application root and backend composition root are complete.
+
+## Client distribution intake — 2026-09-21
+
+- `$workflow-intake` selected `brainstorm` for the request to make the client
+  distributable to external users with a configurable API endpoint and an iOS
+  target: the product/distribution shape is still open-ended (which platforms,
+  which distribution mechanism, whether production Web/CORS is in scope).
+- Created `specs/client-distribution/spec.md` with the gap (hard-coded
+  `DEFAULT_API_BASE_URL = "http://localhost:8080"` and no override in
+  `AppContainer`/`App`; `composeApp` declares only `androidTarget` and `wasmJs`),
+  scope and non-goals, `AC-CDS-01..07`, technical constraints, open decisions for
+  governance, and known risks (Apple distribution prerequisites, iOS
+  Kotlin/Native gaps, public-API abuse follow-up).
+- No `plan.md`, `tasks.md`, or `WORK_GRAPH.yaml` node exists yet;
+  `$spec-governance` is the next phase and must resolve the endpoint-config
+  mechanism, the per-platform distribution mechanism, the CORS/production-Web
+  decision, and the operator-only signing/account boundary.
 
 ## NRS-003 closeout — 2026-09-21
 

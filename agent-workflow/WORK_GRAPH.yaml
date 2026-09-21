@@ -611,3 +611,64 @@ tasks:
       - >-
         python3 -c "import subprocess; svc = subprocess.run(['gcloud','run','services','describe','algorithm-learning-api','--region=asia-east1','--format=value(spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; job = subprocess.run(['gcloud','run','jobs','describe','algorithm-learning-migrate','--region=asia-east1','--format=value(spec.template.spec.template.spec.containers[0].env)'], capture_output=True, text=True).stdout; assert 'algorithm_learning_app' in svc and 'algorithm_learning_migrate' not in svc and 'algorithm_learning_migrate' in job"
       - git diff --check
+  - id: CDS-001
+    title: Add safe build-time and runtime API endpoint selection
+    status: completed
+    depends_on: [CMP-008]
+    parallel_group: client-distribution-configuration
+    spec_refs: ["3", "4 AC-CDS-01/02/07/08/09", "5", "6.1-6.2", "8"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Put endpoint parsing, normalization, selection, reset, and selected-origin
+      state in shared commonMain behind injected storage/default seams. Platform
+      entry points provide the build-selected default and persistent storage;
+      App recreates its AppContainer when the origin changes, so no former-origin
+      auth state survives. Add localized Settings controls without exposing
+      storage or transport details to composables.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - git diff --check
+  - id: CDS-002
+    title: Add the Compose Multiplatform iOS target and Xcode entry point
+    status: pending
+    depends_on: [CDS-001]
+    parallel_group: client-distribution-ios
+    spec_refs: ["3", "4 AC-CDS-01/03/04/07", "5", "6.1-6.3", "7-8"]
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO
+      - git diff --check
+  - id: CDS-003
+    title: Define repeatable signed Android APK packaging
+    status: pending
+    depends_on: [CDS-001]
+    parallel_group: client-distribution-release
+    spec_refs: ["3", "4 AC-CDS-04/06/07/10", "5", "6.1/6.3", "8"]
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleRelease
+      - git diff --check
+  - id: CDS-004
+    title: Produce the operator-gated TestFlight external-test release
+    status: pending
+    depends_on: [CDS-002]
+    parallel_group: client-distribution-release
+    spec_refs: ["3", "4 AC-CDS-03/04/06/07", "5", "6.1/6.3", "7-8"]
+    verification:
+      - cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive
+      - test -d apps/multiplatform/build/iosApp.xcarchive
+      - git diff --check
+  - id: CDS-005
+    title: Record the deliberate production-Web and GCP-CORS deferral
+    status: pending
+    depends_on: [CDS-001]
+    parallel_group: client-distribution-release
+    spec_refs: ["3", "4 AC-CDS-05/06/07", "5", "6.1/6.3", "8"]
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserDevelopmentWebpack
+      - python3 -c "from pathlib import Path; t = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'GCP_CORS_ALLOWED_ORIGINS' in t and 'https://*' not in t and 'http://*' not in t"
+      - git diff --check

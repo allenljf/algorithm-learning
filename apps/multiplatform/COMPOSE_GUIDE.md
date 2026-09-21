@@ -127,6 +127,23 @@ application shell; do that as a deliberate change, not incidentally.
 4. The REST contract is frozen; adapt the client, never the API.
 5. Keep `commonMain` free of `android.*` and browser APIs.
 
+## 8.1 API endpoint configuration
+
+- `EndpointSettings` in `shared/commonMain` is the single owner of endpoint
+  normalization, override selection, reset, and persistence calls. It accepts
+  only absolute HTTP(S) origins without paths and removes a trailing slash.
+- Android and Wasm entry points supply the non-secret build default and an
+  `EndpointOverrideStore`; platform storage never leaks into common UI or data
+  code. Android debug defaults to the emulator's local API and release defaults
+  to the deployed HTTPS API. The browser uses the Gradle `apiBaseUrl` property:
+  it defaults to `http://localhost:8080` for development, while a distributable
+  build must pass the exact production HTTPS origin. Its override is persisted
+  in browser local storage.
+- `App` recreates `AppContainer` when the effective origin changes. This creates
+  a fresh HTTP client/auth repository, so process-memory auth state is not
+  carried from one API origin to another. Settings UI receives only values and
+  callbacks and resolves all labels/errors through `AppStrings`.
+
 ## 9. Auth/session data flow
 
 The auth stack lives in `shared` under `com.algorithmlearning.shared.auth`,

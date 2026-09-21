@@ -176,5 +176,25 @@ flowchart TD
 `algorithm_learning_migrate` and serves readiness as `algorithm_learning_app`,
 and the operator's probe proves DDL is denied while DML succeeds.
 
+# Client Distribution — Dependency Graph
+
+```mermaid
+flowchart TD
+  D1[CDS-001 Endpoint configuration\nready]
+  D2[CDS-002 iOS target + Xcode shell\npending]
+  D3[CDS-003 Signed Android APK\npending]
+  D4[CDS-004 TestFlight release\npending]
+  D5[CDS-005 Web/CORS deferral\npending]
+
+  D1 --> D2
+  D1 --> D3
+  D1 --> D5
+  D2 --> D4
+```
+
+The selected distribution contract is: dual endpoint configuration, direct
+signed Android APK, operator-owned TestFlight external testing, and deferred
+production Web/CORS. `CDS-001` is the only ready task.
+
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.
