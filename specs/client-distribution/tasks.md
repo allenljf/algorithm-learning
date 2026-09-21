@@ -113,15 +113,21 @@ human-readable execution contract.
 - Verification: `gcloud projects describe allenljf-algorithm`; `firebase hosting:sites:list --project allenljf-algorithm`; `curl --fail https://allenljf-algorithm.web.app`; `curl --fail https://allenljf-algorithm.web.app/api/actuator/health/readiness`; `git diff --check`
 - Status: completed
 
-## Phase 6 — Android artifact publication
+## Phase 6 — Android source build
 
-### CDS-007 — Publish a signed Android showcase APK outside Firebase Hosting
+### CDS-007 — Document the public Android source-build showcase path
 
-- Deliverable: operator-published signed APK and SHA-256 through a non-Firebase
-  release channel, plus public download/install evidence and rollback reference.
+- Deliverable: a public-source Android runbook covering prerequisites, clone,
+  debug assembly, local installation, production-endpoint confirmation, and
+  source update/rebuild rollback. It explicitly states that the showcase does
+  not publish an APK, checksum, or external artifact; existing optional signing
+  wiring remains operator-only and out of scope.
 - Depends on: CDS-003, CDS-006
 - Parallel group: `client-distribution-android-publication`
 - Spec refs: 3, 4 AC-CDS-04/06/07/10, 5, 6.3, 8
-- Execution contract: selected by `$execution-strategy`.
-- Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
-- Status: ready (requires an execution contract before work starts)
+- Execution contract: `single-agent` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This is a low-risk
+  documentation task over the already-working debug build path; its exact debug
+  assembly and repository-diff checks are its acceptance evidence.
+- Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `git diff --check`
+- Status: completed

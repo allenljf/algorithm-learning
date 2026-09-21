@@ -1,5 +1,86 @@
 # Progress
 
+## CDS-007 source-build governance revision — 2026-09-21
+
+- `$spec-governance` selected `update-docs` + `infer` after the operator
+  replaced Android APK publication with public source and local debug-build
+  guidance. The Web showcase remains public at
+  `https://allenljf-algorithm.web.app`; Android has no release channel,
+  published APK, checksum, unknown-source download flow, or signing requirement.
+  Existing optional signing wiring remains untouched and operator-only.
+- `$work-graph` revised CDS-007 to document prerequisites, source checkout,
+  debug assembly, local installation, endpoint confirmation, and source rebuild
+  rollback. The previous missing-signing blocker is superseded; CDS-007 is now
+  `ready` and requires a new execution contract. The protected iOS Xcode changes
+  and Firebase local cache remain out of scope.
+
+## CDS-007 execution strategy — source-build path — 2026-09-21
+
+- Selected contract: `single-agent` / `rapid` / `update-docs` / `infer`.
+  Scope: replace APK artifact guidance with an actionable Android source-build
+  runbook only. Completion checklist: public source checkout, JDK/Android SDK
+  prerequisites, debug assembly path, local installation and endpoint check,
+  source rebuild rollback guidance, explicit no-artifact boundary, task-limited
+  verification, and closeout without touching signing material, iOS Xcode
+  changes, or the Firebase local cache.
+
+## CDS-007 closeout — Android source-build showcase path — 2026-09-21
+
+- Replaced the former APK-publication runbook with a public source-build path:
+  JDK/Android SDK prerequisites, clone, debug assembly, `adb` installation,
+  endpoint confirmation, and source revision rebuild rollback. It explicitly
+  excludes any published APK, checksum, release channel, or unknown-source
+  download flow. Optional signing wiring remains operator-only and untouched.
+- Updated the client-distribution specification, plan, tasks, and work graph to
+  make Android a source-built demonstration rather than a signed artifact.
+  This supersedes the prior signing-configuration blocker; no signing material,
+  APK artifact, GitHub Release, or external publish action is required.
+- Task-limited verification passed exactly as contracted:
+  `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug` and `git diff
+  --check`. Gradle emitted its existing KMP/AGP compatibility and deprecation
+  warnings but exited successfully.
+- CDS-007 is `completed`; client-distribution has no remaining task. The
+  pre-existing local iOS Xcode changes and `.firebase/` cache were neither
+  inspected, modified, staged, nor committed.
+
+## CDS-007 execution strategy — 2026-09-21
+
+- Selected contract: `three-perspectives` / `rapid` / `update-docs` / `infer`.
+  Planner boundary: produce one versioned signed Android APK, its SHA-256, and
+  a public non-Firebase download with a known-good rollback reference.
+  Implementer boundary: use the existing Gradle signing seam and GitHub Release
+  channel only; never read, print, stage, or modify the local keystore/signing
+  configuration, iOS Xcode settings, or Firebase local cache. Evaluator
+  boundary: the uploaded APK and checksum correspond to the same signed build,
+  installation guidance is public, and only the task's exact verification runs.
+- Completion checklist: a monotonic versioned signed APK is assembled; SHA-256
+  is calculated from that file and uploaded beside it to a non-Firebase public
+  release; the release notes identify version, checksum, install guidance, and
+  rollback artifact; task-limited verification passes; closeout records public
+  evidence and commits only task artifacts.
+
+## CDS-007 terminal blocker — Android signing configuration unavailable — 2026-09-21
+
+- The task's exact verification was run: `cd apps/multiplatform && ./gradlew
+  :composeApp:assembleRelease` completed successfully, followed by `git diff
+  --check` successfully. The only release APK output was
+  `composeApp/build/outputs/apk/release/composeApp-release-unsigned.apk`.
+- Cause: the ignored local `apps/multiplatform/android-release-signing.properties`
+  file is absent; GitHub has no Android signing secrets or release-publishing
+  workflow. The existing signing seam correctly leaves a release unsigned when
+  no operator material is supplied. Publishing it would violate AC-CDS-04,
+  AC-CDS-07, and AC-CDS-10, so no checksum, GitHub Release, tag, or artifact
+  was created.
+- CDS-007 is `blocked` only at the operator-controlled signing boundary. To
+  resume, the operator must locally create the ignored signing-properties file
+  from `apps/multiplatform/android-release-signing.properties.example` with the
+  established release keystore references (or securely configure the four
+  equivalent CI Gradle properties). Do not provide any signing value in chat.
+  The next execution must choose a new monotonically increasing version code
+  and name, build the signed APK, compute its SHA-256 from that exact file, and
+  publish both to a public GitHub Release. The existing local iOS Xcode changes
+  and `.firebase/` cache were neither inspected, modified, staged, nor committed.
+
 ## CDS-006 closeout — public Firebase/Cloud Run showcase deployed — 2026-09-21
 
 - Completed the isolated `allenljf-algorithm` Firebase/GCP deployment without

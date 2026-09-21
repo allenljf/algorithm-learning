@@ -716,11 +716,18 @@ tasks:
       - curl --fail https://allenljf-algorithm.web.app/api/actuator/health/readiness
       - git diff --check
   - id: CDS-007
-    title: Publish a signed Android showcase APK outside Firebase Hosting
-    status: ready
+    title: Document the public Android source-build showcase path
+    status: completed
     depends_on: [CDS-003, CDS-006]
     parallel_group: client-distribution-android-publication
     spec_refs: ["3", "4 AC-CDS-04/06/07/10", "5", "6.3", "8"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Replace artifact-distribution guidance with public source checkout,
+      Android SDK/JDK prerequisites, debug assembly, local installation,
+      endpoint confirmation, and source rebuild rollback instructions. Preserve
+      optional signing as an operator-only capability without reading or
+      changing signing material, iOS Xcode settings, or Firebase local cache.
     verification:
-      - cd apps/multiplatform && ./gradlew :composeApp:assembleRelease
+      - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
       - git diff --check

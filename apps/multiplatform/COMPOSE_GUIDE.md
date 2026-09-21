@@ -109,16 +109,16 @@ cd apps/multiplatform
 `assembleDebug` requires an Android SDK; the Web target only needs the wrapper
 and a JDK. The build runs on a JDK 17+ toolchain.
 
-### Android release packaging
+### Android source build
 
-Android direct distribution is documented in
-[`ANDROID_RELEASE.md`](ANDROID_RELEASE.md). `composeApp` reads optional release
-signing references from ignored `android-release-signing.properties` or Gradle
-project properties. All four references are required before a release is signed;
-without them, debug assembly and unsigned release assembly remain available.
-Keystores and password values never belong in this repository. `androidVersionCode`
-and `androidVersionName` are optional Gradle properties for a monotonically
-versioned external artifact.
+The public Android path is a local debug build from repository source; its
+prerequisites, build, installation, endpoint confirmation, and source rollback
+steps are documented in [`ANDROID_RELEASE.md`](ANDROID_RELEASE.md). The showcase
+does not publish an APK, checksum, or external artifact. `composeApp` retains
+optional release-signing references from ignored
+`android-release-signing.properties` or Gradle project properties for an
+operator-only use outside this scope. Keystores and password values never belong
+in this repository.
 
 ### iOS development demonstration
 

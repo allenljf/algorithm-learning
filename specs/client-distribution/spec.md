@@ -15,22 +15,22 @@
 - Updated: 2026-09-21
 - Governance mode: `update-docs` + `infer`; revised after the approved public
   showcase decision: Firebase Hosting at `https://allenljf-algorithm.web.app`,
-  a same-project Cloud Run API, direct Android APK distribution, and iOS source/
+  a same-project Cloud Run API, Android source-build guidance, and iOS source/
   simulator demonstration only.
 - Execution contract: not selected; chosen per ready task after planning
 
 ## 1. Goal
 
-Let a person outside the development machine use a public Web client and install
-the Android client without rebuilding it. The public showcase is served from
-`https://allenljf-algorithm.web.app`; Android is a direct signed-APK download.
+Let a person outside the development machine use a public Web client and obtain
+the Android source to build locally. The public showcase is served from
+`https://allenljf-algorithm.web.app`; Android has no published APK artifact.
 The iOS target remains in the repository for source and simulator demonstration,
 not public distribution.
 
 The delivered client already has configurable endpoint selection, Android
 release-signing wiring, and an iOS Xcode shell. This revision changes the
 remaining external-distribution decision from TestFlight plus deferred Web to a
-public Firebase-hosted Web showcase plus direct Android APK.
+public Firebase-hosted Web showcase plus Android source-build guidance.
 
 ## 2. Current state (the gap being closed)
 
@@ -65,8 +65,9 @@ public Firebase-hosted Web showcase plus direct Android APK.
 - A **distribution path** that is honest about platform reality:
   - Web: Firebase Hosting is the public production entry point; it is not a
     downloadable native artifact.
-  - Android: a signed APK is directly downloadable from a non-Firebase artifact
-    channel, because Firebase Spark Hosting does not host APK files.
+  - Android: visitors download the repository source and build the existing
+    debug APK locally; no APK is published through Firebase or another artifact
+    channel.
   - iOS: the checked-in Xcode shell is a source/simulator demonstration only;
     TestFlight, App Store submission, and public IPA distribution are deferred.
 - Documentation (a client distribution/runbook section) and the engineering guide
@@ -96,17 +97,18 @@ public Firebase-hosted Web showcase plus direct Android APK.
   `apps/multiplatform` declares `iosArm64`/`iosSimulatorArm64` and its Xcode
   entry point builds and runs the same shared UI. No external iOS distribution
   is required.
-- **AC-CDS-04:** An external Android user can install a signed APK by following
-  documented checksum and unknown-source guidance. The public Web client is
-  reachable at `https://allenljf-algorithm.web.app`.
+- **AC-CDS-04:** An external Android user can obtain the public source, build a
+  debug APK by following documented prerequisites and commands, and install it
+  locally. The public Web client is reachable at
+  `https://allenljf-algorithm.web.app`.
 - **AC-CDS-05:** The Wasm client is publicly served by Firebase Hosting and
   reaches its API via the same public origin's `/api/**` rewrite. The backend
   allows exactly `https://allenljf-algorithm.web.app`; no wildcard or shared
   origin is accepted.
 - **AC-CDS-06:** The distribution documentation states how a visitor opens the
-  Web showcase, obtains and verifies the Android APK, and runs the iOS project
-  locally in Xcode. It explicitly records that iOS public distribution is out of
-  scope.
+  Web showcase, obtains and builds the Android source locally, and runs the iOS
+  project locally in Xcode. It explicitly records that iOS public distribution
+  is out of scope.
 - **AC-CDS-07:** No secret value, signing key, keystore, provisioning profile, or
   service-account credential is committed; anything required is operator-provided
   and referenced by name.
@@ -118,11 +120,11 @@ public Firebase-hosted Web showcase plus direct Android APK.
 - **AC-CDS-09:** Changing or resetting the endpoint rebuilds the dependency
   graph/session against the selected origin before the next request; an access
   token or refresh state from the former origin is never reused at the new one.
-- **AC-CDS-10:** A release APK is signed only when the operator supplies the
-  keystore location, aliases, and signing passwords through ignored local/CI
-  configuration. The repository may contain only a non-secret example and the
-  signing configuration; it must remain possible to build an unsigned/debug APK
-  without those values.
+- **AC-CDS-10:** Existing optional release-signing wiring remains operator-only:
+  its keystore location, aliases, and passwords are supplied only through
+  ignored local/CI configuration. No signing value or APK artifact is required
+  for the public showcase; it must remain possible to build a debug APK without
+  those values.
 
 ## 5. Technical constraints
 
@@ -153,7 +155,7 @@ public Firebase-hosted Web showcase plus direct Android APK.
 | Documentation / ambiguity | `update-docs` + `infer` | This is an architecture and release workflow change; the supplied requirements establish a mobile-first client and an existing public production API. |
 | Endpoint mechanism | **Both build-time default and runtime override.** Each target gets an explicit local or production default at build time. A locally persisted, user-visible override wins; reset restores that build default. | A distributable client needs a safe production default, while developers and self-hosted/test users need a no-rebuild escape hatch. |
 | Endpoint lifecycle | Validate and normalize before persistence; construct a fresh `AppContainer` for a changed origin and clear the prior session. | The current composition root binds all remotes to one base URL. Keeping its auth state across origins risks sending a token/cookie flow to the wrong server. |
-| Android distribution | **Signed release APK, distributed directly as a versioned release artifact.** Debug APK is developer-only; Play Store tracks are deferred. | This gives an external Android user an installable artifact without adding a store account, listing, policy, or review workflow to this milestone. |
+| Android distribution | **Public source with local debug-build instructions.** No APK artifact, release channel, checksum, or Play Store track is part of this milestone. | This lets an interested visitor run the Android target without operating a signing identity or artifact-distribution channel. |
 | iOS distribution | **Development/source and simulator demonstration only.** TestFlight, App Store submission, and public IPA distribution are deferred. | The product is a public showcase, not an iOS distribution milestone; retaining the target demonstrates Compose Multiplatform parity without Apple release operations. |
 | Web distribution | **Public Firebase Hosting at `https://allenljf-algorithm.web.app`.** The Wasm bundle uses that same origin as its production API base URL, and Firebase rewrites `/api/**` to same-project Cloud Run. | Same-origin delivery avoids cross-site refresh-cookie failure and gives the showcase a stable HTTPS entry point. |
 | GCP CORS / origin validation | **Allow only `https://allenljf-algorithm.web.app`; never use a wildcard.** | The Spring origin validator still validates browser-originated auth requests. A single canonical origin prevents an alternate Firebase subdomain from becoming an unintended credential origin. |
@@ -183,10 +185,11 @@ public Firebase-hosted Web showcase plus direct Android APK.
 
 ### 6.3 Public showcase distribution contract
 
-- Android release artifacts use a stable application ID, monotonically increased
-  version code/name, and the release signing config described in the runbook.
-  The direct-download instructions must disclose Android's unknown-source
-  installation permission and include checksum/version verification.
+- Android source users build the existing debug variant using the checked-in
+  Gradle wrapper after installing the documented Android SDK prerequisites. The
+  source-build runbook states that no signed APK, checksum, unknown-source
+  download flow, or external release channel is provided. Existing optional
+  signing wiring remains available only to an operator outside this scope.
 - `iosApp` remains an Xcode project checked into the repository and consumes the
   Kotlin framework from `shared`/`composeApp`. Its bundle identifier is a
   non-secret development setting; the runbook covers local simulator use only.
@@ -210,8 +213,8 @@ Assumptions retained from intake:
   knows the URL.
 - A single production endpoint is sufficient for this feature; per-user
   self-hosting is not required.
-- The Web client is the primary public showcase; Android is the downloadable
-  native demonstration. iOS source/simulator support demonstrates the third
+- The Web client is the primary public showcase; Android is a locally built
+  source demonstration. iOS source/simulator support demonstrates the third
   Compose Multiplatform target without public installation.
 
 ## 7. Known risks
@@ -233,4 +236,5 @@ Assumptions retained from intake:
 The frozen REST contract, the existing production project's Neon migration/runtime
 role separation, its serialized GCP deploy, forward-only migrations, and the
 "the agent never handles a secret" boundary all remain unchanged by this feature.
-TestFlight, App Store submission, and public iOS IPA distribution are non-goals.
+TestFlight, App Store submission, public iOS IPA distribution, and public Android
+APK distribution are non-goals.

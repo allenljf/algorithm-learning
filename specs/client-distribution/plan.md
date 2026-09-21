@@ -8,7 +8,7 @@
   Kotlin Multiplatform configuration, mobile signing/distribution, iOS/Xcode,
   browser credential boundaries, and operator-controlled external systems.
 - Governance decisions: build-time default plus runtime endpoint override;
-  signed direct Android APK; public Firebase Hosting at
+  Android source-build guidance; public Firebase Hosting at
   `https://allenljf-algorithm.web.app`; same-project Cloud Run rewrite; and iOS
   development/simulator demonstration only.
 - Execution contract: selected per ready task by `$execution-strategy`.
@@ -20,7 +20,7 @@ First retire the now-unneeded TestFlight release requirement and document iOS as
 a development target. Then make browser refresh authentication compatible with
 Firebase Hosting and produce the production Wasm/Firebase configuration. Finally
 provision the isolated showcase project, deploy Cloud Run and Hosting, and
-publish an Android release artifact outside Firebase Hosting.
+document the reproducible Android source-build path.
 
 ## Planned phases
 
@@ -31,7 +31,7 @@ publish an Android release artifact outside Firebase Hosting.
 | 3. Showcase release | CDS-003, CDS-004 | Signed Android packaging and iOS development-only documentation. |
 | 4. Public Web foundation | CDS-005 | Firebase-compatible browser auth, production Wasm packaging, and Hosting configuration. |
 | 5. Public deployment | CDS-006 | Operator-gated `allenljf-algorithm` Firebase/GCP project, Cloud Run replica, and public Hosting deployment. |
-| 6. Android artifact publication | CDS-007 | Operator-published signed APK outside Firebase Hosting. |
+| 6. Android source build | CDS-007 | Public source checkout and local Android debug-build guidance. |
 
 ## Dependency and parallelization rules
 
@@ -44,13 +44,13 @@ publish an Android release artifact outside Firebase Hosting.
 - `CDS-006` is operator-gated because the new project's Neon configuration and
   secret values must be supplied privately. It never changes the existing GCP
   production project's WIF, Cloud Run topology, or Neon identities.
-- `CDS-007` consumes the completed Android signing wiring and uses a non-Firebase
-  artifact channel because Firebase Spark Hosting blocks APK uploads.
+- `CDS-007` consumes the completed Android build foundation and documents a
+  source-only debug build; it does not publish an APK to Firebase or elsewhere.
 
 ## Completion definition
 
 The feature is complete when the public Wasm client is reachable at
 `https://allenljf-algorithm.web.app` with same-origin authenticated API access,
-Android has a downloadable signed APK and checksum, iOS builds through its Xcode
-entry point for local demonstration, and the existing production delivery path
-remains unchanged.
+Android has a documented, reproducible local debug-build path from public source,
+iOS builds through its Xcode entry point for local demonstration, and the
+existing production delivery path remains unchanged.
