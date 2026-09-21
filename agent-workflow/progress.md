@@ -1,5 +1,38 @@
 # Progress
 
+## CDS-004 closeout — 2026-09-21
+
+- Replaced the obsolete TestFlight external-release procedure with a concise
+  iOS source/Simulator showcase runbook. `COMPOSE_GUIDE.md` and
+  `iosApp/README.md` now identify the local Xcode project, Simulator
+  destination, and `iosApp` scheme as the complete iOS path; TestFlight, App
+  Store submission, and public IPA distribution remain explicit non-goals.
+- Planner conclusion: documentation is sufficient because no external iOS
+  distribution is in scope. Implementer conclusion: only the Compose guide,
+  iOS shell runbook, and task governance artifacts changed. Evaluator
+  conclusion: the HTTPS endpoint default remains documented, no signing or
+  account material was introduced, and the operator's uncommitted Xcode changes
+  were not modified.
+- Task-limited verification passed: `cd apps/multiplatform && xcodebuild
+  -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator
+  -configuration Debug build CODE_SIGNING_ALLOWED=NO` (with existing
+  Gradle/AGP and Xcode script-phase warnings) and `git diff --check`.
+- CDS-004 is completed. CDS-005 is now the sole ready task.
+
+## CDS-004 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `rapid` /
+  `update-docs` / `infer` for the iOS development-only documentation task.
+  The scope is limited to replacing the withdrawn TestFlight/archive procedure
+  with a source and Simulator demonstration runbook; it preserves the
+  production HTTPS endpoint default and does not inspect or modify the
+  operator's uncommitted Xcode signing settings.
+- Completion checklist: the Compose guide and iOS shell documentation identify
+  iOS as development/simulator only; local Xcode open/build/run steps are
+  actionable; TestFlight, App Store, IPA, archive, upload, review, and tester
+  instructions are removed; no signing/account material is added; only the two
+  CDS-004 verification commands will run before closeout.
+
 ## Public showcase work graph refreshed — 2026-09-21
 
 - The user approved the revised public-showcase specification. `$work-graph`

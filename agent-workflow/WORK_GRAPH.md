@@ -183,8 +183,8 @@ flowchart TD
   D1[CDS-001 Endpoint configuration\ncompleted]
   D2[CDS-002 iOS target + Xcode shell\ncompleted]
   D3[CDS-003 Signed Android APK\ncompleted]
-  D4[CDS-004 iOS development-only docs\nready]
-  D5[CDS-005 Firebase auth + Hosting config\npending]
+  D4[CDS-004 iOS development-only docs\ncompleted]
+  D5[CDS-005 Firebase auth + Hosting config\nready]
   D6[CDS-006 Firebase/Cloud Run showcase\npending: operator-gated]
   D7[CDS-007 Public signed Android APK\npending]
 
@@ -203,11 +203,11 @@ The selected distribution contract is: Firebase Hosting at
 behind its `/api/**` rewrite, a direct signed Android APK release outside
 Firebase Hosting, and an iOS source/simulator demonstration only. CDS-002
 completed the iOS target shell and CDS-003 completed optional operator-only
-Android signing. CDS-004 supersedes the withdrawn TestFlight release path and
-is the only ready task. CDS-005 will implement the same-origin browser and
-Hosting foundation; CDS-006 is the operator-gated project, secret, and public
-deployment step; CDS-007 publishes the resulting signed APK from a non-Firebase
-channel.
+Android signing. CDS-004 superseded the withdrawn TestFlight release path with
+a Simulator-only runbook and is complete. CDS-005 is now the sole ready task to
+implement the same-origin browser and Hosting foundation; CDS-006 is the
+operator-gated project, secret, and public deployment step; CDS-007 publishes
+the resulting signed APK from a non-Firebase channel.
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

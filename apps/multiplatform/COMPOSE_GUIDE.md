@@ -120,15 +120,14 @@ Keystores and password values never belong in this repository. `androidVersionCo
 and `androidVersionName` are optional Gradle properties for a monotonically
 versioned external artifact.
 
-### iOS external testing
+### iOS development demonstration
 
-The checked-in iOS shell and its TestFlight operator procedure live in
-[`iosApp/README.md`](iosApp/README.md). A release archive requires the
-operator's registered bundle identifier, Apple Developer team, certificate, and
-provisioning profile. The repository contains none of that material. The Xcode
-marketing version and monotonic build number feed the bundle metadata; upload,
-external-test review, and invitations are operator-owned App Store Connect
-actions.
+The checked-in iOS shell is a source and iOS Simulator demonstration of the
+shared Compose UI. Its local build and run instructions live in
+[`iosApp/README.md`](iosApp/README.md). It needs no Apple account, signing
+identity, archive, upload, review, tester, or public iOS artifact. TestFlight,
+App Store submission, and public IPA distribution are deliberately out of scope
+for this showcase.
 
 ### AGP 9 compatibility mode
 

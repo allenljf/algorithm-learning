@@ -66,9 +66,13 @@ human-readable execution contract.
 - Depends on: CDS-002
 - Parallel group: `client-distribution-release`
 - Spec refs: 3, 4 AC-CDS-03/06/07, 5, 6.1/6.3, 8
-- Execution contract: selected by `$execution-strategy`.
+- Execution contract: `three-perspectives` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This is a
+  documentation-only scope change across the Compose guide and thin Xcode
+  shell: retain the local Simulator path and remove all external iOS release
+  procedures without reading or changing operator signing material.
 - Verification: `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 4 — Public Web foundation
 
@@ -83,7 +87,7 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-01/02/05/06/07/08/09, 5, 6.1-6.3, 8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://algorithmlearning.web.app`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ## Phase 5 — Public deployment
 
