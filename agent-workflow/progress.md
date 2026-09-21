@@ -1,5 +1,22 @@
 # Progress
 
+## Public showcase work graph refreshed — 2026-09-21
+
+- The user approved the revised public-showcase specification. `$work-graph`
+  replaced the withdrawn TestFlight and Web/CORS-deferral plan with the ordered
+  public Web release path: CDS-004 documents iOS as source/simulator only,
+  CDS-005 implements the Firebase-compatible same-origin browser foundation,
+  CDS-006 is the operator-gated Firebase/Cloud Run deployment, and CDS-007
+  publishes the signed Android APK outside Firebase Hosting.
+- The graph uses the `three-perspectives` planning depth because its boundary
+  spans browser cookie behavior, Firebase Hosting rewrites, Cloud Run identity,
+  and a separately operated Neon database. The exact public origin remains
+  `https://algorithmlearning.web.app`; the refresh cookie requirement remains
+  `__session`; the existing production project remains out of scope.
+- CDS-004 is the sole ready task. CDS-005, CDS-006, and CDS-007 are pending on
+  their declared dependencies. The earlier CDS-004 TestFlight blocker is
+  retained below as historical evidence only and no longer blocks this scope.
+
 ## Client distribution governance revision — 2026-09-21
 
 - The approved showcase model replaces TestFlight external distribution and the
@@ -10,9 +27,8 @@
   the existing production project remains unchanged. It records the exact
   browser origin and the `__session` refresh-cookie requirement imposed by the
   Hosting rewrite boundary.
-- Spec self-review found no placeholders or contradictions. The revised spec is
-  awaiting user review before the work graph is replaced and no cloud resource
-  has been created.
+- Spec self-review found no placeholders or contradictions. No cloud resource
+  has been created by this planning task.
 
 ## CDS-004 terminal blocker — 2026-09-21
 

@@ -39,7 +39,7 @@ human-readable execution contract.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO`; `git diff --check`
 - Status: completed
 
-## Phase 3 — Release channels
+## Phase 3 — Showcase release
 
 ### CDS-003 — Define repeatable signed Android APK packaging
 
@@ -57,38 +57,58 @@ human-readable execution contract.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
 - Status: completed
 
-### CDS-004 — Produce the operator-gated TestFlight external-test release
+### CDS-004 — Record iOS as a development-only demonstration target
 
-- Deliverable: an operator-run TestFlight release of the iOS app and release
-  evidence: archive/upload, App Store Connect processing, external-test review
-  where required, and an invited external tester installation against the
-  production endpoint. The repository runbook names prerequisites and rollback;
-  no Apple account, certificate, profile, private key, or credential is handled
-  by the agent.
+- Deliverable: remove the obsolete TestFlight release procedure and document the
+  checked-in `iosApp` Xcode shell as a source/simulator demonstration target.
+  It retains the production endpoint default but does not require an Apple
+  identity, archive, upload, or external tester.
 - Depends on: CDS-002
 - Parallel group: `client-distribution-release`
-- Spec refs: 3, 4 AC-CDS-03/04/06/07, 5, 6.1/6.3, 7-8
-- Execution contract: `three-perspectives` analysis; `rapid` test approach;
-  `update-docs` documentation; `infer` ambiguity handling. This is an
-  operator-gated Apple distribution release: the archive and runbook are the
-  repository evidence, while Apple identity, upload, review, and invitations
-  remain outside agent authority.
-- Verification: `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive`; `test -d apps/multiplatform/build/iosApp.xcarchive`; `git diff --check`
-- Status: blocked — Apple Developer team, registered bundle identifier, and
-  distribution signing/provisioning configuration must be supplied by the
-  operator before the required archive, upload, external-test review, and
-  invited-tester evidence can exist.
-
-### CDS-005 — Record the deliberate production-Web and GCP-CORS deferral
-
-- Deliverable: a distribution runbook that states how to make a local Wasm
-  development bundle, why it is not an external production release, and the
-  exact future preconditions for hosting/CORS. Confirm the production workflow
-  leaves `GCP_CORS_ALLOWED_ORIGINS` absent and does not introduce a wildcard or
-  shared origin.
-- Depends on: CDS-001
-- Parallel group: `client-distribution-release`
-- Spec refs: 3, 4 AC-CDS-05/06/07, 5, 6.1/6.3, 8
+- Spec refs: 3, 4 AC-CDS-03/06/07, 5, 6.1/6.3, 8
 - Execution contract: selected by `$execution-strategy`.
-- Verification: `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserDevelopmentWebpack`; `python3 -c "from pathlib import Path; t = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'GCP_CORS_ALLOWED_ORIGINS' in t and 'https://*' not in t and 'http://*' not in t"`; `git diff --check`
+- Verification: `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO`; `git diff --check`
 - Status: ready
+
+## Phase 4 — Public Web foundation
+
+### CDS-005 — Add Firebase-compatible same-origin browser authentication and Hosting configuration
+
+- Deliverable: rename the browser refresh cookie to `__session` without changing
+  its secure rotation lifecycle; add regression coverage; make the production
+  Wasm build use `https://algorithmlearning.web.app`; and add Firebase Hosting
+  configuration for static assets, SPA fallback, and `/api/**` Cloud Run rewrite.
+- Depends on: CDS-001, CDS-004
+- Parallel group: `client-distribution-web-foundation`
+- Spec refs: 3, 4 AC-CDS-01/02/05/06/07/08/09, 5, 6.1-6.3, 8
+- Execution contract: selected by `$execution-strategy`.
+- Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://algorithmlearning.web.app`; `git diff --check`
+- Status: pending
+
+## Phase 5 — Public deployment
+
+### CDS-006 — Provision and release the public Firebase/Cloud Run showcase
+
+- Deliverable: create the `algorithmlearning` Firebase/GCP project; deploy the
+  Cloud Run API in `asia-east1` under its own least-privilege runtime identity;
+  configure its exact allowed origin and operator-provided Neon secrets; deploy
+  Firebase Hosting; and record public browser login/refresh/logout evidence.
+- Depends on: CDS-005
+- Parallel group: `client-distribution-public-deployment`
+- Spec refs: 3, 4 AC-CDS-04/05/06/07/08/09, 5, 6.1-6.3, 7-8
+- Execution contract: selected by `$execution-strategy`.
+- Verification: `gcloud projects describe algorithmlearning`; `firebase hosting:sites:list --project algorithmlearning`; `curl --fail https://algorithmlearning.web.app`; `curl --fail https://algorithmlearning.web.app/api/actuator/health/readiness`; `git diff --check`
+- Status: pending
+
+## Phase 6 — Android artifact publication
+
+### CDS-007 — Publish a signed Android showcase APK outside Firebase Hosting
+
+- Deliverable: operator-published signed APK and SHA-256 through a non-Firebase
+  release channel, plus public download/install evidence and rollback reference.
+- Depends on: CDS-003, CDS-006
+- Parallel group: `client-distribution-android-publication`
+- Spec refs: 3, 4 AC-CDS-04/06/07/10, 5, 6.3, 8
+- Execution contract: selected by `$execution-strategy`.
+- Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
+- Status: pending

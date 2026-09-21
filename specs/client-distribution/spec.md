@@ -3,7 +3,7 @@
 ## Document status
 
 - Feature ID: `client-distribution`
-- Status: revised; awaiting user review before `$work-graph`
+- Status: governed; public-showcase work graph refreshed
 - Requirement baseline: [`../../requirement.md`](../../requirement.md), sections 2
   (platform direction), 3.2 (mobile review app), and 7 (security)
 - Relates to: the delivered Compose Multiplatform client
