@@ -1,5 +1,19 @@
 # Progress
 
+## Client distribution governance revision — 2026-09-21
+
+- The approved showcase model replaces TestFlight external distribution and the
+  Web/CORS deferral: public Wasm at `https://algorithmlearning.web.app`, direct
+  Android APK distribution, and iOS source/simulator demonstration only.
+- The revised spec defines a new `algorithmlearning` Firebase/GCP project with
+  Firebase Hosting's `/api/**` rewrite to its own `asia-east1` Cloud Run API;
+  the existing production project remains unchanged. It records the exact
+  browser origin and the `__session` refresh-cookie requirement imposed by the
+  Hosting rewrite boundary.
+- Spec self-review found no placeholders or contradictions. The revised spec is
+  awaiting user review before the work graph is replaced and no cloud resource
+  has been created.
+
 ## CDS-004 terminal blocker — 2026-09-21
 
 - Selected contract: `three-perspectives` / `rapid` / `update-docs` / `infer`.
