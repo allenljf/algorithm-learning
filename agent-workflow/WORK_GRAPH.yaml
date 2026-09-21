@@ -685,10 +685,18 @@ tasks:
       - git diff --check
   - id: CDS-005
     title: Add Firebase-compatible same-origin browser authentication and Hosting configuration
-    status: ready
+    status: completed
     depends_on: [CDS-001, CDS-004]
     parallel_group: client-distribution-web-foundation
     spec_refs: ["3", "4 AC-CDS-01/02/05/06/07/08/09", "5", "6.1-6.3", "8"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Lock the Firebase-forwardable refresh-cookie contract with API auth
+      regression tests, then rename the cookie while retaining its HttpOnly,
+      Secure, SameSite=Lax, /api/v1/auth path, 30-day lifetime, and rotation
+      behavior. Keep the production Wasm default at the canonical Hosting
+      origin and add only non-secret Firebase Hosting static, SPA, and
+      same-project asia-east1 Cloud Run rewrite configuration.
     verification:
       - cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'
       - cd apps/multiplatform && ./gradlew :shared:allTests
@@ -696,7 +704,7 @@ tasks:
       - git diff --check
   - id: CDS-006
     title: Provision and release the public Firebase/Cloud Run showcase
-    status: pending
+    status: ready
     depends_on: [CDS-005]
     parallel_group: client-distribution-public-deployment
     spec_refs: ["3", "4 AC-CDS-04/05/06/07/08/09", "5", "6.1-6.3", "7-8"]

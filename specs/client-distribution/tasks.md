@@ -85,9 +85,13 @@ human-readable execution contract.
 - Depends on: CDS-001, CDS-004
 - Parallel group: `client-distribution-web-foundation`
 - Spec refs: 3, 4 AC-CDS-01/02/05/06/07/08/09, 5, 6.1-6.3, 8
-- Execution contract: selected by `$execution-strategy`.
+- Execution contract: `three-perspectives` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This crosses the
+  browser-cookie security boundary, the production Web build, and Hosting
+  routing; regression tests establish the unchanged cookie lifecycle before
+  the configuration is added.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://algorithmlearning.web.app`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ## Phase 5 — Public deployment
 
@@ -102,7 +106,7 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-04/05/06/07/08/09, 5, 6.1-6.3, 7-8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `gcloud projects describe algorithmlearning`; `firebase hosting:sites:list --project algorithmlearning`; `curl --fail https://algorithmlearning.web.app`; `curl --fail https://algorithmlearning.web.app/api/actuator/health/readiness`; `git diff --check`
-- Status: pending
+- Status: ready (operator-gated)
 
 ## Phase 6 — Android artifact publication
 

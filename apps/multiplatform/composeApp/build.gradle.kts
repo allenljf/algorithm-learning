@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Sync
 import java.util.Properties
 
 plugins {
@@ -93,6 +94,18 @@ kotlin {
             implementation(libs.compose.uiTest)
         }
     }
+}
+
+val wasmJsHostingDirectory = layout.buildDirectory.dir("firebaseHosting")
+val prepareWasmJsFirebaseHosting = tasks.register<Sync>("prepareWasmJsFirebaseHosting") {
+    dependsOn("wasmJsBrowserProductionWebpack")
+    from(layout.buildDirectory.dir("kotlin-webpack/wasmJs/productionExecutable"))
+    from(layout.buildDirectory.dir("processedResources/wasmJs/main"))
+    into(wasmJsHostingDirectory)
+}
+
+tasks.named("wasmJsBrowserProductionWebpack") {
+    finalizedBy(prepareWasmJsFirebaseHosting)
 }
 
 android {

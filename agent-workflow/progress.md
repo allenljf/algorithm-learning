@@ -1,5 +1,69 @@
 # Progress
 
+## CDS-005 closeout — 2026-09-21
+
+- Replaced the browser refresh-cookie name with Firebase Hosting's forwardable
+  `__session`. `AuthControllerAuthTest` verifies that refresh and logout bind
+  that name and that rotation/expiry retain `HttpOnly`, `Secure`, `SameSite=Lax`,
+  `/api/v1/auth`, and the 30-day maximum age; the original `refresh_token` name
+  is absent from the emitted expiry cookie.
+- The Wasm production webpack task now stages the optimized artifacts and its
+  processed `index.html` into `composeApp/build/firebaseHosting`, using
+  `https://algorithmlearning.web.app` as its production default. Root
+  `firebase.json` deploys that directory with the `/api/**`-first rewrite to
+  `algorithm-learning-api` in `asia-east1`, followed by the SPA fallback; the
+  non-secret `.firebaserc` selects `algorithmlearning`. `infra/firebase/README.md`
+  records the operator-only CDS-006 deployment boundary.
+- Recovery succeeded on attempt 1: moving the staging task after Kotlin target
+  registration fixed the missing-task failure, and the exact production command
+  produced `build/firebaseHosting/index.html` containing the canonical origin.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test
+  -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew
+  :shared:allTests`; `cd apps/multiplatform && ./gradlew
+  :composeApp:wasmJsBrowserProductionWebpack
+  -PapiBaseUrl=https://algorithmlearning.web.app`; and `git diff --check`.
+  The Maven run emitted only the existing Mockito dynamic-agent warning; Gradle
+  emitted existing AGP/KMP compatibility and deprecation warnings.
+- CDS-005 is completed. CDS-006 is now the sole ready task and remains
+  operator-gated for Firebase/GCP project resources and private Neon/secret
+  configuration; the iOS Xcode signing changes already present in the worktree
+  were not inspected, staged, or modified.
+
+## CDS-005 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `tdd` /
+  `update-docs` / `infer` for the Firebase-compatible browser-auth and Hosting
+  foundation. Planner scope: retain the frozen auth/API contract while using
+  Firebase Hosting's forwardable `__session` cookie, a canonical same-origin
+  Wasm production default, and a non-secret Hosting rewrite. Implementer scope:
+  change only the API cookie boundary, regression tests, Wasm packaging, Hosting
+  configuration, and their documentation. Evaluator guardrails: preserve all
+  cookie attributes and 30-day rotation semantics, allow no wildcard origin,
+  add no secret or cloud credential, and do not inspect or alter the operator's
+  uncommitted iOS signing settings.
+- Completion checklist: authentication tests prove `__session` is set, read,
+  rotated, and expired with the existing secure attributes; Wasm's production
+  build receives `https://algorithmlearning.web.app`; Firebase Hosting serves
+  the generated static bundle with an SPA fallback and rewrites only `/api/**`
+  to `algorithm-learning-api` in `asia-east1`; docs identify the operator-gated
+  deploy boundary; only CDS-005's four verification commands run before
+  closeout.
+
+### Recovery — production Wasm Hosting directory
+
+- `max-3-healing`, attempt 1: the first production packaging run established
+  that Kotlin/Wasm writes optimized artifacts to
+  `composeApp/build/kotlin-webpack/wasmJs/productionExecutable` but leaves the
+  processed `index.html` separately under `build/processedResources`. The first
+  staging-task wiring also resolved `wasmJsBrowserProductionWebpack` before the
+  Kotlin target had registered it, causing the required production command to
+  fail with `Task ... not found`.
+- Repair: register the `Sync` staging task after the Kotlin target/source-set
+  block, finalize the production webpack task with it, and copy both artifact
+  directories into `composeApp/build/firebaseHosting`, the directory selected
+  by `firebase.json`. The next attempt reruns the exact CDS-005 production
+  command and confirms the staged `index.html` contains the canonical origin.
+
 ## CDS-004 closeout — 2026-09-21
 
 - Replaced the obsolete TestFlight external-release procedure with a concise
