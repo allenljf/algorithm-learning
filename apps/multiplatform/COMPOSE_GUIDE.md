@@ -13,15 +13,16 @@ apps/multiplatform/
   build.gradle.kts           # plugin aliases only
   gradle/libs.versions.toml  # single pinned version catalog
   local.properties           # operator's Android SDK path, never committed
-  shared/                    # domain, state, and composition root (Android + Wasm)
+  shared/                    # domain, state, and composition root (Android + Wasm + iOS)
     src/commonMain/kotlin/com/algorithmlearning/shared
     src/commonTest/kotlin/com/algorithmlearning/shared
-  composeApp/                # shared Compose UI + Android app + Wasm entry
+  composeApp/                # shared Compose UI + Android app + Wasm/iOS entries
     src/commonMain/kotlin/com/algorithmlearning/app
     src/androidMain/kotlin/com/algorithmlearning/app
     src/androidMain/AndroidManifest.xml
     src/wasmJsMain/kotlin/com/algorithmlearning/app
     src/wasmJsMain/resources/index.html
+  iosApp/                    # thin Xcode shell consuming ComposeApp.framework
 ```
 
 Dependency direction is one way: `composeApp` depends on `shared`; `shared` never
@@ -34,7 +35,7 @@ depends on `composeApp` or on any Compose UI type.
 | Domain | `shared` `commonMain` | Immutable models, value types, repository contracts | Import Compose, Ktor DTOs, or platform types |
 | State / navigation | `shared` `commonMain` | `Navigator`, `AppContainer`, language state | Touch Android/Wasm APIs |
 | UI | `composeApp` `commonMain` | Composables, theme, screens | Read a repository or a service locator directly |
-| Entry points | `composeApp` `androidMain` / `wasmJsMain` | `MainActivity`, Wasm `main`, manifest | Contain product logic |
+| Entry points | `composeApp` `androidMain` / `wasmJsMain` / `iosMain`, `iosApp` | `MainActivity`, Wasm `main`, `MainViewController`, Xcode shell | Contain product logic |
 
 `shared` targets `androidLibrary` and `wasmJs`; `composeApp` targets the Android
 application and `wasmJs` executable, so one `commonMain` UI serves both.
@@ -62,9 +63,9 @@ Rules:
 - Data flows one way: container → composable parameters → callbacks back up.
 - Screens hold only ephemeral UI state (`remember { mutableStateOf(...) }`).
 - When networking arrives, Ktor `HttpClient` lives in `shared` `commonMain` behind
-  a repository contract, with a platform engine actual in `androidMain` and the
-  Wasm engine in `wasmJsMain`. DTOs stay inside the data layer and are mapped to
-  domain models before reaching the UI.
+  a repository contract, with platform engine actuals in `androidMain`, `iosMain`,
+  and `wasmJsMain`. DTOs stay inside the data layer and are mapped to domain
+  models before reaching the UI.
 
 ## 5. Localization
 

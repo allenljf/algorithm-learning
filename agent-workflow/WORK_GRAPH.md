@@ -180,11 +180,11 @@ and the operator's probe proves DDL is denied while DML succeeds.
 
 ```mermaid
 flowchart TD
-  D1[CDS-001 Endpoint configuration\nready]
-  D2[CDS-002 iOS target + Xcode shell\npending]
-  D3[CDS-003 Signed Android APK\npending]
-  D4[CDS-004 TestFlight release\npending]
-  D5[CDS-005 Web/CORS deferral\npending]
+  D1[CDS-001 Endpoint configuration\ncompleted]
+  D2[CDS-002 iOS target + Xcode shell\ncompleted]
+  D3[CDS-003 Signed Android APK\nready]
+  D4[CDS-004 TestFlight release\nready]
+  D5[CDS-005 Web/CORS deferral\nready]
 
   D1 --> D2
   D1 --> D3
@@ -194,7 +194,10 @@ flowchart TD
 
 The selected distribution contract is: dual endpoint configuration, direct
 signed Android APK, operator-owned TestFlight external testing, and deferred
-production Web/CORS. `CDS-001` is the only ready task.
+production Web/CORS. CDS-002 completed with Kotlin/Native iOS targets, Ktor's
+Darwin engine, and an Xcode simulator shell. CDS-003, CDS-004, and CDS-005 are
+now ready; Phase 3 execution remains serialized because its runbook and release
+evidence overlap.
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

@@ -31,9 +31,13 @@ human-readable execution contract.
 - Depends on: CDS-001
 - Parallel group: `client-distribution-ios`
 - Spec refs: 3, 4 AC-CDS-01/03/04/07, 5, 6.1-6.3, 7-8
-- Execution contract: selected by `$execution-strategy`.
+- Execution contract: `three-perspectives` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This task changes
+  target/build and generated Xcode integration rather than independently
+  testable product behavior; its exact Gradle and Xcode build verification is
+  the acceptance evidence.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO`; `git diff --check`
-- Status: pending
+- Status: completed
 
 ## Phase 3 — Release channels
 
@@ -48,7 +52,7 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-04/06/07/10, 5, 6.1/6.3, 8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ### CDS-004 — Produce the operator-gated TestFlight external-test release
 
@@ -63,7 +67,7 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-03/04/06/07, 5, 6.1/6.3, 7-8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive`; `test -d apps/multiplatform/build/iosApp.xcarchive`; `git diff --check`
-- Status: pending
+- Status: ready
 
 ### CDS-005 — Record the deliberate production-Web and GCP-CORS deferral
 
@@ -77,4 +81,4 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-05/06/07, 5, 6.1/6.3, 8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserDevelopmentWebpack`; `python3 -c "from pathlib import Path; t = Path('.github/workflows/gcp-production-deploy.yml').read_text(); assert 'GCP_CORS_ALLOWED_ORIGINS' in t and 'https://*' not in t and 'http://*' not in t"`; `git diff --check`
-- Status: pending
+- Status: ready

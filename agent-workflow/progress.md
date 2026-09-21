@@ -1,5 +1,35 @@
 # Progress
 
+## CDS-002 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `rapid` /
+  `update-docs` / `infer` for the ready iOS-foundation task and moved CDS-002
+  to `in_progress`. Completion checklist: declare both Kotlin/Native iOS
+  targets in `shared` and `composeApp`; make the Darwin Ktor engine actual;
+  add an operator-configurable Xcode shell which renders the same `App` with
+  a locally persisted endpoint override; document local iOS build/run steps;
+  run only the five CDS-002 verification commands; then close and commit.
+
+## CDS-002 closeout — 2026-09-21
+
+- Added `iosArm64` and `iosSimulatorArm64` targets to both KMP modules, the
+  `iosMain` Ktor Darwin engine actual, and a thin `iosApp` SwiftUI/Xcode shell.
+  The shell gets its non-secret default endpoint from `Info.plist`, persists the
+  shared Settings override in `NSUserDefaults`, and builds the Compose framework
+  through `embedAndSignAppleFrameworkForXcode`; it contains no signing material.
+- `apps/multiplatform/iosApp/README.md` documents simulator build/run and the
+  operator-only bundle-ID, team, certificate, provisioning, and endpoint-default
+  settings. `COMPOSE_GUIDE.md` now includes iOS source-set, entry-point, and
+  Darwin-engine boundaries.
+- Contracted verification passed: `:shared:allTests`, `:composeApp:allTests`,
+  `:composeApp:assembleDebug`, and the exact `xcodebuild` simulator command
+  with `CODE_SIGNING_ALLOWED=NO`. The Xcode build uses `iosSimulatorArm64` and
+  succeeded; its only non-failing warnings are existing AGP/KMP deprecations,
+  Gradle configuration-time Wasm notices, and Xcode's expected no-output script
+  phase notice.
+- CDS-002 is completed. CDS-003, CDS-004, and CDS-005 are ready; the next
+  ordered Phase 3 task is CDS-003.
+
 ## Client distribution governance and work graph — 2026-09-21
 
 - CDS-001 closed: added a tested shared endpoint-selection boundary, persistent
