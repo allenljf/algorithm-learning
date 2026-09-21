@@ -31,13 +31,11 @@ Web 是主要的題目管理後台；Android 與 iOS 專注於瀏覽、複習與
 
 ### 2.2 前端 client 遷移（已確認）
 
-- 原 Flutter client `apps/learning_app` 已由 `compose-multiplatform-migration`
-  的 `CMP-001..CMP-007` 遷移為 Kotlin Compose Multiplatform client
-  `apps/multiplatform`，並於 `CMP-008` 顯式封存（見
-  `apps/learning_app/ARCHIVED.md`）。
+- 原 Flutter client 已由 `compose-multiplatform-migration` 的 `CMP-001..CMP-007`
+  遷移為 Kotlin Compose Multiplatform client `apps/multiplatform`；原始碼與其
+  Flutter 專用開發指南已在 `FRR-001` 完整移除。
 - Compose client 沿用同一後端 REST 契約，不變更 API；其建構與測試準則見
-  `apps/multiplatform/COMPOSE_GUIDE.md`。`flutter-dev-guide/` 僅治理封存的
-  Flutter client，不再治理 `apps/multiplatform`。
+  `apps/multiplatform/COMPOSE_GUIDE.md`。
 - 對等性與遷移記錄見
   `specs/compose-multiplatform-migration/retirement.md`。
 

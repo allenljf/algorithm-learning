@@ -134,6 +134,13 @@ flowchart TD
   C7 --> C8
 ```
 
+# Flutter Retirement Removal — Dependency Graph
+
+```mermaid
+flowchart TD
+  F1[FRR-001 Remove Flutter assets and obsolete references\ncompleted]
+```
+
 # Neon Least-Privilege Role — Dependency Graph
 
 ```mermaid

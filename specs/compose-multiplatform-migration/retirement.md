@@ -4,11 +4,10 @@
 
 - Feature: `compose-multiplatform-migration` (task `CMP-008`)
 - Date: 2026-09-19
-- Decision: the Flutter client `apps/learning_app` is retired by **explicit
-  archive**. It is retained, frozen, and marked inactive by
-  [`../../apps/learning_app/ARCHIVED.md`](../../apps/learning_app/ARCHIVED.md);
-  it is not built, tested, or deployed. `apps/multiplatform` is the active
-  client.
+- Decision: the Flutter client was first retired by **explicit archive** on
+  2026-09-19, then fully deleted with its Flutter-only engineering guide by
+  `FRR-001` on 2026-09-22. It is not built, tested, or deployed.
+  `apps/multiplatform` is the active client.
 - Acceptance basis: `AC-CMP-07` closes when the cross-platform acceptance suite
   passes and the Flutter client is removed or explicitly archived. `CMP-007`
   passed, so this task archives the client.
@@ -17,10 +16,10 @@
 
 | Concern | Retired Flutter client | Active Compose client |
 |---|---|---|
-| Root | `apps/learning_app` | `apps/multiplatform` |
+| Root | Removed | `apps/multiplatform` |
 | Language / UI | Dart, Material 3, Riverpod, GoRouter, Dio | Kotlin, Compose Multiplatform, Ktor, manual `AppContainer` DI |
 | Targets | Android, iOS, Web | Android, Web (Wasm); iOS/Desktop deferred |
-| Engineering guide | `flutter-dev-guide/` | `apps/multiplatform/COMPOSE_GUIDE.md` |
+| Engineering guide | Removed | `apps/multiplatform/COMPOSE_GUIDE.md` |
 | Verification | `flutter analyze` / `flutter test` / `integration_test` | `./gradlew :composeApp:allTests` / `:composeApp:assembleDebug` |
 
 ## Parity mapping
@@ -46,8 +45,8 @@ wire value `hacker_rank`; counts-only `GET /dashboard`).
   drives the rendered Compose screens. Evidence is recorded in
   `apps/multiplatform/COMPOSE_GUIDE.md` section 14 and
   `infra/acceptance/README.md`.
-- The Flutter `integration_test` journey remains the historical MVP acceptance
-  evidence; it is frozen with the archived client and is no longer run.
+- The former Flutter `integration_test` journey remains historical MVP
+  acceptance evidence in task records; its source is no longer retained or run.
 - Owner isolation, authorization, and transport/status mapping were, and remain,
   API and data-layer concerns rather than client-emulated behavior.
 

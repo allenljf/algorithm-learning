@@ -1,9 +1,8 @@
 # Compose Multiplatform Engineering Guide
 
-This guide governs `apps/multiplatform`, the Kotlin Compose Multiplatform client
-that replaces the Flutter client `apps/learning_app`. `flutter-dev-guide/` governs
-the Flutter client only and does not apply here. The Spring Boot REST contract is
-frozen; this client adapts to it and never changes it.
+This guide governs `apps/multiplatform`, the Kotlin Compose Multiplatform client.
+It is the repository's sole client engineering guide. The Spring Boot REST
+contract is frozen; this client adapts to it and never changes it.
 
 ## 1. Module architecture
 

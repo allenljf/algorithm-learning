@@ -16,7 +16,8 @@
 先建立或更新至少一份完整 spec。開始實作前，建立或更新 plan、tasks 與 dependency graph；每次只執行一個 ready task，並依 task 合約更新進度與推薦下一步。
 ```
 
-本專案的 project-specific prompt 如下；它額外指定 Flutter 開發守則：
+本專案的 project-specific prompt 如下；涉及客戶端實作時，它額外指定 Compose
+開發守則：
 
 ```text
 請使用本專案的 agent workflow 開始或恢復工作。
@@ -24,8 +25,7 @@
 第一步完整閱讀：
 - AGENTS.md
 - AI_DEVELOPMENT_GUIDE.md
-- flutter-dev-guide/AGENTS.md
-- flutter-dev-guide/guides/00-principles.md
+- apps/multiplatform/COMPOSE_GUIDE.md（僅客戶端實作任務）
 - agent-workflow/WORK_GRAPH.yaml
 - agent-workflow/progress.md
 
@@ -64,18 +64,18 @@ command.
 每次執行前，依序閱讀：
 
 1. `AGENTS.md`
-2. `flutter-dev-guide/AGENTS.md`、`guides/00-principles.md`，及該任務路由出的 guides/checklist
+2. 客戶端實作任務讀取 `apps/multiplatform/COMPOSE_GUIDE.md` 的適用章節
 3. 功能已存在的完整 `spec.md`、`plan.md`、`tasks.md`；建立工件的 workflow 階段須明確記錄尚未存在者
 4. `agent-workflow/WORK_GRAPH.yaml` 的已存在 task 節點與 `agent-workflow/progress.md`
 
-Flutter guide 是程式架構的權威；本文件只治理 agent 如何分析、規劃、執行與交接。
+Compose guide 是客戶端程式架構的權威；本文件只治理 agent 如何分析、規劃、執行與交接。
 
 ## 四個工程概念
 
 | 概念 | 在本專案的落地方式 |
 |---|---|
 | SDD | 每項功能以 `spec.md → plan.md → tasks.md → implementation` 建立可追溯工件。|
-| Harness | `AGENTS.md`、Flutter guide、skills、工作圖與 progress 都在 repository，可讀、可改、可驗證。|
+| Harness | `AGENTS.md`、Compose guide、skills、工作圖與 progress 都在 repository，可讀、可改、可驗證。|
 | Loop | 驗證失敗時採 `max-3-healing` 或 `force-once`，有明確終止條件。|
 | Graph engineering | `WORK_GRAPH.yaml` 是 task 狀態與依賴的來源真相；Mermaid 是可讀視圖。|
 
@@ -121,7 +121,7 @@ flowchart TD
 
 ## 何時用單一 agent 或三個視角
 
-預設使用單一 agent。高風險、跨 Flutter/API/DB、規格歧義高或架構變更時，使用三個視角：planner 定義路徑、implementer 提出最小變更、evaluator 對照 spec 與 task 合約。三者是分析視角，不授權額外修改或額外驗證。
+預設使用單一 agent。高風險、跨 client/API/DB、規格歧義高或架構變更時，使用三個視角：planner 定義路徑、implementer 提出最小變更、evaluator 對照 spec 與 task 合約。三者是分析視角，不授權額外修改或額外驗證。
 
 ## 工作圖與跨對話恢復
 

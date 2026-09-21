@@ -88,7 +88,7 @@ Use this shape, replacing every bracketed value with current facts. Include only
 先完整閱讀：
 - AGENTS.md
 - AI_DEVELOPMENT_GUIDE.md
-- flutter-dev-guide/AGENTS.md 與本任務適用的 guides/checklist
+- apps/multiplatform/COMPOSE_GUIDE.md（僅客戶端實作任務）
 - <each existing full spec/plan/tasks path>
 - agent-workflow/WORK_GRAPH.yaml 的 <task node, when it exists>
 - agent-workflow/progress.md

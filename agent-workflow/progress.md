@@ -1,5 +1,18 @@
 # Progress
 
+## FRR-001 closeout — Flutter assets fully removed — 2026-09-22
+
+- Deleted the retired Flutter client `apps/learning_app` and the entire
+  Flutter-only `flutter-dev-guide`, including tracked sources and local ignored
+  build artifacts. `apps/multiplatform` remains the sole client.
+- Updated active entry points, workflow preflight guidance, the requirement
+  baseline, Compose guide, migration record, and acceptance-evidence document
+  to remove dead links and obsolete Flutter prerequisites. Historical completed
+  task records remain as migration provenance only.
+- Task-limited verification passed exactly as contracted: both removed paths are
+  absent, `apps/multiplatform` exists, and `git diff --check` passed.
+- FRR-001 is completed. No additional ready task was created.
+
 ## CDS-007 source-build governance revision — 2026-09-21
 
 - `$spec-governance` selected `update-docs` + `infer` after the operator

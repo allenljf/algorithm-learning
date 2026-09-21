@@ -17,7 +17,7 @@ completed MVP's library, authentication, or review-disclosure behavior.
 
 The client is now the Kotlin Compose Multiplatform app `apps/multiplatform`
 (governed by [`../../apps/multiplatform/COMPOSE_GUIDE.md`](../../apps/multiplatform/COMPOSE_GUIDE.md));
-the Flutter client is archived. References below are to the Compose client. The
+the former Flutter client has been removed. References below are to the Compose client. The
 delivered review stack uses policy version `fixed-v1` with immutable events and
 server-calculated `nextReviewAt`.
 
@@ -235,8 +235,8 @@ responses, and `AppStrings` for localized explanation text.
 - Ambiguity decision: `infer`. The intake left three items open; governance
   rules on each and records the rationale.
 - Client ruling: the spec was written before the Compose migration. All client
-  boundaries are the Compose Multiplatform app `apps/multiplatform`; the Flutter
-  client is archived and `flutter-dev-guide` does not govern the replacement.
+  boundaries are the Compose Multiplatform app `apps/multiplatform`; the former
+  Flutter client and its guide have been removed.
 - Migration ruling: `V2` must replace the `V1` `reviews_policy_version_check`
   (`policy_version = 'fixed-v1'`) with a check allowing `fixed-v1` and
   `adaptive-v1`, and add the nullable snapshot columns; otherwise new adaptive
@@ -256,4 +256,3 @@ responses, and `AppStrings` for localized explanation text.
 - The algorithm in section 3.2, the UTC/injected-clock rule, the append-only
   model, and owner-isolation `404` semantics are accepted as the executable
   contract for `$work-graph`.
-

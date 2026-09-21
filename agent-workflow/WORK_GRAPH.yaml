@@ -426,6 +426,22 @@ tasks:
     verification:
       - test ! -d apps/learning_app || test -f apps/learning_app/ARCHIVED.md
       - git diff --check
+  - id: FRR-001
+    title: Remove Flutter assets and obsolete active references
+    status: completed
+    depends_on: []
+    parallel_group: flutter-removal
+    spec_refs: ["Goal", "Scope", "AC-FRR-01..05", "Assumptions and rationale"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Delete the retired Flutter client and Flutter-only engineering guide, then
+      update active entry-point and migration documentation while retaining
+      immutable historical task records as provenance.
+    verification:
+      - test ! -d apps/learning_app
+      - test ! -d flutter-dev-guide
+      - test -d apps/multiplatform
+      - git diff --check
   - id: NLP-001
     title: Add the password-free Neon role ownership/rotation artifact and runbook
     status: completed
