@@ -183,7 +183,7 @@ flowchart TD
   D1[CDS-001 Endpoint configuration\ncompleted]
   D2[CDS-002 iOS target + Xcode shell\ncompleted]
   D3[CDS-003 Signed Android APK\ncompleted]
-  D4[CDS-004 TestFlight release\nready]
+  D4[CDS-004 TestFlight release\nblocked: operator signing]
   D5[CDS-005 Web/CORS deferral\nready]
 
   D1 --> D2
@@ -197,8 +197,9 @@ signed Android APK, operator-owned TestFlight external testing, and deferred
 production Web/CORS. CDS-002 completed with Kotlin/Native iOS targets, Ktor's
 Darwin engine, and an Xcode simulator shell. CDS-003 completed with optional,
 operator-only Android signing wiring and a direct-distribution runbook. CDS-004
-and CDS-005 are ready; Phase 3 execution remains serialized because its runbook
-and release evidence overlap.
+is blocked until the operator configures Apple signing and completes the
+TestFlight release. CDS-005 remains ready; Phase 3 execution remains serialized
+because its runbook and release evidence overlap.
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

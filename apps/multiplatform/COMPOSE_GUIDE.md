@@ -120,6 +120,16 @@ Keystores and password values never belong in this repository. `androidVersionCo
 and `androidVersionName` are optional Gradle properties for a monotonically
 versioned external artifact.
 
+### iOS external testing
+
+The checked-in iOS shell and its TestFlight operator procedure live in
+[`iosApp/README.md`](iosApp/README.md). A release archive requires the
+operator's registered bundle identifier, Apple Developer team, certificate, and
+provisioning profile. The repository contains none of that material. The Xcode
+marketing version and monotonic build number feed the bundle metadata; upload,
+external-test review, and invitations are operator-owned App Store Connect
+actions.
+
 ### AGP 9 compatibility mode
 
 `composeApp` is one Kotlin Multiplatform application module that owns the shared

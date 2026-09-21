@@ -68,9 +68,16 @@ human-readable execution contract.
 - Depends on: CDS-002
 - Parallel group: `client-distribution-release`
 - Spec refs: 3, 4 AC-CDS-03/04/06/07, 5, 6.1/6.3, 7-8
-- Execution contract: selected by `$execution-strategy`.
+- Execution contract: `three-perspectives` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This is an
+  operator-gated Apple distribution release: the archive and runbook are the
+  repository evidence, while Apple identity, upload, review, and invitations
+  remain outside agent authority.
 - Verification: `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive`; `test -d apps/multiplatform/build/iosApp.xcarchive`; `git diff --check`
-- Status: ready
+- Status: blocked — Apple Developer team, registered bundle identifier, and
+  distribution signing/provisioning configuration must be supplied by the
+  operator before the required archive, upload, external-test review, and
+  invited-tester evidence can exist.
 
 ### CDS-005 — Record the deliberate production-Web and GCP-CORS deferral
 

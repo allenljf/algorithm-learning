@@ -1,5 +1,37 @@
 # Progress
 
+## CDS-004 terminal blocker — 2026-09-21
+
+- Selected contract: `three-perspectives` / `rapid` / `update-docs` / `infer`.
+  The repository portion now documents the operator-only TestFlight process and
+  connects `Info.plist` bundle version fields to Xcode's marketing version and
+  monotonic build number.
+- Required command attempted exactly:
+  `cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive`.
+  It stopped during `GatherProvisioningInputs` with: `Signing for "iosApp"
+  requires a development team. Select a development team in the Signing &
+  Capabilities editor.` No archive was produced.
+- Recovery mode: `force-once`. No repository-only change can infer or create an
+  Apple Developer team, registered bundle identifier, certificate, provisioning
+  profile, App Store Connect access, beta review, or external invitation without
+  crossing the operator-only credential/account boundary. CDS-004 is `blocked`.
+- Operator next action: configure the registered bundle identifier, Apple
+  Developer team, distribution certificate, and provisioning profile in Xcode;
+  archive and upload the build; complete any external-test review; invite a
+  tester and record their production-endpoint installation. Resume CDS-004 only
+  after that evidence is available.
+
+## CDS-004 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `rapid` /
+  `update-docs` / `infer` for the operator-gated TestFlight task and moved it
+  to `in_progress`. Completion checklist: a release archive uses only an
+  operator-configured bundle identifier/team/signing identity; the runbook
+  covers upload, processing, external review, invitation, production-endpoint
+  installation, expiry/retest, and rollback; no Apple credential or signing
+  material is inspected, handled, or committed; only the three CDS-004
+  verification commands will run before closeout.
+
 ## CDS-003 closeout — 2026-09-21
 
 - Added optional Android release signing in `composeApp`: it reads only the four

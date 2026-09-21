@@ -669,10 +669,22 @@ tasks:
       - git diff --check
   - id: CDS-004
     title: Produce the operator-gated TestFlight external-test release
-    status: ready
+    status: blocked
     depends_on: [CDS-002]
     parallel_group: client-distribution-release
     spec_refs: ["3", "4 AC-CDS-03/04/06/07", "5", "6.1/6.3", "7-8"]
+    execution_contract: {analysis: three-perspectives, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Archive the checked-in Xcode shell only with operator-configured Apple
+      signing. Document the TestFlight workflow, external-test review, invited
+      tester production-endpoint check, expiry/retest path, and revision-based
+      rollback; never inspect or handle Apple identities, certificates,
+      profiles, private keys, or App Store Connect credentials.
+    blocker: >-
+      The required Release archive stopped at Xcode signing because no
+      DEVELOPMENT_TEAM is configured. The operator must configure the registered
+      bundle identifier, Apple Developer team, distribution certificate, and
+      provisioning profile, then perform the TestFlight upload/review/invitation.
     verification:
       - cd apps/multiplatform && xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release archive -archivePath build/iosApp.xcarchive
       - test -d apps/multiplatform/build/iosApp.xcarchive
