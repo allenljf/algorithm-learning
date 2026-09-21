@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.tasks.Copy
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,6 +12,33 @@ plugins {
 
 val wasmApiBaseUrl = providers.gradleProperty("apiBaseUrl")
     .orElse("http://localhost:8080")
+
+val localReleaseSigning = Properties().also { properties ->
+    val propertiesFile = rootProject.file("android-release-signing.properties")
+    if (propertiesFile.isFile) {
+        propertiesFile.inputStream().use(properties::load)
+    }
+}
+
+fun releaseSigningValue(key: String): String? =
+    providers.gradleProperty("androidRelease${key.replaceFirstChar(Char::uppercase)}").orNull
+        ?: localReleaseSigning.getProperty(key)
+
+val releaseSigningKeys = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+val releaseSigningValues = releaseSigningKeys.associateWith(::releaseSigningValue)
+val releaseSigningEnabled = releaseSigningValues.values.any { !it.isNullOrBlank() }
+
+if (releaseSigningEnabled) {
+    require(releaseSigningValues.values.all { !it.isNullOrBlank() }) {
+        "Release signing requires storeFile, storePassword, keyAlias, and keyPassword."
+    }
+}
+
+val androidVersionCode = providers.gradleProperty("androidVersionCode")
+    .map(String::toInt)
+    .getOrElse(1)
+val androidVersionName = providers.gradleProperty("androidVersionName")
+    .getOrElse("1.0")
 
 tasks.withType<Copy>().configureEach {
     if (name == "wasmJsProcessResources") {
@@ -75,8 +103,8 @@ android {
         applicationId = "com.algorithmlearning"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = androidVersionCode
+        versionName = androidVersionName
     }
     packaging {
         resources {
@@ -86,6 +114,14 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            if (releaseSigningEnabled) {
+                signingConfig = signingConfigs.maybeCreate("release").apply {
+                    storeFile = file(releaseSigningValues.getValue("storeFile")!!)
+                    storePassword = releaseSigningValues.getValue("storePassword")
+                    keyAlias = releaseSigningValues.getValue("keyAlias")
+                    keyPassword = releaseSigningValues.getValue("keyPassword")
+                }
+            }
         }
     }
     compileOptions {

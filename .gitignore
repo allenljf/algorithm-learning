@@ -34,4 +34,5 @@ gha-creds-*.json
 .kotlin/
 **/.kotlin/
 local.properties
+android-release-signing.properties
 *.hprof

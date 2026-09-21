@@ -50,9 +50,12 @@ human-readable execution contract.
 - Depends on: CDS-001
 - Parallel group: `client-distribution-release`
 - Spec refs: 3, 4 AC-CDS-04/06/07/10, 5, 6.1/6.3, 8
-- Execution contract: selected by `$execution-strategy`.
+- Execution contract: `three-perspectives` analysis; `rapid` test approach;
+  `update-docs` documentation; `infer` ambiguity handling. This is build and
+  release configuration rather than independently testable product behavior;
+  the exact debug/release assembly commands are its acceptance evidence.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleDebug`; `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
-- Status: ready
+- Status: completed
 
 ### CDS-004 — Produce the operator-gated TestFlight external-test release
 

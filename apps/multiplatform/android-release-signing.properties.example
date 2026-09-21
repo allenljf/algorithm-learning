@@ -1,0 +1,6 @@
+# Copy to android-release-signing.properties locally, then replace every value.
+# This file is deliberately non-secret; the copied file is ignored by Git.
+storeFile=/absolute/path/to/algorithm-learning-release.keystore
+storePassword=operator-supplied-store-password
+keyAlias=operator-supplied-key-alias
+keyPassword=operator-supplied-key-password

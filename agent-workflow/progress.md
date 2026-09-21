@@ -1,5 +1,32 @@
 # Progress
 
+## CDS-003 closeout — 2026-09-21
+
+- Added optional Android release signing in `composeApp`: it reads only the four
+  operator-provided references from ignored local configuration or CI Gradle
+  properties, rejects an incomplete set, and otherwise leaves debug and unsigned
+  release assembly available. `androidVersionCode` and `androidVersionName`
+  provide release-time version metadata without embedding a version workflow in
+  source.
+- Added the ignored configuration example and the Android direct-release runbook
+  (build, SHA-256, unknown-source installation, version record, and rollback).
+  No keystore, alias, password, or other secret was read or committed.
+- Contracted verification passed: `:composeApp:assembleDebug`,
+  `:composeApp:assembleRelease`, and `git diff --check`. The builds emitted only
+  existing AGP/KMP compatibility and Gradle-deprecation warnings.
+- CDS-003 is completed. CDS-004 and CDS-005 remain ready in Phase 3; the ordered
+  next task is CDS-004.
+
+## CDS-003 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `rapid` /
+  `update-docs` / `infer` for the ready signed-APK packaging task and moved it
+  to `in_progress`. Completion checklist: optional release signing activates
+  only with all operator-provided references; no signing value or keystore is
+  committed; debug and unsigned release builds remain possible; the runbook
+  covers versioning, checksums, direct installation, and rollback; only the
+  three CDS-003 verification commands will run before closeout.
+
 ## CDS-002 execution started — 2026-09-21
 
 - `$execution-strategy` selected `three-perspectives` / `rapid` /

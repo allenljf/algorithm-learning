@@ -652,10 +652,17 @@ tasks:
       - git diff --check
   - id: CDS-003
     title: Define repeatable signed Android APK packaging
-    status: ready
+    status: completed
     depends_on: [CDS-001]
     parallel_group: client-distribution-release
     spec_refs: ["3", "4 AC-CDS-04/06/07/10", "5", "6.1/6.3", "8"]
+    execution_contract: {analysis: three-perspectives, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add optional release signing that activates only when all four non-secret
+      references are supplied through ignored local configuration or Gradle CI
+      properties. Keep debug and unsigned release assembly usable without
+      operator material, and document artifact versioning, checksum, direct
+      installation, and rollback without handling any keystore or password.
     verification:
       - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
       - cd apps/multiplatform && ./gradlew :composeApp:assembleRelease
