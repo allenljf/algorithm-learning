@@ -185,8 +185,8 @@ flowchart TD
   D3[CDS-003 Signed Android APK\ncompleted]
   D4[CDS-004 iOS development-only docs\ncompleted]
   D5[CDS-005 Firebase auth + Hosting config\ncompleted]
-  D6[CDS-006 Firebase/Cloud Run showcase\nready: operator-gated]
-  D7[CDS-007 Public signed Android APK\npending]
+  D6[CDS-006 Firebase/Cloud Run showcase\ncompleted]
+  D7[CDS-007 Public signed Android APK\nready]
 
   D1 --> D2
   D1 --> D3
@@ -199,15 +199,16 @@ flowchart TD
 ```
 
 The selected distribution contract is: Firebase Hosting at
-`https://algorithmlearning.web.app`, a same-project `asia-east1` Cloud Run API
+`https://allenljf-algorithm.web.app`, a same-project `asia-east1` Cloud Run API
 behind its `/api/**` rewrite, a direct signed Android APK release outside
 Firebase Hosting, and an iOS source/simulator demonstration only. CDS-002
 completed the iOS target shell and CDS-003 completed optional operator-only
 Android signing. CDS-004 superseded the withdrawn TestFlight release path with
 a Simulator-only runbook and is complete. CDS-005 completed the same-origin
-browser and Hosting foundation; CDS-006 is now the sole ready, operator-gated
-project, secret, and public deployment step; CDS-007 publishes the resulting
-signed APK from a non-Firebase channel after CDS-006.
+browser and Hosting foundation; CDS-006 completed the public deployment for the
+governed `allenljf-algorithm` project. CDS-007 is now ready to publish the
+resulting signed APK from a non-Firebase channel after an execution contract is
+selected.
 
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.

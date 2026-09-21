@@ -14,7 +14,7 @@
 - Intake mode: `brainstorm` (the product/distribution shape is still open-ended)
 - Updated: 2026-09-21
 - Governance mode: `update-docs` + `infer`; revised after the approved public
-  showcase decision: Firebase Hosting at `https://algorithmlearning.web.app`,
+  showcase decision: Firebase Hosting at `https://allenljf-algorithm.web.app`,
   a same-project Cloud Run API, direct Android APK distribution, and iOS source/
   simulator demonstration only.
 - Execution contract: not selected; chosen per ready task after planning
@@ -23,7 +23,7 @@
 
 Let a person outside the development machine use a public Web client and install
 the Android client without rebuilding it. The public showcase is served from
-`https://algorithmlearning.web.app`; Android is a direct signed-APK download.
+`https://allenljf-algorithm.web.app`; Android is a direct signed-APK download.
 The iOS target remains in the repository for source and simulator demonstration,
 not public distribution.
 
@@ -52,8 +52,8 @@ public Firebase-hosted Web showcase plus direct Android APK.
   - a user-visible setting persisted locally that overrides that default until
     reset, so a downloader can point the app at a reachable API without a
     rebuild.
-- A **public Web deployment**: a new `algorithmlearning` Firebase/GCP project
-  hosts the Wasm bundle at `https://algorithmlearning.web.app` and routes
+- A **public Web deployment**: a new `allenljf-algorithm` Firebase/GCP project
+  hosts the Wasm bundle at `https://allenljf-algorithm.web.app` and routes
   `/api/**` through Firebase Hosting to a same-project Cloud Run service in
   `asia-east1`.
 - A production Cloud Run replica in the new project that uses the existing Neon
@@ -98,10 +98,10 @@ public Firebase-hosted Web showcase plus direct Android APK.
   is required.
 - **AC-CDS-04:** An external Android user can install a signed APK by following
   documented checksum and unknown-source guidance. The public Web client is
-  reachable at `https://algorithmlearning.web.app`.
+  reachable at `https://allenljf-algorithm.web.app`.
 - **AC-CDS-05:** The Wasm client is publicly served by Firebase Hosting and
   reaches its API via the same public origin's `/api/**` rewrite. The backend
-  allows exactly `https://algorithmlearning.web.app`; no wildcard or shared
+  allows exactly `https://allenljf-algorithm.web.app`; no wildcard or shared
   origin is accepted.
 - **AC-CDS-06:** The distribution documentation states how a visitor opens the
   Web showcase, obtains and verifies the Android APK, and runs the iOS project
@@ -139,7 +139,7 @@ public Firebase-hosted Web showcase plus direct Android APK.
 - iOS builds require macOS + Xcode; CI is `ubuntu-24.04` and cannot build iOS, so
   iOS verification is operator/local unless a macOS runner is introduced.
 - Firebase Hosting and its Cloud Run rewrite must be in the same new
-  `algorithmlearning` GCP project. The rewrite region is `asia-east1`.
+  `allenljf-algorithm` GCP project. The rewrite region is `asia-east1`.
 - The browser refresh cookie uses the Firebase Hosting forwardable `__session`
   name while retaining `HttpOnly`, `Secure`, `SameSite=Lax`, its `/api/v1/auth`
   path, and the existing 30-day rotation semantics.
@@ -155,9 +155,9 @@ public Firebase-hosted Web showcase plus direct Android APK.
 | Endpoint lifecycle | Validate and normalize before persistence; construct a fresh `AppContainer` for a changed origin and clear the prior session. | The current composition root binds all remotes to one base URL. Keeping its auth state across origins risks sending a token/cookie flow to the wrong server. |
 | Android distribution | **Signed release APK, distributed directly as a versioned release artifact.** Debug APK is developer-only; Play Store tracks are deferred. | This gives an external Android user an installable artifact without adding a store account, listing, policy, or review workflow to this milestone. |
 | iOS distribution | **Development/source and simulator demonstration only.** TestFlight, App Store submission, and public IPA distribution are deferred. | The product is a public showcase, not an iOS distribution milestone; retaining the target demonstrates Compose Multiplatform parity without Apple release operations. |
-| Web distribution | **Public Firebase Hosting at `https://algorithmlearning.web.app`.** The Wasm bundle uses that same origin as its production API base URL, and Firebase rewrites `/api/**` to same-project Cloud Run. | Same-origin delivery avoids cross-site refresh-cookie failure and gives the showcase a stable HTTPS entry point. |
-| GCP CORS / origin validation | **Allow only `https://algorithmlearning.web.app`; never use a wildcard.** | The Spring origin validator still validates browser-originated auth requests. A single canonical origin prevents an alternate Firebase subdomain from becoming an unintended credential origin. |
-| Cloud Run endpoint | **Deploy a second `algorithm-learning-api` service to the new `algorithmlearning` project in `asia-east1`.** | Firebase Hosting's Cloud Run rewrite stays within the Firebase-associated GCP project. The existing production project and its release flow remain unchanged. |
+| Web distribution | **Public Firebase Hosting at `https://allenljf-algorithm.web.app`.** The Wasm bundle uses that same origin as its production API base URL, and Firebase rewrites `/api/**` to same-project Cloud Run. | Same-origin delivery avoids cross-site refresh-cookie failure and gives the showcase a stable HTTPS entry point. |
+| GCP CORS / origin validation | **Allow only `https://allenljf-algorithm.web.app`; never use a wildcard.** | The Spring origin validator still validates browser-originated auth requests. A single canonical origin prevents an alternate Firebase subdomain from becoming an unintended credential origin. |
+| Cloud Run endpoint | **Deploy a second `algorithm-learning-api` service to the new `allenljf-algorithm` project in `asia-east1`.** | Firebase Hosting's Cloud Run rewrite stays within the Firebase-associated GCP project. The existing production project and its release flow remain unchanged. |
 | Browser refresh cookie | **Rename the refresh cookie to `__session` without changing its security attributes or lifecycle.** | Firebase Hosting forwards `__session` for rewritten dynamic requests; this preserves the existing HttpOnly rotating-refresh design under the public origin. |
 | Signing and Apple identity | **Android signing remains operator-only; Apple identity is not required for the showcase.** | The agent may create non-secret configuration wiring and runbooks but never requests, reads, prints, uploads, or rotates secret/signing/account material. |
 
@@ -165,7 +165,7 @@ public Firebase-hosted Web showcase plus direct Android APK.
 
 - The build system supplies a non-secret `defaultApiBaseUrl` per target/build
   variant. Local defaults remain suitable for emulator/browser development;
-  the public Wasm build defaults to `https://algorithmlearning.web.app`, while
+  the public Wasm build defaults to `https://allenljf-algorithm.web.app`, while
   the Android release default remains the existing HTTPS Cloud Run origin. A
   distributable build must never default to `localhost`.
 - A shared endpoint-settings abstraction owns validation, normalization,
@@ -193,7 +193,7 @@ public Firebase-hosted Web showcase plus direct Android APK.
 - Firebase Hosting owns the canonical public origin. Its static deployment
   contains the Wasm production bundle and SPA fallback; `/api/**` is the sole
   dynamic rewrite to `algorithm-learning-api` in `asia-east1`. The deployed Web
-  bundle uses `https://algorithmlearning.web.app` as its production API base URL.
+  bundle uses `https://allenljf-algorithm.web.app` as its production API base URL.
 - The new Cloud Run service gets its own least-privilege runtime service account
   and Secret Manager references. An operator supplies the existing Neon endpoint
   and credential values through the new project's secret/configuration boundary;
@@ -216,7 +216,7 @@ Assumptions retained from intake:
 
 ## 7. Known risks
 
-- The `algorithmlearning` Firebase project ID and its `web.app` subdomain are
+- The `allenljf-algorithm` Firebase project ID and its `web.app` subdomain are
   globally allocated; creation can fail if another account claims the ID.
 - The new Cloud Run service needs an operator-created, non-secret/secret
   configuration boundary for Neon before it can serve production traffic.

@@ -1,5 +1,197 @@
 # Progress
 
+## CDS-006 closeout — public Firebase/Cloud Run showcase deployed — 2026-09-21
+
+- Completed the isolated `allenljf-algorithm` Firebase/GCP deployment without
+  changing the existing `alert-study-508214-s5` production project. The active
+  project is number `1062311115113`; Firebase Hosting serves
+  `https://allenljf-algorithm.web.app`, with its `/api/**` rewrite targeting the
+  `asia-east1` Cloud Run service `algorithm-learning-api`.
+- Cloud Build published the API image to the project-local `algorithm-learning`
+  Artifact Registry repository. The direct-Neon migration Cloud Run Job
+  `algorithm-learning-migrate` completed successfully before the pooled-Neon
+  serving service was released under the dedicated
+  `algorithm-learning-runtime` identity. Runtime access to Secret Manager stays
+  limited to the four named CDS-006 secret containers; no secret value was read,
+  printed, or committed.
+- Recovery: the Hosting rewrite preserves the `/api` prefix, so the actuator
+  endpoint was configured beneath `/api/actuator` and Spring Security now
+  permits its readiness path. The public readiness probe returns
+  `{"status":"UP"}`.
+- Public-browser evidence passed with a disposable non-personal test account:
+  account creation reached Dashboard; a full page reload retained the signed-in
+  Dashboard session; Sign out returned the application to the Sign in form.
+- Required verification passed: `gcloud projects describe allenljf-algorithm`;
+  `firebase hosting:sites:list --project allenljf-algorithm` (via the
+  repository's `npx firebase-tools` wrapper); both required public `curl --fail`
+  probes; and `git diff --check`. The user’s pre-existing uncommitted iOS Xcode
+  signing settings were not inspected, modified, staged, or committed.
+- CDS-006 is `completed`. CDS-007 is now `ready` and still needs its own
+  `$execution-strategy` contract before work begins.
+
+## CDS-006 resumed — private configuration verified — 2026-09-21
+
+- The operator completed the private configuration wizard. Without reading any
+  values, the agent verified that all four required Secret Manager containers
+  now have enabled version `1`, that the ignored
+  `infra/env/.env.showcase` configuration file exists, and that the dedicated
+  runtime service account exists. CDS-006 returned to `in_progress` for the
+  Cloud Run and Firebase Hosting deployment phase.
+
+## CDS-006 private configuration wizard prepared — 2026-09-21
+
+- Created the one-run, executable
+  `scripts/cds-006-showcase-private-config-wizard.sh` from the project wizard
+  template. It confirms access to `allenljf-algorithm`, accepts only bare Neon
+  hostnames/identifiers, builds password-free JDBC URLs locally, reads the four
+  secret values with hidden terminal input, streams them directly into the new
+  project's existing Secret Manager containers, then unsets them. It writes
+  only non-secret deployment values to the ignored
+  `infra/env/.env.showcase` file.
+- Static verification passed: `bash -n` succeeds and Git confirms the local
+  configuration file is ignored. `shellcheck` is not installed. The wizard was
+  not run by the agent because it requires the operator's Neon and secret
+  values. CDS-006 remains blocked until the operator completes it and confirms
+  success without disclosing any value.
+
+## CDS-006 terminal recovery — showcase foundation complete, private configuration pending — 2026-09-21
+
+- The operator authorized the same billing account used by the existing project.
+  `allenljf-algorithm` is now linked to `billingAccounts/01EB1E-475316-280641`
+  and billing is enabled. The agent then enabled Cloud Run, Artifact Registry,
+  Secret Manager, Cloud Build, IAM Credentials, and STS; created the
+  `asia-east1` Docker repository `algorithm-learning`; created
+  `algorithm-learning-runtime@allenljf-algorithm.iam.gserviceaccount.com`; and
+  created the four empty required Secret Manager containers. The runtime
+  identity has `roles/secretmanager.secretAccessor` only on those four named
+  containers, not project-wide Secret Manager access.
+- The remaining Cloud Run migration Job and serving service cannot be safely
+  deployed without operator-provided private values: current JWT and refresh
+  hash key versions; runtime and migration Neon role password versions; and the
+  password-free direct and pooled Neon JDBC URLs plus their role names. The
+  agent did not read or copy any values from the existing production project.
+  Hosting is intentionally not deployed before its `/api/**` target can become
+  healthy.
+- CDS-006 is `blocked` at the required private configuration boundary; CDS-007
+  remains pending. Existing production resources and the user's local iOS
+  signing settings remain unchanged.
+
+## CDS-006 terminal recovery — billing selection required — 2026-09-21
+
+- The new `allenljf-algorithm` Firebase/GCP project was created successfully by
+  the authenticated operator account. `gcloud projects describe` reports active
+  project number `1062311115113`, and Firebase Hosting created the default site
+  at `https://allenljf-algorithm.web.app`. This establishes the governed
+  canonical origin without changing the existing production project.
+- Cloud billing is not enabled (`billingAccountName` empty, `billingEnabled:
+  false`), so Cloud Run, Artifact Registry, and Secret Manager cannot yet be
+  provisioned. The account can access one open billing account,
+  `01EB1E-475316-280641` (display name `我的帳單帳戶`), but binding it can incur
+  charges and requires the operator's explicit confirmation. No billing account,
+  service API, Cloud Run service, secret, Neon configuration, or iOS signing
+  setting was changed.
+- CDS-006 is `blocked` pending authorization to link that billing account and
+  the later private runtime configuration. CDS-007 remains pending.
+
+## CDS-006 canonical-origin governance revision — 2026-09-21
+
+- `$spec-governance` selected `update-docs` + `infer` after the operator
+  explicitly replaced the unavailable `algorithmlearning` ID with
+  `allenljf-algorithm`. The canonical public origin is now
+  `https://allenljf-algorithm.web.app`; it is the Wasm production API base URL
+  and the exact sole browser origin allowed by the showcase API. The Firebase
+  project mapping, plan, task verification, work graph, and Hosting runbook now
+  use this new project identity. Historical attempts against the globally
+  allocated `algorithmlearning` ID remain recorded below as evidence.
+- CDS-006 returned to `in_progress`. The revised decision remains within the
+  same isolated-project model: existing production resources and local iOS
+  signing settings are out of scope, and the operator never provides a secret.
+
+## CDS-006 terminal recovery — required project ID allocated — 2026-09-21
+
+- Recovery mode: `force-once`. With the now-authenticated Firebase CLI, the
+  authorized creation command `npx firebase-tools projects:create
+  algorithmlearning --display-name "Algorithm Learning Showcase"` was attempted
+  once. Firebase rejected it because a GCP project with ID `algorithmlearning`
+  already exists. This reconciles the earlier gcloud permission-denied result:
+  the required project is allocated, but the authenticated account cannot access
+  it.
+- No project, Firebase site, billing setting, API, Cloud Run resource, secret,
+  or existing production resource changed. CDS-006 cannot infer a substitute
+  project ID because the governed specification fixes the canonical public
+  origin as `https://algorithmlearning.web.app`. The operator must either grant
+  this account access to the existing `algorithmlearning` project, or explicitly
+  approve a new project ID and matching canonical-origin/spec/work-graph change.
+  CDS-006 is `blocked`; CDS-007 remains pending.
+
+## CDS-006 resumed — 2026-09-21
+
+- The operator completed Firebase CLI authentication. `npx firebase-tools
+  login:list` now reports `allenliproject@gmail.com`, and `projects:list` is
+  available; it lists only the unrelated `daily-news-93f7b` project, so the
+  requested `algorithmlearning` project ID remains available for creation.
+  CDS-006 returned to `in_progress`. The next authorized action is creating the
+  isolated Firebase/GCP project; the existing production project remains out of
+  scope.
+
+## CDS-006 terminal recovery — 2026-09-21
+
+- Recovery mode: `force-once`. The one non-mutating deployment-preflight attempt
+  established that the active operator account, `allenliproject@gmail.com`, has
+  no access to `algorithmlearning`: `gcloud projects describe algorithmlearning`
+  returned permission denied (or the project does not exist). The active gcloud
+  project remains the protected existing production project
+  `alert-study-508214-s5`, which CDS-006 must not change. Firebase tooling is
+  available through `npx firebase-tools`, but that cannot supply project access
+  or the required private configuration.
+- No Firebase or GCP resource was created or changed; no secret, Neon endpoint,
+  signing material, or iOS Xcode setting was read, printed, staged, or modified.
+  The project cannot be safely created or deployed until an operator either
+  grants the active account the required access to the existing
+  `algorithmlearning` project, or creates that project under its own billing/
+  organization boundary and grants deployment access. The operator must also
+  privately configure the independent showcase runtime/migration Neon
+  credentials, JWT and refresh-hash secret versions, the password-free direct
+  and pooled Neon URLs, and the exact
+  `https://algorithmlearning.web.app` allowed-origin setting before a Cloud Run
+  release can succeed.
+- CDS-006 is `blocked`; CDS-007 remains pending on it. Resume only after the
+  operator confirms project access and the private configuration is complete,
+  without sharing any secret value.
+
+### Firebase CLI authentication follow-up
+
+- The operator reported Firebase login, but the deployment environment's
+  `npx firebase-tools login:list` returned `No authorized accounts`; its
+  `projects:list` therefore could not authenticate. Started the official
+  device-login flow, which issued session ID `A307A` and requires the operator
+  to complete the displayed Firebase authorization page, then run the returned
+  `firebase login <authorizationCode>` command locally. The authorization code
+  must not be pasted into this conversation or committed. No project or cloud
+  resource was changed by this authentication attempt.
+
+## CDS-006 execution started — 2026-09-21
+
+- `$execution-strategy` selected `three-perspectives` / `test-candidates` /
+  `update-docs` / `infer` for the operator-gated Firebase/GCP public showcase
+  deployment. Planner boundary: create or verify only the isolated
+  `algorithmlearning` project resources, then deploy the prepared production
+  Wasm Hosting bundle and an `asia-east1` Cloud Run API replica. Implementer
+  boundary: use existing non-secret deployment configuration and operator-owned
+  secret references only; never read, print, copy, or commit Neon credentials.
+  Evaluator boundary: verify the exact canonical Hosting origin, same-origin
+  readiness rewrite, least-privilege runtime identity, and browser
+  login/refresh/logout evidence while preserving the existing production GCP
+  project and untouched local iOS signing settings.
+- Completion checklist: the `algorithmlearning` project and Firebase Hosting
+  site exist; the showcase API runs in `asia-east1` with an independent
+  least-privilege runtime identity and operator-provided Neon configuration;
+  only `https://algorithmlearning.web.app` is allowed; the prepared production
+  Wasm bundle is deployed with the `/api/**` rewrite; public browser
+  login/refresh/logout evidence is recorded; the five CDS-006 verification
+  commands pass; closeout changes only deployment records and workflow
+  artifacts, never the user's iOS signing changes.
+
 ## CDS-005 closeout — 2026-09-21
 
 - Replaced the browser refresh-cookie name with Firebase Hosting's forwardable

@@ -80,7 +80,7 @@ human-readable execution contract.
 
 - Deliverable: rename the browser refresh cookie to `__session` without changing
   its secure rotation lifecycle; add regression coverage; make the production
-  Wasm build use `https://algorithmlearning.web.app`; and add Firebase Hosting
+  Wasm build use `https://allenljf-algorithm.web.app`; and add Firebase Hosting
   configuration for static assets, SPA fallback, and `/api/**` Cloud Run rewrite.
 - Depends on: CDS-001, CDS-004
 - Parallel group: `client-distribution-web-foundation`
@@ -90,23 +90,28 @@ human-readable execution contract.
   browser-cookie security boundary, the production Web build, and Hosting
   routing; regression tests establish the unchanged cookie lifecycle before
   the configuration is added.
-- Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://algorithmlearning.web.app`; `git diff --check`
+- Verification: `cd services/api && ./mvnw -q test -Dtest='*AuthTest,*SecurityTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app`; `git diff --check`
 - Status: completed
 
 ## Phase 5 — Public deployment
 
 ### CDS-006 — Provision and release the public Firebase/Cloud Run showcase
 
-- Deliverable: create the `algorithmlearning` Firebase/GCP project; deploy the
+- Deliverable: create the `allenljf-algorithm` Firebase/GCP project; deploy the
   Cloud Run API in `asia-east1` under its own least-privilege runtime identity;
   configure its exact allowed origin and operator-provided Neon secrets; deploy
   Firebase Hosting; and record public browser login/refresh/logout evidence.
 - Depends on: CDS-005
 - Parallel group: `client-distribution-public-deployment`
 - Spec refs: 3, 4 AC-CDS-04/05/06/07/08/09, 5, 6.1-6.3, 7-8
-- Execution contract: selected by `$execution-strategy`.
-- Verification: `gcloud projects describe algorithmlearning`; `firebase hosting:sites:list --project algorithmlearning`; `curl --fail https://algorithmlearning.web.app`; `curl --fail https://algorithmlearning.web.app/api/actuator/health/readiness`; `git diff --check`
-- Status: ready (operator-gated)
+- Execution contract: `three-perspectives` analysis; `test-candidates` test
+  approach; `update-docs` documentation; `infer` ambiguity handling. This
+  operator-gated deployment crosses Firebase Hosting, Cloud Run identity, and
+  private Neon configuration. Public deployment evidence, rather than new
+  product tests, is the primary acceptance proof; any repository documentation
+  needed to record the deployed topology is updated without handling secrets.
+- Verification: `gcloud projects describe allenljf-algorithm`; `firebase hosting:sites:list --project allenljf-algorithm`; `curl --fail https://allenljf-algorithm.web.app`; `curl --fail https://allenljf-algorithm.web.app/api/actuator/health/readiness`; `git diff --check`
+- Status: completed
 
 ## Phase 6 — Android artifact publication
 
@@ -119,4 +124,4 @@ human-readable execution contract.
 - Spec refs: 3, 4 AC-CDS-04/06/07/10, 5, 6.3, 8
 - Execution contract: selected by `$execution-strategy`.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:assembleRelease`; `git diff --check`
-- Status: pending
+- Status: ready (requires an execution contract before work starts)

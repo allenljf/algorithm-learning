@@ -9,7 +9,7 @@
   browser credential boundaries, and operator-controlled external systems.
 - Governance decisions: build-time default plus runtime endpoint override;
   signed direct Android APK; public Firebase Hosting at
-  `https://algorithmlearning.web.app`; same-project Cloud Run rewrite; and iOS
+  `https://allenljf-algorithm.web.app`; same-project Cloud Run rewrite; and iOS
   development/simulator demonstration only.
 - Execution contract: selected per ready task by `$execution-strategy`.
 
@@ -30,7 +30,7 @@ publish an Android release artifact outside Firebase Hosting.
 | 2. iOS foundation | CDS-002 | Kotlin/Native iOS targets, Ktor iOS engine, and an `iosApp` Xcode entry point. |
 | 3. Showcase release | CDS-003, CDS-004 | Signed Android packaging and iOS development-only documentation. |
 | 4. Public Web foundation | CDS-005 | Firebase-compatible browser auth, production Wasm packaging, and Hosting configuration. |
-| 5. Public deployment | CDS-006 | Operator-gated `algorithmlearning` Firebase/GCP project, Cloud Run replica, and public Hosting deployment. |
+| 5. Public deployment | CDS-006 | Operator-gated `allenljf-algorithm` Firebase/GCP project, Cloud Run replica, and public Hosting deployment. |
 | 6. Android artifact publication | CDS-007 | Operator-published signed APK outside Firebase Hosting. |
 
 ## Dependency and parallelization rules
@@ -50,7 +50,7 @@ publish an Android release artifact outside Firebase Hosting.
 ## Completion definition
 
 The feature is complete when the public Wasm client is reachable at
-`https://algorithmlearning.web.app` with same-origin authenticated API access,
+`https://allenljf-algorithm.web.app` with same-origin authenticated API access,
 Android has a downloadable signed APK and checksum, iOS builds through its Xcode
 entry point for local demonstration, and the existing production delivery path
 remains unchanged.
