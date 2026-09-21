@@ -442,6 +442,25 @@ tasks:
       - test ! -d flutter-dev-guide
       - test -d apps/multiplatform
       - git diff --check
+  - id: PHR-001
+    title: Publish bilingual project handoff documentation
+    status: completed
+    depends_on: []
+    parallel_group: project-handoff-documentation
+    spec_refs: ["Goal", "Scope", "AC-HRD-01..05", "Assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Author source-backed English and Traditional-Chinese READMEs, validate
+      structure and links, record workflow closeout, then commit and push only
+      the documentation work after the user-authorized pre-existing change commit.
+    verification:
+      - test -f README.md
+      - test -f README.zh-TW.md
+      - >-
+        python3 -c "from pathlib import Path; import re; files=['README.md','README.zh-TW.md']; [Path(f).read_text() for f in files]; links=re.findall(r'(?<!! )\[[^]]+\]\((?!https?://|mailto:|#)([^)#]+)', '\n'.join(Path(f).read_text() for f in files)); missing=[p for p in links if not Path(p).exists()]; assert not missing, missing"
+      - >-
+        python3 -c "from pathlib import Path; a=Path('README.md').read_text(); b=Path('README.zh-TW.md').read_text(); marker=chr(96)*3+'mermaid'; assert a.count('## ') >= 12 and b.count('## ') >= 12; assert 'workflow-intake' in a and 'workflow-intake' in b; assert marker in a and marker in b"
+      - git diff --check
   - id: NLP-001
     title: Add the password-free Neon role ownership/rotation artifact and runbook
     status: completed

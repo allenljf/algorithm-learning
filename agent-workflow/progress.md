@@ -1,5 +1,21 @@
 # Progress
 
+## PHR-001 closeout — bilingual project handoff README — 2026-09-22
+
+- Replaced the minimal root README with an English project handoff and added a
+  Traditional-Chinese counterpart. Both cover local setup, Docker, Java/Spring
+  architecture, Flyway tables and fields, REST routes, Compose modules/features,
+  API-to-UI flow, user operations, AI workflow skills, deployment boundaries,
+  and security guidance.
+- Added GitHub Mermaid system, backend, Compose, request-data, and agent-workflow
+  diagrams. The documents use only checked-in source/runbook facts and do not
+  direct readers to removed Flutter tooling.
+- Verification passed: both files exist; all local Markdown links resolve; both
+  documents have the required heading depth, Mermaid diagrams, and workflow
+  skill content; `git diff --check` passed.
+- PHR-001 is completed. The user explicitly authorized committing the prior
+  iOS/Firebase working-tree changes first; that separate commit was `cd9f584`.
+
 ## FRR-001 closeout — Flutter assets fully removed — 2026-09-22
 
 - Deleted the retired Flutter client `apps/learning_app` and the entire

@@ -3,7 +3,7 @@
 ## Document status
 
 - Feature ID: `project-handoff-readme`
-- Status: intake complete; pending design-spec review
+- Status: completed
 - Intake mode: `quick-analysis`
 - Date: 2026-09-22
 
@@ -52,3 +52,11 @@ repository default because GitHub displays `README.md`; Traditional Chinese is
 the reader-equivalent counterpart. Existing detailed runbooks remain canonical
 for operator-only GCP/Neon credentials and deployment tasks; the README links
 to them rather than duplicating sensitive procedures.
+
+## Governance record
+
+- Documentation decision: `update-docs`.
+- Ambiguity decision: `infer`.
+- The user explicitly authorized direct execution on `main`, including a first
+  commit of the previously uncommitted iOS/Firebase files. The README task then
+  commits and pushes its own documentation artifacts.

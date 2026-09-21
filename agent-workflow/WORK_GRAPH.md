@@ -141,6 +141,13 @@ flowchart TD
   F1[FRR-001 Remove Flutter assets and obsolete references\ncompleted]
 ```
 
+# Project Handoff README — Dependency Graph
+
+```mermaid
+flowchart TD
+  H1[PHR-001 Bilingual final handoff\ncompleted]
+```
+
 # Neon Least-Privilege Role — Dependency Graph
 
 ```mermaid
