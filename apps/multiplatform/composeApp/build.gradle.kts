@@ -57,8 +57,13 @@ val verifyWasmViewport = tasks.register("verifyWasmViewport") {
     inputs.file(indexHtml)
     doLast {
         val document = indexHtml.asFile.readText()
-        check("html, body, #composeTarget" in document && "height: 100%;" in document) {
-            "The Wasm entry document must give html, body, and #composeTarget a full-height viewport."
+        check(
+            "html, body, #composeTarget" in document &&
+                "height: 100%;" in document &&
+                "ResizeObserver" in document &&
+                "window.dispatchEvent(new Event(\"resize\"))" in document,
+        ) {
+            "The Wasm entry document must give Compose a full-height host and notify it when that host changes size."
         }
     }
 }

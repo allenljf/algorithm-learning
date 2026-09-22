@@ -15,5 +15,11 @@
     <div id="composeTarget"></div>
     <script>globalThis.__ALGORITHM_LEARNING_API_BASE_URL__ = "${apiBaseUrl}";</script>
     <script type="application/javascript" src="composeApp.js"></script>
+    <script>
+        const composeTarget = document.getElementById("composeTarget");
+        new ResizeObserver(() => {
+            window.dispatchEvent(new Event("resize"));
+        }).observe(composeTarget);
+    </script>
 </body>
 </html>

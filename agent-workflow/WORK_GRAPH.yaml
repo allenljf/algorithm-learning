@@ -33,6 +33,25 @@ tasks:
       - npx firebase-tools deploy --only hosting --project allenljf-algorithm
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'height: 100%'
       - git diff --check
+  - id: WAV-003
+    title: Synchronize Compose viewport with browser-chrome size changes
+    status: completed
+    depends_on: [WAV-002]
+    parallel_group: wasm-auth-viewport-responsive
+    spec_refs: ["Goal", "AC-WAV-01..05", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Observe composeTarget's box with the browser-native ResizeObserver and
+      dispatch the resize event that ComposeViewport already handles. Keep the
+      fix in the Wasm entry document; do not change shared UI, Cloud Run, or
+      Firebase configuration.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'ResizeObserver'
+      - git diff --check
   - id: ALG-001
     title: Create monorepo and reproducible toolchain skeleton
     status: completed

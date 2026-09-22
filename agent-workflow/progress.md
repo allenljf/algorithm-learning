@@ -1,5 +1,35 @@
 # Progress
 
+## WAV-003 closeout — responsive Wasm viewport synchronization — 2026-09-22
+
+- Added a `ResizeObserver` to the Wasm entry document's `composeTarget`. When
+  browser chrome changes the host box (such as enabling Chrome vertical tabs),
+  it dispatches the existing browser `resize` signal that ComposeViewport uses
+  to remeasure its canvas. The shared Compose UI and all backend, Cloud Run,
+  secret, and Firebase configuration remain untouched.
+- TDD evidence: the strengthened `:composeApp:verifyWasmViewport` task first
+  failed with the expected missing resize-notification message; it passed after
+  the bridge was added. Task-limited verification then passed: the viewport
+  task, `:composeApp:allTests`, production Wasm webpack build with the canonical
+  origin, Firebase Hosting deployment, public `ResizeObserver` source check,
+  and `git diff --check`. The builds emitted only existing KMP/AGP,
+  deprecation, and webpack bundle-size warnings.
+- WAV-003 is completed and the responsive bundle is published at
+  `https://allenljf-algorithm.web.app`.
+
+## WAV-003 execution started — responsive Wasm viewport synchronization — 2026-09-22
+
+- `$workflow-intake` selected `quick-analysis`; `$spec-governance` retained
+  `update-docs` / `infer`; and `$work-graph` created WAV-003 after the user
+  reported that Chrome vertical tabs leave the Compose canvas at a stale
+  height until a manual window resize. The work is limited to the Wasm entry
+  document, regression coverage, and Firebase Hosting publication.
+- `$execution-strategy` selected `single-agent` / `tdd` / `update-docs` /
+  `infer`. Completion checklist: prove the deterministic check fails without
+  a container-resize bridge; add only a `ResizeObserver` on `composeTarget`
+  that notifies Compose's existing resize path; prove the check and client
+  suite pass; rebuild, deploy, verify the public page, close out, and commit.
+
 ## WAV-002 closeout — public Wasm viewport publication — 2026-09-22
 
 - Rebuilt the committed Wasm viewport correction with the canonical production

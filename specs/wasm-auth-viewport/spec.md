@@ -26,6 +26,10 @@ configuration change.
   document stops declaring its full-height viewport contract.
 - **AC-WAV-04:** The public `https://allenljf-algorithm.web.app` site serves
   the rebuilt production bundle containing the full-height viewport contract.
+- **AC-WAV-05:** Changing the browser content area's dimensions after startup
+  (including Chrome's vertical-tab layout) causes the Compose viewport to
+  remeasure, so the complete sign-in form remains visible without manually
+  resizing the browser window.
 
 ## Technical constraints
 
@@ -33,6 +37,8 @@ configuration change.
 - Apply the layout rule in the Wasm entry document so `ComposeViewport` receives
   a full-height host element.
 - Preserve the existing `composeTarget` id and generated API-base-url script.
+- Observe the host element's dimensions and notify Compose through its existing
+  browser-resize path; do not change shared UI layout or browser chrome.
 - Deploy only the checked-in Firebase Hosting configuration to the existing
   `allenljf-algorithm` project; do not alter Cloud Run, secrets, or hosting
   rewrites.
@@ -47,3 +53,7 @@ configuration change.
   access to the existing `allenljf-algorithm` Hosting site. Rebuilding from the
   committed viewport fix before deployment prevents stale build output from
   being released.
+- Responsiveness assumption: Chrome's vertical-tab transition changes the host
+  element's box after Compose starts without reliably giving the Compose canvas
+  a useful initial browser resize. A `ResizeObserver` on `composeTarget` is the
+  narrowest browser-native signal for that change.

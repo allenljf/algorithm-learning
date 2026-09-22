@@ -4,6 +4,7 @@
 |---|---|---|---|---|---|---|
 | WAV-001 | Restore full-height Wasm authentication viewport | none | wasm-auth-viewport | 1, AC-WAV-01..03, 4 | `cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport`; `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check` | completed |
 | WAV-002 | Publish the verified Wasm viewport correction | WAV-001 | wasm-auth-viewport-release | Goal, AC-WAV-04, constraints, decisions | `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app`; `npx firebase-tools deploy --only hosting --project allenljf-algorithm`; `curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'height: 100%'`; `git diff --check` | completed |
+| WAV-003 | Synchronize Compose viewport with browser-chrome size changes | WAV-002 | wasm-auth-viewport-responsive | Goal, AC-WAV-01..05, constraints, decisions | `cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport`; `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app`; `npx firebase-tools deploy --only hosting --project allenljf-algorithm`; `curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'ResizeObserver'`; `git diff --check` | completed |
 
 ## Phase 1 — Web viewport correction
 
@@ -18,6 +19,29 @@
   `update-docs` documentation; `infer` ambiguity handling.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`; `git diff --check`.
+- Status: completed.
+
+## Phase 3 — Responsive viewport synchronization
+
+### WAV-003 — Synchronize Compose viewport with browser-chrome size changes
+
+- Deliverable: a browser-native observation of `composeTarget` that causes the
+  existing Compose viewport resize path to run whenever its host box changes,
+  plus deterministic regression coverage and a published production bundle.
+- Depends on: WAV-002.
+- Parallel group: `wasm-auth-viewport-responsive`.
+- Spec refs: Goal, AC-WAV-01..05, technical constraints, decisions and
+  assumptions.
+- Execution contract: `single-agent` analysis; `tdd` test approach;
+  `update-docs` documentation; `infer` ambiguity handling.
+- Verification: `cd apps/multiplatform && ./gradlew
+  :composeApp:verifyWasmViewport`; `cd apps/multiplatform && ./gradlew
+  :composeApp:allTests`; `cd apps/multiplatform && ./gradlew
+  :composeApp:wasmJsBrowserProductionWebpack
+  -PapiBaseUrl=https://allenljf-algorithm.web.app`; `npx firebase-tools deploy
+  --only hosting --project allenljf-algorithm`; `curl --fail --silent
+  --show-error https://allenljf-algorithm.web.app | rg -F 'ResizeObserver'`; and
+  `git diff --check`.
 - Status: completed.
 
 ## Phase 2 — Public Hosting publication
