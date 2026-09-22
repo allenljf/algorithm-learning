@@ -1,5 +1,12 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# Wasm Authentication Viewport — Dependency Graph
+
+```mermaid
+flowchart TD
+  W1[WAV-001 Full-height Web auth viewport\ncompleted]
+```
+
 ```mermaid
 flowchart TD
   T1[ALG-001 Monorepo skeleton\ncompleted]

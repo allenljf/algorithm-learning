@@ -50,6 +50,19 @@ tasks.withType<Copy>().configureEach {
     }
 }
 
+val verifyWasmViewport = tasks.register("verifyWasmViewport") {
+    group = "verification"
+    description = "Verifies that the Wasm page host fills the browser viewport."
+    val indexHtml = layout.projectDirectory.file("src/wasmJsMain/resources/index.html")
+    inputs.file(indexHtml)
+    doLast {
+        val document = indexHtml.asFile.readText()
+        check("html, body, #composeTarget" in document && "height: 100%;" in document) {
+            "The Wasm entry document must give html, body, and #composeTarget a full-height viewport."
+        }
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {

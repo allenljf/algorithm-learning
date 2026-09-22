@@ -1,5 +1,28 @@
 # Progress
 
+## WAV-001 closeout — Wasm authentication viewport — 2026-09-22
+
+- Fixed the root cause in the Wasm entry document: `html`, `body`, and
+  `#composeTarget` now share a full-height viewport contract and the browser's
+  default body margin is removed. ComposeViewport can therefore give the
+  existing sign-in form its full layout instead of clipping it after Email.
+- Added the deterministic `:composeApp:verifyWasmViewport` check. It was first
+  observed failing with the required-contract message, then passed after the
+  CSS change. The task's `:composeApp:allTests` and `git diff --check` also
+  passed. Existing KMP/AGP deprecation warnings remain unrelated.
+- WAV-001 is completed. Publishing the updated static bundle to Firebase
+  Hosting remains a separate deployment action.
+
+## WAV-001 intake and governance — 2026-09-22
+
+- A public Web reproduction showed the authentication screen clipped after the
+  Email field. The page viewport was 704×964, while `html`, `body`, and
+  `#composeTarget` measured only 177.5px, 161.5px, and 161.5px high
+  respectively. This rules out the Email field itself as the root cause.
+- Created `wasm-auth-viewport` with the `update-docs` / `infer` decision. The
+  single ready task WAV-001 uses `single-agent` / `tdd` and is limited to the
+  Wasm entry-document host layout and a deterministic regression check.
+
 ## PHR-001 closeout — bilingual project handoff README — 2026-09-22
 
 - Replaced the minimal root README with an English project handoff and added a

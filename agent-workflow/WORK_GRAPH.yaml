@@ -1,6 +1,21 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: WAV-001
+    title: Restore full-height Wasm authentication viewport
+    status: completed
+    depends_on: []
+    parallel_group: wasm-auth-viewport
+    spec_refs: ["1", "AC-WAV-01..03", "4"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add only the entry-document viewport contract and its deterministic
+      regression check so ComposeViewport receives a full-height host. Keep
+      authentication behavior, shared Compose code, and API behavior unchanged.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
   - id: ALG-001
     title: Create monorepo and reproducible toolchain skeleton
     status: completed
