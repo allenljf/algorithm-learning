@@ -1,5 +1,34 @@
 # Progress
 
+## WAV-002 closeout — public Wasm viewport publication — 2026-09-22
+
+- Rebuilt the committed Wasm viewport correction with the canonical production
+  origin `https://allenljf-algorithm.web.app` and deployed only the existing
+  Firebase Hosting target. Firebase confirmed the new Hosting version was
+  finalized and released at `https://allenljf-algorithm.web.app`.
+- Task-limited verification passed exactly: the production webpack task
+  succeeded; `npx firebase-tools deploy --only hosting --project
+  allenljf-algorithm` completed; the public root document contains
+  `height: 100%`; and `git diff --check` passed. Build output included only the
+  existing KMP/AGP compatibility, deprecation, and webpack bundle-size
+  warnings.
+- WAV-002 is completed. No Cloud Run, Firebase configuration, secret, or
+  application-code change was made.
+
+## WAV-002 execution started — public Wasm viewport publication — 2026-09-22
+
+- `$workflow-intake` selected `quick-analysis` for the bounded release request;
+  `$spec-governance` retained `update-docs` / `infer`; and `$work-graph` created
+  WAV-002 after completed WAV-001. The task is deliberately limited to a fresh
+  production Wasm build, Firebase Hosting deployment, and public-source
+  evidence; it excludes application, Cloud Run, secret, and Firebase
+  configuration changes.
+- `$execution-strategy` selected `single-agent` / `rapid` / `update-docs` /
+  `infer`. Completion checklist: rebuild the committed viewport fix using
+  `https://allenljf-algorithm.web.app`, deploy only Hosting, confirm the public
+  root document includes the full-height contract, run the task's exact
+  verification, then persist closeout and commit the workflow artifacts.
+
 ## WAV-001 closeout — Wasm authentication viewport — 2026-09-22
 
 - Fixed the root cause in the Wasm entry document: `html`, `body`, and

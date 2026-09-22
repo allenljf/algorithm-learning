@@ -5,6 +5,9 @@
 ```mermaid
 flowchart TD
   W1[WAV-001 Full-height Web auth viewport\ncompleted]
+  W2[WAV-002 Publish corrected Web bundle\ncompleted]
+
+  W1 --> W2
 ```
 
 ```mermaid

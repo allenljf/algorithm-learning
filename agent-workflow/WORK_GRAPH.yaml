@@ -16,6 +16,23 @@ tasks:
       - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmViewport
       - cd apps/multiplatform && ./gradlew :composeApp:allTests
       - git diff --check
+  - id: WAV-002
+    title: Publish the verified Wasm viewport correction
+    status: completed
+    depends_on: [WAV-001]
+    parallel_group: wasm-auth-viewport-release
+    spec_refs: ["Goal", "AC-WAV-04", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Rebuild the committed viewport correction with the canonical public API
+      origin, deploy only the existing Firebase Hosting target, and record
+      public root-document evidence. Do not change Firebase configuration,
+      Cloud Run, secrets, or application behavior.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'height: 100%'
+      - git diff --check
   - id: ALG-001
     title: Create monorepo and reproducible toolchain skeleton
     status: completed
