@@ -1,5 +1,63 @@
 # Progress
 
+## ARR-001 closeout — public registration recovery — 2026-09-24
+
+- Added a regression-tested server-only unexpected-error boundary. It logs the
+  existing request ID, exception class, and a stack trace with the original
+  exception message and cause chain removed; the browser still receives the
+  same generic `internal_error` response. The red test first observed no log
+  event, then passed after the sanitized correlation record was implemented.
+- The reported 500 did not recur during an authorized synthetic public
+  registration after the diagnostic API release, so it cannot be truthfully
+  assigned to a specific database, crypto, or session component. The new
+  diagnostic record means any recurrence will be attributable without exposing
+  credentials or request bodies.
+- Recovery evidence: two local ARM-image attempts were rejected before Java
+  started and never received traffic (`exec format error`, then an absent image
+  tag). Google Cloud Build produced the required Linux `amd64` image; Cloud Run
+  revision `algorithm-learning-api-00007-zh8` is ready and serves 100% of
+  traffic. The final generated synthetic public registration returned HTTP 201;
+  readiness returned `{"status":"UP"}`.
+- Contracted verification passed: `cd services/api && ./mvnw -q test`; `cd
+  services/api && ./mvnw -q -DskipTests package`; public readiness; generated
+  public registration HTTP 201; and `git diff --check`. Maven emitted existing
+  Mockito dynamic-agent and unavailable-local-Docker/Testcontainers notices but
+  returned success. ARR-001 is completed.
+
+## ARR-001 intake, governance, and work graph — 2026-09-24
+
+- `$workflow-intake` selected `quick-analysis` for the explicit repair and
+  deployment request. `$spec-governance` selected `update-docs` / `infer`, and
+  `$work-graph` created the single ready task `ARR-001`.
+- Evidence before implementation: a public `POST /api/v1/auth/register` at the
+  reported time returned HTTP 500 while public readiness was HTTP 200. The
+  generic exception mapper suppresses response details and does not emit a
+  correlated exception log, so the completed incident cannot reveal its cause.
+- ARR-001 is limited to redacted diagnostic logging, the root-cause repair and
+  regression test, deployment to the existing `allenljf-algorithm` Cloud Run
+  service, and one generated synthetic public registration. It excludes user
+  credentials, Firebase configuration, and API contract changes.
+- `$execution-strategy` selected `single-agent` / `tdd` / `update-docs` /
+  `infer`; ARR-001 is now in progress. Completion checklist: prove that the
+  exception boundary logs a request correlation without a sensitive message;
+  deploy that diagnostic-only change; collect one synthetic registration's
+  redacted root cause; add its regression test before the correction; deploy
+  the corrected API; prove readiness and public HTTP 201; then close and commit.
+- Recovery round 1: the initial diagnostic revision
+  `algorithm-learning-api-00004-kjf` did not become ready and retained zero
+  traffic. Cloud Run logs show `failed to load /opt/java/openjdk/bin/java: exec
+  format error`, proving the local ARM image is incompatible with the serving
+  platform. The next bounded correction is to rebuild the same diagnostic code
+  explicitly for `linux/amd64`; no application behavior, secret, or service
+  configuration is changed.
+- Recovery round 2: the legacy local Docker builder could not complete an
+  explicit `linux/amd64` build (`does not provide the specified platform`), and
+  this host has no `docker buildx` command. Its subsequent image push did not
+  create a tag, so Cloud Run rejected the nonexistent image and continued to
+  route all traffic to `algorithm-learning-api-00003-hbq`. The final bounded
+  release attempt will use Google Cloud Build, which produces the Cloud Run
+  platform image remotely rather than relying on the ARM workstation builder.
+
 ## WAV-003 closeout — responsive Wasm viewport synchronization — 2026-09-22
 
 - Added a `ResizeObserver` to the Wasm entry document's `composeTarget`. When

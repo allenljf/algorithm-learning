@@ -1,5 +1,12 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# Authentication Registration Recovery — Dependency Graph
+
+```mermaid
+flowchart TD
+  R1[ARR-001 Diagnose, repair, and release public registration\ncompleted]
+```
+
 # Wasm Authentication Viewport — Dependency Graph
 
 ```mermaid

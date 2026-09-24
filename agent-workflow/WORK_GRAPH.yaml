@@ -1,6 +1,24 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: ARR-001
+    title: Diagnose, repair, and release public registration
+    status: completed
+    depends_on: []
+    parallel_group: auth-registration-recovery
+    spec_refs: ["Goal", "Evidence and root-cause investigation", "AC-ARR-01..04", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add correlated, redacted server-side logging at the safe unexpected-error
+      boundary, use one synthetic public registration to identify the actual
+      failing component, make the smallest tested correction there, and deploy
+      the API to the existing service without changing Hosting or secrets.
+    verification:
+      - cd services/api && ./mvnw -q test
+      - cd services/api && ./mvnw -q -DskipTests package
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app/api/actuator/health/readiness
+      - synthetic public POST /api/v1/auth/register returns HTTP 201
+      - git diff --check
   - id: WAV-001
     title: Restore full-height Wasm authentication viewport
     status: completed

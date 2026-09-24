@@ -6,9 +6,12 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import dev.algorithmlearning.api.auth.application.AuthException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 class ApiExceptionHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(AuthException.class)
     ProblemDetail handleAuthException(AuthException exception, HttpServletRequest request) {
@@ -21,6 +24,9 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpectedException(Exception exception, HttpServletRequest request) {
+        var requestId = request.getAttribute(RequestIdFilter.ATTRIBUTE);
+        LOGGER.error("Unhandled request failure; requestId={}; exception={}", requestId,
+                exception.getClass().getName(), sanitizedStackTrace(exception));
         var problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred.");
@@ -29,6 +35,12 @@ class ApiExceptionHandler {
         problem.setProperty("code", "internal_error");
         problem.setProperty("requestId", request.getAttribute(RequestIdFilter.ATTRIBUTE));
         return problem;
+    }
+
+    private static RuntimeException sanitizedStackTrace(Exception exception) {
+        var sanitized = new RuntimeException(exception.getClass().getName());
+        sanitized.setStackTrace(exception.getStackTrace());
+        return sanitized;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
