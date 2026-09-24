@@ -16,6 +16,10 @@ same-project Firebase rewrite.
   correlated server-side unexpected-error logging.
 - `services/api/src/test/java/...`: regression coverage for the actual failing
   registration component once production evidence identifies it.
+- `apps/multiplatform/shared/.../AppStrings.kt`: English and Traditional
+  Chinese registration validation wording.
+- `apps/multiplatform/composeApp/.../AuthViewModel.kt`: local registration
+  password-length guard, mapped to the localized presentation error.
 - `specs/auth-registration-recovery/*`, `agent-workflow/*`: task contract,
   diagnostic evidence, release evidence, and completion state.
 
@@ -37,3 +41,7 @@ recovery loop with redacted evidence.
 Cloud Run runs the existing service on `linux/amd64`. Local Docker builds must
 therefore specify that platform; an ARM-only image fails before Java starts and
 must never receive production traffic.
+
+The API's 422 contract is preserved, but the public form checks the same
+12-character minimum before it sends a registration request. This prevents an
+opaque transport-category message and keeps login behavior unchanged.

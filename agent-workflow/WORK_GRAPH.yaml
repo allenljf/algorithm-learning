@@ -6,18 +6,17 @@ tasks:
     status: completed
     depends_on: []
     parallel_group: auth-registration-recovery
-    spec_refs: ["Goal", "Evidence and root-cause investigation", "AC-ARR-01..04", "Technical constraints", "Decisions and assumptions"]
+    spec_refs: ["Goal", "Evidence and root-cause investigation", "AC-ARR-01..05", "Technical constraints", "Decisions and assumptions"]
     execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     implementation_strategy: >-
-      Add correlated, redacted server-side logging at the safe unexpected-error
-      boundary, use one synthetic public registration to identify the actual
-      failing component, make the smallest tested correction there, and deploy
-      the API to the existing service without changing Hosting or secrets.
+      Keep the existing API validation correction and add a localized,
+      pre-submit registration password-length error to the shared Compose form;
+      rebuild and publish the existing Wasm bundle without changing Hosting
+      configuration or secrets.
     verification:
-      - cd services/api && ./mvnw -q test
-      - cd services/api && ./mvnw -q -DskipTests package
-      - curl --fail --silent --show-error https://allenljf-algorithm.web.app/api/actuator/health/readiness
-      - synthetic public POST /api/v1/auth/register returns HTTP 201
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
       - git diff --check
   - id: WAV-001
     title: Restore full-height Wasm authentication viewport

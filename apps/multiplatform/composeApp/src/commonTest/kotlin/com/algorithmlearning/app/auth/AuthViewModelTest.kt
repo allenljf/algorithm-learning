@@ -37,14 +37,14 @@ class AuthViewModelTest {
         val viewModel = AuthViewModel(holder, backgroundScope)
 
         viewModel.emailChanged("a@test.dev")
-        viewModel.passwordChanged("password")
+        viewModel.passwordChanged("password-1234")
         viewModel.submit()
         advanceUntilIdle()
 
         assertEquals("a@test.dev", holder.state.value.session?.user?.email)
         assertNull(viewModel.form.value.error)
         assertFalse(viewModel.form.value.submitting)
-        assertEquals(listOf("a@test.dev" to "password"), repository.loginCalls)
+        assertEquals(listOf("a@test.dev" to "password-1234"), repository.loginCalls)
     }
 
     @Test
@@ -74,12 +74,26 @@ class AuthViewModelTest {
 
         viewModel.toggleMode()
         viewModel.emailChanged("a@test.dev")
-        viewModel.passwordChanged("password")
+        viewModel.passwordChanged("password-1234")
         viewModel.submit()
         advanceUntilIdle()
 
         assertEquals(AuthErrorKind.RATE_LIMITED, viewModel.form.value.error)
-        assertEquals(listOf("a@test.dev" to "password"), repository.registerCalls)
+        assertEquals(listOf("a@test.dev" to "password-1234"), repository.registerCalls)
+    }
+
+    @Test
+    fun registeringWithAShortPasswordExplainsTheMinimumWithoutCallingTheRepository() = runTest(UnconfinedTestDispatcher()) {
+        val repository = FakeAuthRepository()
+        val viewModel = AuthViewModel(AuthSessionHolder(repository), backgroundScope)
+
+        viewModel.toggleMode()
+        viewModel.emailChanged("a@test.dev")
+        viewModel.passwordChanged("too-short")
+        viewModel.submit()
+
+        assertEquals("PASSWORD_TOO_SHORT", viewModel.form.value.error?.name)
+        assertTrue(repository.registerCalls.isEmpty())
     }
 
     @Test

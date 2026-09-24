@@ -45,6 +45,9 @@ the originating exception cannot be recovered from the completed incident.
   `allenljf-algorithm` Cloud Run service, the public readiness endpoint is UP,
   and an authorized disposable synthetic registration succeeds through the
   public Hosting origin.
+- **AC-ARR-05:** The registration form rejects a password shorter than 12
+  characters before a network request and displays a localized message that
+  states the minimum length.
 
 ## Technical constraints
 
@@ -85,3 +88,6 @@ the originating exception cannot be recovered from the completed incident.
 - The repair handles `MethodArgumentNotValidException` as HTTP 422 with code
   `validation_error`. A registration password must contain 12 to 128 characters;
   no account is created when this validation fails.
+- The HTTP repair still maps 422 to the client's generic unexpected category.
+  The Web form must therefore apply the same public password-length rule before
+  submission and render a localized, actionable message.

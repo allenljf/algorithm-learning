@@ -42,7 +42,7 @@ class ComposeAcceptanceTest {
         val auth = AuthViewModel(sessionHolder, backgroundScope)
         auth.toggleMode()
         auth.emailChanged("ada@example.com")
-        auth.passwordChanged("secret")
+        auth.passwordChanged("secret-password")
         auth.submit()
         advanceUntilIdle()
         assertEquals("ada@example.com", sessionHolder.state.value.session?.user?.email)

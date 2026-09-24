@@ -1,5 +1,26 @@
 # Progress
 
+## ARR-001 final closeout — actionable registration validation message — 2026-09-24
+
+- Added a shared, localized pre-submit registration rule: passwords shorter than
+  12 characters now show `Password must be at least 12 characters` (or
+  `密碼至少需要 12 個字元`) and do not call the registration API.
+- TDD evidence: the new `AuthViewModelTest` was red before the guard was added,
+  then green with the full `:composeApp:allTests` suite.
+- Release evidence: production Wasm build passed and Firebase Hosting published
+  the bundle at https://allenljf-algorithm.web.app. The Firebase CLI reported
+  only its local Node-engine compatibility warning; the release completed.
+- ARR-001 is completed. The prior API validation correction remains deployed;
+  this closeout makes the common short-password case actionable in the UI.
+
+## ARR-001 reopened — actionable registration validation message — 2026-09-24
+
+- The user confirmed that the API's repaired HTTP 422 currently reaches the
+  Wasm client as the generic “Something went wrong” message. ARR-001 is
+  reopened with AC-ARR-05: the shared registration form must reject a password
+  shorter than 12 characters before the request and show a localized minimum
+  length explanation. The task includes a rebuilt and published Hosting bundle.
+
 ## ARR-001 final closeout — registration validation returns 422 — 2026-09-24
 
 - The user-reported post-release failure was traced to

@@ -63,7 +63,7 @@ class AcceptanceUiTest {
         }
 
         onNodeWithTag("auth-email").performTextInput("ada@example.com")
-        onNodeWithTag("auth-password").performTextInput("secret")
+        onNodeWithTag("auth-password").performTextInput("secret-password")
         onNodeWithTag("auth-submit").performClick()
 
         assertNotNull(holder.state.value.session)

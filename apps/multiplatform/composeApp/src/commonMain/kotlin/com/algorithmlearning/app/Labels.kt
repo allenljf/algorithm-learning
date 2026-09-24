@@ -32,6 +32,7 @@ fun ReviewStatus.label(strings: AppStrings): String = when (this) {
 
 fun AuthErrorKind.label(strings: AppStrings): String = when (this) {
     AuthErrorKind.MISSING_CREDENTIALS -> strings.authMissingCredentialsMessage
+    AuthErrorKind.PASSWORD_TOO_SHORT -> strings.authPasswordTooShortMessage
     AuthErrorKind.INVALID_CREDENTIALS -> strings.authInvalidCredentialsMessage
     AuthErrorKind.RATE_LIMITED -> strings.authRateLimitedMessage
     AuthErrorKind.NETWORK -> strings.authNetworkErrorMessage

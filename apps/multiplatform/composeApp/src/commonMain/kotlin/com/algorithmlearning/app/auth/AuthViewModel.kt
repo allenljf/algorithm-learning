@@ -20,6 +20,7 @@ enum class AuthMode { LOGIN, REGISTER }
  */
 enum class AuthErrorKind {
     MISSING_CREDENTIALS,
+    PASSWORD_TOO_SHORT,
     INVALID_CREDENTIALS,
     RATE_LIMITED,
     NETWORK,
@@ -64,6 +65,10 @@ class AuthViewModel(
         if (values.submitting) return
         if (values.email.isBlank() || values.password.isBlank()) {
             _form.update { it.copy(error = AuthErrorKind.MISSING_CREDENTIALS) }
+            return
+        }
+        if (values.mode == AuthMode.REGISTER && values.password.length < 12) {
+            _form.update { it.copy(error = AuthErrorKind.PASSWORD_TOO_SHORT) }
             return
         }
         _form.update { it.copy(submitting = true, error = null) }
