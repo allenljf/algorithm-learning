@@ -77,3 +77,11 @@ the originating exception cannot be recovered from the completed incident.
   no component-specific correction can be truthfully attributed. The accepted
   recovery is the tested diagnostic boundary plus a verified, working public
   registration on a Linux `amd64` release.
+- Follow-up evidence: the later user reproduction produced
+  `MethodArgumentNotValidException` for the registration request. Bean
+  validation errors have no dedicated handler and therefore incorrectly fall
+  through to the unexpected-error handler as HTTP 500. This task is reopened
+  until that validation boundary returns the existing validation problem shape.
+- The repair handles `MethodArgumentNotValidException` as HTTP 422 with code
+  `validation_error`. A registration password must contain 12 to 128 characters;
+  no account is created when this validation fails.

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import dev.algorithmlearning.api.auth.application.AuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,15 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ProblemDetail handleValidationException(IllegalArgumentException exception, HttpServletRequest request) {
+        return validationProblem(request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ProblemDetail handleRequestBodyValidationException(MethodArgumentNotValidException exception, HttpServletRequest request) {
+        return validationProblem(request);
+    }
+
+    private static ProblemDetail validationProblem(HttpServletRequest request) {
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, "One or more fields are invalid.");
         problem.setTitle("Request validation failed");
         problem.setType(java.net.URI.create("https://algorithm-learning.local/problems/validation-error"));

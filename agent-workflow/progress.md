@@ -1,5 +1,32 @@
 # Progress
 
+## ARR-001 final closeout — registration validation returns 422 — 2026-09-24
+
+- The user-reported post-release failure was traced to
+  `MethodArgumentNotValidException`: a registration password shorter than the
+  API's required 12 characters reached the generic unexpected-error handler.
+  The API now maps request-body validation to the established HTTP 422
+  `validation_error` problem instead of HTTP 500. No account is written for an
+  invalid request.
+- TDD evidence: a MockMvc registration with a short password first failed with
+  the observed 500, then passed with HTTP 422 and `validation_error` after the
+  dedicated handler was added. Full API tests and packaging passed.
+- Google Cloud Build produced the Linux `amd64` image and Cloud Run revision
+  `algorithm-learning-api-00008-vd2` now serves 100% of traffic. Public
+  verification returned HTTP 422 for the short-password request and readiness
+  returned `{"status":"UP"}`. ARR-001 is completed.
+
+## ARR-001 reopened — validation errors were incorrectly reported as 500 — 2026-09-24
+
+- The user immediately reproduced the error after ARR-001 closeout. The new
+  redacted Cloud Run record identifies
+  `org.springframework.web.bind.MethodArgumentNotValidException` on
+  `POST /api/v1/auth/register`, not a database or registration-service error.
+  The request failed bean validation (such as a password under the API's
+  12-character minimum), but `ApiExceptionHandler` has no matching handler and
+  turns it into `internal_error` / HTTP 500. ARR-001 is reopened to return the
+  established HTTP 422 validation problem instead.
+
 ## ARR-001 closeout — public registration recovery — 2026-09-24
 
 - Added a regression-tested server-only unexpected-error boundary. It logs the
