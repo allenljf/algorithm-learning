@@ -1,5 +1,26 @@
 # Progress
 
+## WNA-001 closeout — native mobile-Web authentication inputs — 2026-09-27
+
+- Replaced Wasm's canvas credential controls with positioned, browser-native
+  email and password inputs. A direct user tap therefore focuses a real HTML
+  input, allowing the mobile browser to invoke its software keyboard. Android
+  and iOS retain the original Compose controls; shared authentication state,
+  validation, and API behavior are unchanged.
+- Regression coverage proves input semantics, login/register autocomplete,
+  disabled submission state, callback-driven recomposition without replacing a
+  focused value, password visibility value/focus retention, and DOM cleanup.
+  The deterministic guard checks the native-input contract, input creation,
+  both credential kinds, and direct input event wiring.
+- Fresh verification passed: `:composeApp:verifyWasmNativeAuthInputs`,
+  `:composeApp:allTests`, production `:composeApp:wasmJsBrowserProductionWebpack`
+  using `https://allenljf-algorithm.web.app`, and `git diff --check`.
+  The build retained only pre-existing KMP/AGP compatibility and Gradle
+  configuration warnings. Firebase Hosting was intentionally not published.
+- Independent review identified focus, guard, recomposition, cleanup, and
+  listener-lifecycle gaps; all were addressed before the final verification.
+  WNA-001 is completed.
+
 ## WNA-001 intake — mobile Web software keyboard — 2026-09-27
 
 - User reproduction: tapping the public Web authentication fields on a phone
@@ -7,9 +28,12 @@
 - The behavior matches JetBrains' documented Compose Wasm canvas-input issue.
   This client already uses Compose Multiplatform 1.11.1, so the correction is a
   Web-native input seam rather than an unverified framework upgrade.
-- `specs/wasm-native-auth-input/spec.md` is created. Its `plan.md`, `tasks.md`,
-  and corresponding work-graph node remain intentionally absent until
-  specification governance completes.
+- The approved specification is executable. `plan.md`, `tasks.md`, and the
+  ready `WNA-001` work-graph node now define one Web-only, TDD task. The task
+  deliberately excludes Firebase Hosting deployment because publishing was not
+  requested.
+- WNA-001 is in progress with the recorded `single-agent` / `tdd` /
+  `update-docs` / `infer` execution contract.
 
 ## ARR-001 final closeout — actionable registration validation message — 2026-09-24
 

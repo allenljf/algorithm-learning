@@ -1,5 +1,12 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# Wasm Native Authentication Input — Dependency Graph
+
+```mermaid
+flowchart TD
+  N1[WNA-001 Native browser auth inputs\ncompleted]
+```
+
 # Authentication Registration Recovery — Dependency Graph
 
 ```mermaid

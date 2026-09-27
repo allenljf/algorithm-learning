@@ -1,6 +1,20 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: WNA-001
+    title: Replace Wasm canvas credential fields with native browser inputs
+    status: completed
+    depends_on: []
+    parallel_group: wasm-native-auth-input
+    spec_refs: ["Goal", "Scope and non-goals", "AC-WNA-01..06", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Introduce a platform auth-field seam; preserve Compose fields on Android
+      and iOS, while Wasm creates directly focusable native email and password
+      DOM controls synchronized with existing form callbacks.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmNativeAuthInputs :composeApp:allTests :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - git diff --check
   - id: ARR-001
     title: Diagnose, repair, and release public registration
     status: completed
