@@ -2799,3 +2799,19 @@ The Flutter application root and backend composition root are complete.
 
 下一個建議動作是以 `$work-graph` 為 `algorithm-learning-platform` 建立 feature
 plan、task list 與產品 task graph；不要直接開始產品程式碼實作。
+
+## RUG-001 closeout — bilingual README website-use cases — 2026-09-27
+
+- Used `workflow-intake` in `quick-analysis` mode, then recorded the
+  `update-docs` / `infer` governance decisions. The bounded request became the
+  single documentation task `RUG-001` with a `single-agent` / `rapid` contract.
+- Added matching onboarding guidance and three concrete user scenarios to
+  `README.md` and `README.zh-TW.md`: recording a solved problem, finding and
+  organizing a study set, and completing a guided due-review session while
+  checking Dashboard progress.
+- The scenarios are source-aligned with the checked-in Compose navigation and
+  product flows; no application, API, data, or deployment behavior changed.
+- Task-limited verification passed: both README scenario markers and getting-
+  started headings are present, each language has exactly three use-case
+  headings, and `git diff --check` passed.
+- `RUG-001` is completed. No follow-on task is required.

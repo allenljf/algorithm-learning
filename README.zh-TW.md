@@ -199,6 +199,47 @@ sequenceDiagram
 6. **讀取進度。** Dashboard 顯示 total、difficulty distribution、due count。
 7. **設定用戶端。** Settings 可變更 language 或已驗證 API origin；變更 origin 會建立新的 client/auth stack，因此需重新登入。
 
+### 開始使用網站
+
+1. 建立帳號或登入；成功登入後會從 **Dashboard** 開始。
+2. 在 Dashboard 選擇 **Add problem**，或開啟 **Problems** 建立新紀錄。先儲存一筆題目，再開始進行複習。
+3. 回到 Dashboard 查看題庫總數和今日待複習數；接著可透過 **Problems** 管理題目，或透過 **Review** 複習到期題目。
+
+### 使用情境
+
+#### 使用情境 1：記錄已解出的題目
+
+**目標：** 在解題思路還清楚時，保留題目背後的推理過程。
+
+1. 在 LeetCode 等平台解完題後，開啟 **Problems** 並選擇 **Add problem**。
+2. 填入 title、platform、difficulty 與選填的題目連結；再補上能幫助未來自己的 key insight、time/space complexity、mistake 或 interview note。
+3. 建立如 `array`、`two pointers`、`dynamic programming` 的 tag，並新增包含 language、code、explanation 的 solution。
+4. 儲存紀錄。
+
+**結果：** 題目會成為可搜尋的個人學習紀錄；其 tag 和一個或多個獨立 solution 都可從題目 detail 頁面取用。
+
+#### 使用情境 2：找出並整理學習清單
+
+**目標：** 在面試前或每週讀書時，建立一組聚焦的題目清單。
+
+1. 開啟 **Problems**，以 title、note 或 insight 中的關鍵字搜尋。
+2. 用 platform、difficulty、review status、tag filter 縮小結果；例如，找出標記為 `graph` 且已到期的 medium LeetCode 題目。
+3. 開啟其中一筆紀錄，修正 note、補上另一種 solution，或加上新的 tag。
+4. 保留目前的 filter，依序處理篩出的題目。
+
+**結果：** 你不必靠記憶就能找回相關題目，並持續維護日後有用的筆記和不同解法。
+
+#### 使用情境 3：完成一次專注複習
+
+**目標：** 複習到期題目時，不要太早看到答案。
+
+1. 先在 **Dashboard** 查看待複習數量，再開啟 **Review** 並選擇一筆到期題目。
+2. 依序完成引導階段：**Problem**、**Think**、**Hint**、**My Approach**、**Solution**。在揭露下一階段前，先寫下或在心中驗證自己的方法。
+3. Solution 顯示後，選擇 0 到 4 的 confidence，選填 review note，然後送出複習。
+4. 需要時回到 Dashboard，查看更新後的 due count 和總題數。
+
+**結果：** 這次 review 會保留在題目的 history，伺服器會依提交的 confidence 推導下一個 review date，下一次便能從正確的到期清單開始。
+
 ## AI 工作流
 
 書面工件是 agent control plane：`spec.md` 定義結果、`plan.md` 說明交付順序、`tasks.md` 使工作可執行、`agent-workflow/WORK_GRAPH.yaml` 是 task/dependency 真相來源、`progress.md` 保存 resume evidence。

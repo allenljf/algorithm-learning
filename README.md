@@ -199,6 +199,68 @@ sequenceDiagram
 6. **Read progress.** Dashboard shows totals, difficulty distribution, and due count.
 7. **Configure client.** Settings changes language or validated API origin. Changing origin creates a fresh client/auth stack, so sign in again.
 
+### Getting started on the website
+
+1. Create an account or sign in. The Dashboard is the starting point after a
+   successful sign-in.
+2. Select **Add problem** on the Dashboard, or open **Problems** and start a
+   new record. Save one problem before attempting a review session.
+3. Return to the Dashboard to see the library totals and the number of reviews
+   due today. From there, use **Problems** to manage records or **Review** to
+   study a due problem.
+
+### Use cases
+
+#### Use case 1: Capture a solved problem
+
+**Goal:** Preserve the reasoning behind a problem while the solution is still
+fresh.
+
+1. After solving a problem on a platform such as LeetCode, open **Problems**
+   and choose **Add problem**.
+2. Enter its title, platform, difficulty, and optional problem link. Add the
+   key insight, time/space complexity, mistakes, or interview notes that will
+   help your future self.
+3. Create tags such as `array`, `two pointers`, or `dynamic programming`, then
+   add a solution with its language, code, and explanation.
+4. Save the record.
+
+**Result:** The problem becomes a searchable personal learning record. Its tags
+and one or more independent solutions remain available from the problem detail
+page.
+
+#### Use case 2: Find and organize a study set
+
+**Goal:** Build a focused set of records before an interview or a weekly study
+session.
+
+1. Open **Problems** and search by a word from a title, note, or insight.
+2. Narrow the results with platform, difficulty, review-status, and tag
+filters—for example, medium LeetCode problems tagged `graph` that are due.
+3. Open a result to correct notes, add another solution, or assign a new tag.
+4. Keep the selected filters while you work through the resulting list.
+
+**Result:** You can retrieve related problems without relying on memory, then
+maintain the notes and alternative approaches that make the set useful later.
+
+#### Use case 3: Run a focused review session
+
+**Goal:** Revisit due problems without seeing the answer too early.
+
+1. Check the due-review count on the **Dashboard**, then open **Review** and
+   select a due problem.
+2. Work through the guided stages in order: **Problem**, **Think**, **Hint**,
+   **My Approach**, and **Solution**. Write down or mentally test your approach
+   before revealing the next stage.
+3. After the solution is visible, choose a confidence score from 0 to 4, add an
+   optional review note, and submit the review.
+4. Return to the Dashboard when needed to see the updated due count and overall
+   problem totals.
+
+**Result:** The review is stored in the problem history and the server derives
+the next review date from the submitted confidence, so the next session starts
+with the right due list.
+
 ## AI development workflow
 
 Written artifacts are the agent control plane: `spec.md` defines the outcome, `plan.md` explains delivery order, `tasks.md` makes work executable, `agent-workflow/WORK_GRAPH.yaml` is the task/dependency source of truth, and `progress.md` stores resume evidence.

@@ -167,6 +167,13 @@ flowchart TD
   H1[PHR-001 Bilingual final handoff\ncompleted]
 ```
 
+# README Use-case Guide — Dependency Graph
+
+```mermaid
+flowchart TD
+  U1[RUG-001 Practical bilingual website-use scenarios\ncompleted]
+```
+
 # Neon Least-Privilege Role — Dependency Graph
 
 ```mermaid

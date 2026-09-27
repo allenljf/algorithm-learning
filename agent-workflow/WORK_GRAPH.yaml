@@ -529,6 +529,24 @@ tasks:
       - >-
         python3 -c "from pathlib import Path; a=Path('README.md').read_text(); b=Path('README.zh-TW.md').read_text(); marker=chr(96)*3+'mermaid'; assert a.count('## ') >= 12 and b.count('## ') >= 12; assert 'workflow-intake' in a and 'workflow-intake' in b; assert marker in a and marker in b"
       - git diff --check
+  - id: RUG-001
+    title: Add practical website-use scenarios to both READMEs
+    status: completed
+    depends_on: []
+    parallel_group: readme-use-case-documentation
+    spec_refs: ["Goal", "Scope", "AC-RUG-01..04", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Extend the existing English and Traditional-Chinese user-guide sections
+      with equivalent first-time learner scenarios for capture, organization,
+      and review/progress. Do not alter application behavior, setup, API, or
+      deployment documentation.
+    verification:
+      - >-
+        python3 -c "from pathlib import Path; a=Path('README.md').read_text(); b=Path('README.zh-TW.md').read_text(); required=['Use case 1: Capture a solved problem','Use case 2: Find and organize a study set','Use case 3: Run a focused review session','使用情境 1：記錄已解出的題目','使用情境 2：找出並整理學習清單','使用情境 3：完成一次專注複習']; assert all(item in a or item in b for item in required)"
+      - >-
+        python3 -c "from pathlib import Path; a=Path('README.md').read_text(); b=Path('README.zh-TW.md').read_text(); assert 'Getting started on the website' in a and '開始使用網站' in b; assert a.count('Use case ') == 3 and b.count('使用情境 ') == 3"
+      - git diff --check
   - id: NLP-001
     title: Add the password-free Neon role ownership/rotation artifact and runbook
     status: completed
