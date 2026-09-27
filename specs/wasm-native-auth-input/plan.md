@@ -34,3 +34,8 @@ by this task.
 WNA-001 is a single implementation and verification task. The change is
 Web-only and preserves the existing viewport contract, native mobile targets,
 and backend contract.
+
+When publication is explicitly requested, WNA-002 rebuilds with the canonical
+public API origin, deploys only the existing Firebase Hosting target, and
+confirms the public document includes the native authentication-input CSS
+contract. It makes no code or infrastructure configuration change.

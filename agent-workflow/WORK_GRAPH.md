@@ -5,6 +5,9 @@
 ```mermaid
 flowchart TD
   N1[WNA-001 Native browser auth inputs\ncompleted]
+  N2[WNA-002 Publish native Web auth inputs\ncompleted]
+
+  N1 --> N2
 ```
 
 # Authentication Registration Recovery — Dependency Graph

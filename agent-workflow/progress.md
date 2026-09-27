@@ -1,5 +1,27 @@
 # Progress
 
+## WNA-002 execution started — publish native mobile-Web authentication inputs — 2026-09-27
+
+- User explicitly authorized Firebase Hosting publication of the completed
+  WNA-001 correction. This release is limited to a fresh Wasm production build,
+  the existing `allenljf-algorithm` Hosting target, and public contract
+  evidence; it excludes Firebase configuration, Cloud Run, secrets, and API
+  changes.
+- WNA-002 uses the recorded `single-agent` / `rapid` / `update-docs` / `infer`
+  contract and is ready to begin its release verification.
+
+## WNA-002 closeout — published native mobile-Web authentication inputs — 2026-09-27
+
+- Firebase Hosting successfully published the fresh production Wasm bundle to
+  https://allenljf-algorithm.web.app. The deploy completed with the existing
+  `allenljf-algorithm` target and no Firebase configuration, Cloud Run, secret,
+  or API deployment change.
+- Release verification passed: production Wasm build with the canonical public
+  API origin, `firebase-tools deploy --only hosting --project
+  allenljf-algorithm`, public root-document evidence of `.native-auth-input {`,
+  and `git diff --check`.
+- WNA-002 is completed.
+
 ## WNA-001 closeout — native mobile-Web authentication inputs — 2026-09-27
 
 - Replaced Wasm's canvas credential controls with positioned, browser-native

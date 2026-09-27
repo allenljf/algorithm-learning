@@ -12,7 +12,8 @@ contract.
 In scope: a Web-only native-input presentation layer for the login and
 registration email/password fields, bidirectional synchronization with the
 existing `AuthViewModel`, localized labels and errors, password visibility,
-and deterministic Web verification of focusable native controls.
+deterministic Web verification of focusable native controls, and publication
+to the existing Firebase Hosting target when explicitly requested.
 
 Out of scope: changes to Android or iOS presentation, authentication routes,
 request/response formats, password policy, endpoint configuration, account
@@ -34,6 +35,9 @@ management, or a visual redesign of the authenticated application.
 - **AC-WNA-06:** A deterministic Web check fails if the authentication form
   stops supplying focusable native inputs, and the production Wasm bundle still
   builds with the public API origin.
+- **AC-WNA-07:** When the user explicitly requests publication, Firebase
+  Hosting serves the verified production Wasm bundle and the public document
+  retains the native authentication-input contract.
 
 ## Technical constraints
 
@@ -47,6 +51,9 @@ management, or a visual redesign of the authenticated application.
   in browser scripts.
 - Do not log, persist, expose, or test with real credentials.
 - Preserve the full-height `ComposeViewport` host and its resize observer.
+- Publishing is limited to the existing `allenljf-algorithm` Firebase Hosting
+  target; do not alter Firebase configuration, Cloud Run, secrets, or API
+  deployment settings.
 
 ## Decisions and assumptions
 

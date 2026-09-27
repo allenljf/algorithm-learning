@@ -15,6 +15,22 @@ tasks:
     verification:
       - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmNativeAuthInputs :composeApp:allTests :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
       - git diff --check
+  - id: WNA-002
+    title: Publish verified native Web authentication inputs
+    status: completed
+    depends_on: [WNA-001]
+    parallel_group: wasm-native-auth-input-release
+    spec_refs: ["AC-WNA-07", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Rebuild the verified Wasm native-input bundle with the canonical public
+      API origin, deploy only the existing Firebase Hosting target, and verify
+      the public root document retains the native-input contract.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'native-auth-input {'
+      - git diff --check
   - id: ARR-001
     title: Diagnose, repair, and release public registration
     status: completed
