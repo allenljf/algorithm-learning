@@ -68,6 +68,29 @@ val verifyWasmViewport = tasks.register("verifyWasmViewport") {
     }
 }
 
+val verifyWasmNativeAuthInputs = tasks.register("verifyWasmNativeAuthInputs") {
+    group = "verification"
+    description = "Verifies that Wasm authentication uses native browser inputs."
+    val nativeFields = layout.projectDirectory.file(
+        "src/wasmJsMain/kotlin/com/algorithmlearning/app/auth/PlatformAuthFields.wasmJs.kt",
+    )
+    inputs.file(nativeFields)
+    doLast {
+        val source = nativeFields.asFile.readText()
+        val requiredNativeInputContract = listOf(
+            "native-auth-input-contract",
+            "document.createElement(\"input\")",
+            "kind = \"email\"",
+            "kind = \"password\"",
+            "addEventListener(\"input\"",
+        )
+        val missing = requiredNativeInputContract.filterNot(source::contains)
+        check(missing.isEmpty()) {
+            "The Wasm authentication form must retain its native-input contract; missing: $missing"
+        }
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {

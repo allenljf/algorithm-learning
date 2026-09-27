@@ -9,6 +9,20 @@
             height: 100%;
             margin: 0;
         }
+        #composeTarget { position: relative; }
+        .native-auth-input {
+            box-sizing: border-box;
+            position: absolute;
+            z-index: 1;
+            border: 1px solid #cac4d0;
+            border-radius: 4px;
+            background: #141218;
+            color: #e6e0e9;
+            font: 16px system-ui, sans-serif;
+            padding: 0 16px;
+        }
+        .native-auth-input:focus { outline: 2px solid #d0bcff; outline-offset: -2px; }
+        .native-auth-input-action { position: absolute; z-index: 2; border: 0; background: transparent; color: #d0bcff; }
     </style>
 </head>
 <body>
