@@ -1,5 +1,16 @@
 # Progress
 
+## WNA-001 intake — mobile Web software keyboard — 2026-09-27
+
+- User reproduction: tapping the public Web authentication fields on a phone
+  gives visual focus but does not invoke the software keyboard.
+- The behavior matches JetBrains' documented Compose Wasm canvas-input issue.
+  This client already uses Compose Multiplatform 1.11.1, so the correction is a
+  Web-native input seam rather than an unverified framework upgrade.
+- `specs/wasm-native-auth-input/spec.md` is created. Its `plan.md`, `tasks.md`,
+  and corresponding work-graph node remain intentionally absent until
+  specification governance completes.
+
 ## ARR-001 final closeout — actionable registration validation message — 2026-09-24
 
 - Added a shared, localized pre-submit registration rule: passwords shorter than
