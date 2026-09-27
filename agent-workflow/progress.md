@@ -1,5 +1,85 @@
 # Progress
 
+## N150-001 execution checkpoint — NeetCode 150 complete API import — 2026-09-27
+
+## N150-001 external API blocker — 2026-09-27
+
+### Root-cause diagnosis
+
+### Local repair ready for authorized deployment
+
+- Added the production-incident regression guard
+  `JpaProblemRepositoryQueryTest`: an unfiltered list must not embed optional
+  full-text-search or tag-array SQL. It was observed failing against the prior
+  repository query and passes after the conditional SQL assembly correction.
+- The correction leaves supplied search and tag filters intact, but omits their
+  predicates and bound parameters when absent. `cd services/api && ./mvnw -q
+  test` and `./mvnw -q -DskipTests package` pass. The API deployment is now
+  explicitly authorized by the user; it will use the existing Cloud Run service
+  configuration and a new image only, with no migration or secret change.
+
+- A minimal authenticated probe reproduced HTTP 500 for `/problems` with no
+  parameters and with page sizes 1, 20, and 100, plus the `platform=leetcode`
+  filter. The same result occurs through the direct Cloud Run revision
+  `algorithm-learning-api-00014-glt`, eliminating the Hosting rewrite and the
+  importer as causes.
+- The direct response supplied request ID `66a0158f-a4f6-413b-bb7d-7ce8d0957271`.
+  Cloud Run's corresponding redacted application log records
+  `org.springframework.jdbc.BadSqlGrammarException` from `ApiExceptionHandler`.
+  The only route path is `JpaProblemRepository.search`, whose SQL unconditionally
+  references `problem_search_vector(...)` and casts `:tagIds` to `uuid[]`.
+  Production logging intentionally suppresses the PostgreSQL detail, so the
+  exact invalid database symbol cannot be safely distinguished without
+  authorized database/server diagnostic access. The high-confidence failure
+  boundary is the deployed Problems search SQL or its database migration state,
+  not authentication or request pagination.
+
+- Revalidation on the next autonomous continuation again returned HTTP 500 for
+  `GET /api/v1/problems?page=1&pageSize=100`. This is the third consecutive
+  occurrence of the same production pagination failure. The credential remains
+  valid, and no production writes were made.
+
+- Production login remains successful and no token was persisted. The required
+  owner-scoped initial reconciliation cannot proceed because both
+  `GET /api/v1/problems?platform=leetcode&page=1&pageSize=100` and the
+  parameter-free fallback `GET /api/v1/problems?page=1&pageSize=100` return
+  HTTP 500. The importer reports only method, path, and status; no credential,
+  bearer value, response body, or account data is recorded.
+- The fallback proves the issue is not the importer's platform filter. Since
+  the import contract requires paging existing problems before any write and
+  paging them again for read-back, continuing would risk duplicate data and
+  cannot meet AC-N150-05/06. No production problem, tag, or solution write was
+  attempted after this failure.
+
+- Added `04-補齊63題詳解.md`, generated from the checked-in metadata with
+  original Traditional-Chinese summaries, algorithm study guidance, complexity,
+  common mistakes, Kotlin implementation references, and two authored-case
+  records per former index-only item. `ExtraSolutions.kt` now contains the 63
+  independent Kotlin implementations.
+- The unified checker now compiles all 150 lesson implementations and passed:
+  146 executable cases for the existing 67 new lessons plus compilation and
+  two checked-in case records for each of the 63 supplements. The next
+  implementation step is to turn every supplemental case into an executable
+  method-level assertion, then connect canonical lesson content to the importer
+  so it writes/reconciles Kotlin solutions and verifies every detail response.
+
+- Preflight confirmed the checked-in NeetCode metadata has exactly 150 unique
+  IDs and that both locally configured import credential variables are present;
+  neither value was read into workflow artifacts or command output.
+- A production API login returned HTTP 200. Its bearer token was held only in
+  process memory and discarded; no website UI was operated.
+- Created the feature specification, plan, task contract, and graph node.
+  The current task is in progress. Added an initial non-secret Python importer
+  contract and local unit check. It currently validates the canonical metadata
+  and uses only API endpoints; production import is deliberately deferred until
+  every 150-item lesson/solution manifest is complete.
+- Repaired the existing NeetCode checker’s obsolete LeetCode75 metadata path
+  and made its Kotlin compiler lookup use the installed Android Studio toolchain.
+  It now passes 146 cases across 67 new solutions. This establishes the exact
+  remaining gap: add 63 original lessons, Kotlin implementations, and at least
+  two cases each; expand checker/importer to all 150; then run the task’s
+  production import/read-back verification and closeout.
+
 ## WNA-002 execution started — publish native mobile-Web authentication inputs — 2026-09-27
 
 - User explicitly authorized Firebase Hosting publication of the completed
