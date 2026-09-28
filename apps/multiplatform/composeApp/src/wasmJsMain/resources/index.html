@@ -31,7 +31,13 @@
     <script type="application/javascript" src="composeApp.js"></script>
     <script>
         const composeTarget = document.getElementById("composeTarget");
-        new ResizeObserver(() => {
+        let observedWidth = composeTarget.getBoundingClientRect().width;
+        let observedHeight = composeTarget.getBoundingClientRect().height;
+        new ResizeObserver(([entry]) => {
+            const { width, height } = entry.contentRect;
+            if (width === observedWidth && height === observedHeight) return;
+            observedWidth = width;
+            observedHeight = height;
             window.dispatchEvent(new Event("resize"));
         }).observe(composeTarget);
     </script>

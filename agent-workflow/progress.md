@@ -3138,3 +3138,28 @@ plan、task list 與產品 task graph；不要直接開始產品程式碼實作�
   started headings are present, each language has exactly three use-case
   headings, and `git diff --check` passed.
 - `RUG-001` is completed. No follow-on task is required.
+## WRF-001 execution started — guarded Wasm resize forwarding — 2026-09-28
+
+- The public Wasm sign-in page reproduces with a white Compose surface and an
+  unstable render. The entry document's unguarded `ResizeObserver` forwards
+  every observation as a global browser `resize`, creating a feedback path into
+  ComposeViewport.
+- `$workflow-intake` used quick analysis; `$spec-governance` recorded
+  `update-docs` / `infer`; `$work-graph` created WRF-001. The user explicitly
+  requested direct repair and Hosting deployment without test-suite execution.
+- `$execution-strategy` selected `single-agent` / `rapid` / `update-docs` /
+  `infer`. The implementation records initial host dimensions, forwards only
+  distinct observations, rebuilds the production Wasm bundle, and deploys only
+  Firebase Hosting.
+## WRF-001 closeout — guarded Wasm resize forwarding — 2026-09-28
+
+- Replaced the unguarded host-observation bridge with a cached dimension pair:
+  the initial `ResizeObserver` notification is ignored, while a real width or
+  height change is still forwarded once to ComposeViewport through `resize`.
+  This removes the observed redraw feedback path without removing browser-chrome
+  responsiveness.
+- Per the user's explicit request, no test suite was run. The production Wasm
+  webpack build completed, Firebase Hosting deployment completed, and the
+  public root document confirms both the guarded bridge and the canonical
+  production API origin. `git diff --check` passed.
+- WRF-001 is completed; no follow-on task is required.

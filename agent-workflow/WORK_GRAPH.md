@@ -62,6 +62,13 @@ flowchart TD
   W2 --> W3
 ```
 
+# Wasm Resize Feedback Recovery — Dependency Graph
+
+```mermaid
+flowchart TD
+  F1[WRF-001 Guard host resize forwarding and publish\ncompleted]
+```
+
 ```mermaid
 flowchart TD
   T1[ALG-001 Monorepo skeleton\ncompleted]

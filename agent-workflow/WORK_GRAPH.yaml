@@ -221,6 +221,22 @@ tasks:
       - npx firebase-tools deploy --only hosting --project allenljf-algorithm
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'ResizeObserver'
       - git diff --check
+  - id: WRF-001
+    title: Guard Wasm host resize forwarding and publish
+    status: completed
+    depends_on: []
+    parallel_group: wasm-resize-feedback-recovery
+    spec_refs: ["Goal", "AC-WRF-01..03", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Record the initial composeTarget dimensions and forward only distinct host
+      dimensions through the existing Compose resize path; update the narrow
+      source guard, rebuild the production Wasm bundle, and deploy only Hosting.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'let observedWidth = composeTarget.getBoundingClientRect().width'
+      - git diff --check
   - id: ALG-001
     title: Create monorepo and reproducible toolchain skeleton
     status: completed
