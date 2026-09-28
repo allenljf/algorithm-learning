@@ -25,6 +25,13 @@ import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 
 // native-auth-input-contract: browser-native credential controls own mobile IME focus.
+@JsFun("() => window.devicePixelRatio || 1")
+private external fun devicePixelRatio(): Double
+
+internal fun composePixelsToCssPixels(value: Float, density: Double): Double = value / density
+
+private fun cssPixels(value: Float): String = "${composePixelsToCssPixels(value, devicePixelRatio())}px"
+
 @Composable
 internal actual fun PlatformAuthFields(
     state: AuthFormState,
@@ -141,13 +148,14 @@ private fun NativeAuthInput(
             .height(56.dp)
             .onGloballyPositioned { coordinates ->
                 val position = coordinates.positionInWindow()
-                input.style.left = "${position.x}px"
-                input.style.top = "${position.y}px"
-                input.style.width = "${coordinates.size.width}px"
-                input.style.height = "${coordinates.size.height}px"
+                input.style.left = cssPixels(position.x)
+                input.style.top = cssPixels(position.y)
+                input.style.width = cssPixels(coordinates.size.width.toFloat())
+                input.style.height = cssPixels(coordinates.size.height.toFloat())
                 action?.apply {
-                    style.right = "${position.x + 12}px"
-                    style.top = "${position.y + (coordinates.size.height - 36) / 2}px"
+                    style.left = cssPixels(position.x + coordinates.size.width - 12f)
+                    style.top = cssPixels(position.y + (coordinates.size.height - 36) / 2f)
+                    style.transform = "translateX(-100%)"
                 }
             },
     )

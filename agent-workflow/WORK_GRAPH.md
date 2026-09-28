@@ -1,5 +1,17 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# NeetCode 150 Complete API Import — Dependency Graph
+
+```mermaid
+flowchart TD
+  N150[N150-001 Complete Kotlin solutions, validation, and production import\ncompleted]
+```
+
+`N150-001` owns full checked-in Kotlin-solution completion with executable
+cases, local validation, safe idempotent REST import, paginated production
+read-back, and a redacted summary. Existing lessons are optional reference
+material. It does not modify any deployed application or API contract.
+
 # Wasm Native Authentication Input — Dependency Graph
 
 ```mermaid
@@ -8,6 +20,13 @@ flowchart TD
   N2[WNA-002 Publish native Web auth inputs\ncompleted]
 
   N1 --> N2
+```
+
+# Wasm Native Authentication Layout Repair — Dependency Graph
+
+```mermaid
+flowchart TD
+  L1[WNL-001 Repair and publish high-DPI native auth layout\ncompleted]
 ```
 
 # Authentication Registration Recovery — Dependency Graph

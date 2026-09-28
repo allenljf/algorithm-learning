@@ -1,6 +1,25 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: N150-001
+    title: Complete NeetCode 150 Kotlin solutions and idempotent API import
+    status: completed
+    depends_on: []
+    parallel_group: neetcode150-complete-api-import
+    spec_refs: ["Goal", "Scope and non-goals", "AC-N150-01..07", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Reconcile checked-in 150-item metadata and independently implemented
+      Kotlin sources into a canonical validated solution manifest, complete the
+      missing executable cases, then use a standard-library idempotent importer
+      which authenticates only in memory and verifies the owner-scoped production
+      records through pagination and details without altering application APIs.
+    verification:
+      - python3 docs/algorithm/neetcode150/checks/verify.py
+      - python3 tools/test_neetcode150_import.py
+      - python3 tools/neetcode150_import.py --validate
+      - python3 tools/neetcode150_import.py --import-and-verify
+      - git diff --check
   - id: WNA-001
     title: Replace Wasm canvas credential fields with native browser inputs
     status: completed
@@ -28,6 +47,23 @@ tasks:
       the public root document retains the native-input contract.
     verification:
       - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'native-auth-input {'
+      - git diff --check
+  - id: WNL-001
+    title: Repair and publish high-DPI native authentication layout
+    status: completed
+    depends_on: []
+    parallel_group: wasm-native-auth-layout
+    spec_refs: ["Goal", "Incident evidence", "AC-WNL-01..05", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Convert the existing Wasm native-auth DOM overlay's Compose device-pixel
+      geometry to CSS pixels before assigning styles, prove the conversion at
+      high DPI, then rebuild and publish only the existing Firebase Hosting
+      bundle and verify its public document.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmNativeAuthInputs :composeApp:allTests :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
       - npx firebase-tools deploy --only hosting --project allenljf-algorithm
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'native-auth-input {'
       - git diff --check

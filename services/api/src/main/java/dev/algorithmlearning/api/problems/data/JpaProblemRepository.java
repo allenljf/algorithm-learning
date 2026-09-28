@@ -16,7 +16,7 @@ public class JpaProblemRepository implements ProblemRepository {
     private final NamedParameterJdbcTemplate namedJdbc;
     public JpaProblemRepository(ProblemJpaRepository problems, TagRepository tags, JdbcTemplate jdbc, NamedParameterJdbcTemplate namedJdbc) { this.problems = problems; this.tags = tags; this.jdbc = jdbc; this.namedJdbc = namedJdbc; }
     public Problem save(Problem problem) {
-        var saved = problems.save(entity(problem));
+        var saved = problems.saveAndFlush(entity(problem));
         jdbc.update("delete from problem_tags where problem_id = ?", problem.id());
         for (var tag : problem.tags()) jdbc.update("insert into problem_tags (problem_id, tag_id) values (?, ?)", problem.id(), tag.id());
         return map(saved);

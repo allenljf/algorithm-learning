@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import com.algorithmlearning.app.auth.AuthFormState
 import com.algorithmlearning.app.auth.AuthMode
 import com.algorithmlearning.app.auth.AuthScreen
+import com.algorithmlearning.app.auth.composePixelsToCssPixels
 import com.algorithmlearning.shared.AppLanguage
 import com.algorithmlearning.shared.StringCatalog
 import kotlinx.browser.document
@@ -26,6 +27,13 @@ private external fun nativeInputEvent(): Event
 
 @OptIn(ExperimentalTestApi::class)
 class NativeAuthFieldsUiTest {
+
+    @Test
+    fun composePixelGeometryConvertsToCssPixelsAtHighDensity() {
+        assertEquals(430.0, composePixelsToCssPixels(860f, 2.0))
+        assertEquals(420.0, composePixelsToCssPixels(840f, 2.0))
+        assertEquals(56.0, composePixelsToCssPixels(112f, 2.0))
+    }
 
     @AfterTest
     fun removeComposeTarget() {

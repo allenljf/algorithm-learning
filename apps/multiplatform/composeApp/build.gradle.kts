@@ -83,6 +83,10 @@ val verifyWasmNativeAuthInputs = tasks.register("verifyWasmNativeAuthInputs") {
             "kind = \"email\"",
             "kind = \"password\"",
             "addEventListener(\"input\"",
+            "composePixelsToCssPixels",
+            "input.style.left = cssPixels(position.x)",
+            "input.style.width = cssPixels(coordinates.size.width.toFloat())",
+            "style.left = cssPixels(position.x + coordinates.size.width - 12f)",
         )
         val missing = requiredNativeInputContract.filterNot(source::contains)
         check(missing.isEmpty()) {

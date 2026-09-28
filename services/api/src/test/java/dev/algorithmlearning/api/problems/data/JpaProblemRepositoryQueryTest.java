@@ -21,4 +21,13 @@ class JpaProblemRepositoryQueryTest {
         assertThat(source).doesNotContain("(:q='' or");
         assertThat(source).doesNotContain("(:tagCount=0 or");
     }
+
+    @Test
+    void flushesProblemBeforeWritingItsJdbcTagLinks() throws Exception {
+        var source = Files.readString(Path.of("src/main/java/dev/algorithmlearning/api/problems/data/JpaProblemRepository.java"));
+
+        assertThat(source).contains("problems.saveAndFlush(entity(problem))");
+        assertThat(source.indexOf("problems.saveAndFlush(entity(problem))"))
+                .isLessThan(source.indexOf("insert into problem_tags"));
+    }
 }

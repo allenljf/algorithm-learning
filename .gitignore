@@ -36,3 +36,6 @@ gha-creds-*.json
 local.properties
 android-release-signing.properties
 *.hprof
+
+docs/algorithm
+tools/

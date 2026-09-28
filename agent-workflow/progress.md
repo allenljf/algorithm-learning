@@ -1,5 +1,67 @@
 # Progress
 
+## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
+
+- The published login page is reproducibly broken on both desktop and mobile
+  high-DPI displays. At a 1280-by-720 CSS-pixel viewport with DPR 2, the
+  published email input is `left=860`, `top=536`, `width=840`, and `height=112`;
+  its right edge is beyond the viewport.
+- The evidence isolates the defect to the Wasm DOM overlay: Compose
+  device-pixel coordinates are assigned directly to CSS-pixel styles. The
+  correction will be Web-only, retain native keyboard-capable inputs, and
+  convert overlay geometry at the existing seam.
+- `WNL-001` is ready with the recorded `single-agent` / `tdd` /
+  `update-docs` / `infer` execution contract. Its task includes the previously
+  authorized limited Firebase Hosting publication after exact verification.
+
+## WNL-001 execution started — high-DPI native authentication layout repair — 2026-09-28
+
+- Task status is `in_progress`. The first change will be a regression test for
+  CSS-pixel conversion at DPR 2; production overlay code will not change until
+  that test demonstrates the published defect.
+
+## WNL-001 closeout — high-DPI native authentication layout repaired and published — 2026-09-28
+
+- The Wasm overlay now converts Compose device-pixel position and size values
+  before assigning CSS geometry. At DPR 2, the incident values 860, 840, and
+  112 convert to 430, 420, and 56 CSS pixels. The password action now anchors
+  to the password field's right edge rather than using an unrelated host-right
+  offset.
+- TDD evidence: the high-DPI conversion test first failed because the
+  conversion function did not exist, then passed after the minimal Web-only
+  implementation. The deterministic native-input guard now requires the
+  conversion at input and action geometry assignments.
+- Verification passed: `:composeApp:verifyWasmNativeAuthInputs`,
+  `:composeApp:allTests`, and production Wasm webpack build with the public API
+  origin. Firebase Hosting published the verified six-file bundle to
+  `https://allenljf-algorithm.web.app`; public HTML still contains the native
+  input contract and the served JavaScript has a new content ETag.
+- A previously opened browser tab continued to serve its cached pre-release
+  `composeApp.js` because Hosting gives that stable asset path `max-age=3600`.
+  Fresh requests receive the new ETag and bundle; a user with that old tab must
+  reload bypassing its cache once. `WNL-001` is completed.
+
+## N150-001 closeout — NeetCode 150 Kotlin solutions and production import — 2026-09-28
+
+- The canonical Kotlin check compiles all 150 sources: 67 NeetCode lesson
+  sources, 63 independently implemented supplements, and 20 reusable local
+  LeetCode 75 solutions. It passed 312 authored executable cases, with at
+  least two cases for every metadata ID.
+- The non-secret importer now extracts one independent Kotlin source per ID,
+  rather than assigning an aggregate test program to every API solution. Its
+  static contract check confirms exactly 150 metadata/source mappings.
+- A production write failure was traced to `JpaProblemRepository` writing JDBC
+  tag links before the JPA problem row was flushed. `saveAndFlush` now makes
+  the row visible before that foreign-key write; its focused regression test,
+  full API test suite, and package build passed. Cloud Run revision
+  `algorithm-learning-api-00011-5k5` serves the correction.
+- Production REST import and paginated detail read-back passed using only the
+  existing API. The initial redacted summary records `created=149`, `updated=0`,
+  `skipped=1`, `failed=0`, `failedIds=[]`, and `safeToRerun=true`; a final
+  idempotency run records `created=0`, `updated=0`, `skipped=150`, `failed=0`,
+  `failedIds=[]`, and `safeToRerun=true`. No account credential or bearer
+  token was persisted.
+
 ## N150-001 execution checkpoint — NeetCode 150 complete API import — 2026-09-27
 
 ## N150-001 external API blocker — 2026-09-27
