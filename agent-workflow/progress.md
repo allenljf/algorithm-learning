@@ -109,6 +109,21 @@
   a new terminal importer summary; the existing safe idempotent command remains
   the only permitted synchronization path.
 
+## DLE-005 closeout — 2026-09-28
+
+- Final cross-layer acceptance now creates a tagged problem with every learning
+  field, saves its Kotlin explanation/code, reopens it through the repository
+  adapter, and verifies the complete persisted Detail data. Existing focused UI
+  and history tests additionally prove immediate content visibility, the
+  840dp responsive contract, Review-list Detail routing, and `popstate`
+  reconciliation without a history echo.
+- Final verification passed: `:shared:allTests`, `:composeApp:allTests`, forced
+  `:composeApp:wasmJsBrowserTest --rerun-tasks`, the NeetCode 150 verifier,
+  importer payload tests, importer `--validate`, and `git diff --check`.
+- DLE-001 through DLE-005 are completed. The only remaining working-tree files
+  are the user-pre-existing `.firebase/hosting...cache` and `firebase.json`
+  modifications; they were never staged or included in feature commits.
+
 ## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
 
 - The published login page is reproducibly broken on both desktop and mobile

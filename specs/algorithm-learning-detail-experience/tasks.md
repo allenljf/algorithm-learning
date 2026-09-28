@@ -86,4 +86,4 @@ authoritative in `agent-workflow/WORK_GRAPH.yaml`.
   `python3 docs/algorithm/neetcode150/checks/verify.py`;
   `python3 tools/test_neetcode150_import.py`; `python3 tools/neetcode150_import.py --validate`;
   `git diff --check`.
-- Status: ready.
+- Status: completed.

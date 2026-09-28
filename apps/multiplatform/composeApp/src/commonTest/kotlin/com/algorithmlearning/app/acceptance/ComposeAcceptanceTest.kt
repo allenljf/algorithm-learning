@@ -28,8 +28,8 @@ import kotlin.test.assertTrue
  *
  * The real presentation state holders drive a single stateful
  * [ControlledApiAdapter], proving the four experiences share one coherent
- * session: register, create/search a problem with a solution and tag, work the
- * staged review, then read the dashboard aggregate the journey produced.
+ * session: register, create/search a complete learning detail with a solution
+ * and tag, record a scheduled-review event, then read the dashboard aggregate.
  */
 class ComposeAcceptanceTest {
 
@@ -47,7 +47,7 @@ class ComposeAcceptanceTest {
         advanceUntilIdle()
         assertEquals("ada@example.com", sessionHolder.state.value.session?.user?.email)
 
-        // 2. Problem management: empty library, create with a tag, add a solution.
+        // 2. Problem management: create, save, and reload a complete learning detail.
         val problems = ProblemsViewModel(api.problems, api.tags, api.solutions, backgroundScope)
         problems.initialize()
         advanceUntilIdle()
@@ -63,7 +63,15 @@ class ComposeAcceptanceTest {
         problems.toggleEditorTag(arrayTag.id)
         problems.editorTitleChanged("Two Sum")
         problems.editorDifficultyChanged(ProblemDifficulty.HARD)
-        problems.editorNotesChanged("Use a hash map")
+        problems.editorDescriptionChanged("Find two indices whose values reach the target.")
+        problems.editorNotesChanged("找出兩個索引，使對應數值相加為目標。")
+        problems.editorKeyInsightChanged("先查補數，再記錄目前索引。")
+        problems.editorTimeComplexityChanged("O(n)")
+        problems.editorSpaceComplexityChanged("O(n)")
+        problems.editorMistakesChanged("不可先存目前元素，否則可能重用同一索引。")
+        problems.editorTestMaterialChanged("執行兩個含重複值與一般值的案例。")
+        problems.editorKotlinCodeChanged("// 中文註解\nfun twoSum() = intArrayOf(0, 1)")
+        problems.editorKotlinExplanationChanged("以雜湊表保存先前值與索引。")
         problems.saveProblem()
         advanceUntilIdle()
 
@@ -71,11 +79,21 @@ class ComposeAcceptanceTest {
         val savedId = problems.state.value.detail!!.detail.summary.id
         assertEquals("Two Sum", problems.state.value.detail!!.detail.summary.title)
         assertEquals(listOf(arrayTag), problems.state.value.detail!!.detail.summary.tags)
-
-        problems.solutionCodeChanged("return complement")
-        problems.saveSolution()
-        advanceUntilIdle()
         assertEquals(1, problems.state.value.detail!!.solutions.size)
+        assertEquals("Find two indices whose values reach the target.", problems.state.value.detail!!.detail.description)
+        assertEquals("找出兩個索引，使對應數值相加為目標。", problems.state.value.detail!!.detail.notes)
+        assertEquals("先查補數，再記錄目前索引。", problems.state.value.detail!!.detail.keyInsight)
+        assertEquals("O(n)", problems.state.value.detail!!.detail.timeComplexity)
+        assertEquals("O(n)", problems.state.value.detail!!.detail.spaceComplexity)
+        assertEquals("執行兩個含重複值與一般值的案例。", problems.state.value.detail!!.detail.interviewNotes)
+        assertEquals("以雜湊表保存先前值與索引。", problems.state.value.detail!!.solutions.single().explanation)
+        assertTrue(problems.state.value.detail!!.solutions.single().code.startsWith("// 中文註解"))
+
+        problems.backToList()
+        problems.openProblem(savedId)
+        advanceUntilIdle()
+        assertEquals("找出兩個索引，使對應數值相加為目標。", problems.state.value.detail!!.detail.notes)
+        assertEquals("以雜湊表保存先前值與索引。", problems.state.value.detail!!.solutions.single().explanation)
 
         // Search and filter reload the narrowed list.
         problems.backToList()
