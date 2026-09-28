@@ -43,4 +43,10 @@ class Navigator(start: AppDestination = AppDestination.Dashboard) {
     fun resetTo(destination: AppDestination) {
         _backStack.value = listOf(destination)
     }
+
+    /** Applies a browser popstate route without appending another in-memory entry. */
+    fun replaceWith(destination: AppDestination) {
+        if (destination == current && _backStack.value.size == 1) return
+        _backStack.value = listOf(destination)
+    }
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,6 +41,9 @@ import com.algorithmlearning.app.problems.ProblemsViewModel
 import com.algorithmlearning.app.review.ReviewActions
 import com.algorithmlearning.app.review.ReviewScreen
 import com.algorithmlearning.app.review.ReviewViewModel
+import com.algorithmlearning.app.navigation.NoopRouteHistory
+import com.algorithmlearning.app.navigation.RouteHistory
+import com.algorithmlearning.app.navigation.RouteHistoryCoordinator
 import com.algorithmlearning.shared.AppContainer
 import com.algorithmlearning.shared.AppDestination
 import com.algorithmlearning.shared.AppLanguage
@@ -47,13 +51,21 @@ import com.algorithmlearning.shared.AppStrings
 import com.algorithmlearning.shared.EndpointOverrideStore
 import com.algorithmlearning.shared.EndpointSettings
 import com.algorithmlearning.shared.InvalidApiBaseUrl
+import com.algorithmlearning.shared.Navigator
 import com.algorithmlearning.shared.StringCatalog
 
 @Composable
-fun App(defaultApiBaseUrl: String, endpointStore: EndpointOverrideStore) {
+fun App(
+    defaultApiBaseUrl: String,
+    endpointStore: EndpointOverrideStore,
+    routeHistory: RouteHistory = NoopRouteHistory,
+) {
     val endpointSettings = remember { EndpointSettings(defaultApiBaseUrl, endpointStore) }
     var effectiveBaseUrl by remember { mutableStateOf(endpointSettings.effectiveBaseUrl) }
-    val container = remember(effectiveBaseUrl) { AppContainer(baseUrl = effectiveBaseUrl) }
+    val initialDestination = remember(routeHistory) { routeHistory.initialDestination() ?: AppDestination.Dashboard }
+    val container = remember(effectiveBaseUrl, initialDestination) {
+        AppContainer(baseUrl = effectiveBaseUrl, navigator = Navigator(initialDestination))
+    }
     var language by remember { mutableStateOf(container.currentLanguage()) }
     val strings = remember(language) { StringCatalog.of(language) }
     val scope = rememberCoroutineScope()
@@ -79,6 +91,7 @@ fun App(defaultApiBaseUrl: String, endpointStore: EndpointOverrideStore) {
                     endpointSettings = endpointSettings,
                     effectiveBaseUrl = effectiveBaseUrl,
                     onEndpointChanged = { effectiveBaseUrl = endpointSettings.effectiveBaseUrl },
+                    routeHistory = routeHistory,
                 )
                 !restored -> RestoringSession(strings)
                 else -> {
@@ -120,6 +133,7 @@ private fun SignedInApp(
     endpointSettings: EndpointSettings,
     effectiveBaseUrl: String,
     onEndpointChanged: () -> Unit,
+    routeHistory: RouteHistory,
 ) {
     val scope = rememberCoroutineScope()
     val problemsViewModel = remember(container) {
@@ -149,14 +163,31 @@ private fun SignedInApp(
     val dashboardState by dashboardViewModel.state.collectAsState()
     val backStack by container.navigator.backStack.collectAsState()
     val current = backStack.last()
+    val routeCoordinator = remember(container.navigator, routeHistory) {
+        RouteHistoryCoordinator(container.navigator, routeHistory)
+    }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(current) {
+    DisposableEffect(routeCoordinator) {
+        routeCoordinator.start()
+        onDispose { routeCoordinator.stop() }
+    }
+
+    LaunchedEffect(current, routeCoordinator) {
+        routeCoordinator.navigatorChanged(current)
         when (current) {
             AppDestination.Dashboard -> dashboardViewModel.load()
             AppDestination.Review -> reviewViewModel.initialize()
             is AppDestination.ProblemDetail -> problemsViewModel.openProblem(current.problemId)
             else -> Unit
+        }
+    }
+
+    // A browser popstate can restore the library route while the view model is
+    // still holding a loaded detail; retain the list/query state but hide detail.
+    LaunchedEffect(current, problemsState.view) {
+        if (current == AppDestination.Problems && problemsState.view == com.algorithmlearning.app.problems.ProblemsView.DETAIL) {
+            problemsViewModel.backToList()
         }
     }
 
@@ -208,6 +239,10 @@ private fun SignedInApp(
                     actions = problemsActions(
                         viewModel = problemsViewModel,
                         onOpenProblem = { id -> container.navigator.navigateTo(AppDestination.ProblemDetail(id)) },
+                        onBackToList = {
+                            problemsViewModel.backToList()
+                            routeCoordinator.appBack()
+                        },
                         onReviewProblem = { id ->
                             reviewViewModel.openProblem(id)
                             container.navigator.resetTo(AppDestination.Review)
@@ -220,6 +255,10 @@ private fun SignedInApp(
                     actions = problemsActions(
                         viewModel = problemsViewModel,
                         onOpenProblem = { id -> container.navigator.navigateTo(AppDestination.ProblemDetail(id)) },
+                        onBackToList = {
+                            problemsViewModel.backToList()
+                            routeCoordinator.appBack()
+                        },
                         onReviewProblem = { id ->
                             reviewViewModel.openProblem(id)
                             container.navigator.resetTo(AppDestination.Review)
@@ -251,6 +290,7 @@ private fun SignedInApp(
 private fun problemsActions(
     viewModel: ProblemsViewModel,
     onOpenProblem: (String) -> Unit,
+    onBackToList: () -> Unit,
     onReviewProblem: (String) -> Unit,
 ): ProblemsActions = ProblemsActions(
     refresh = viewModel::refresh,
@@ -285,7 +325,7 @@ private fun problemsActions(
     requestDeleteProblem = viewModel::requestDeleteProblem,
     cancelDeleteProblem = viewModel::cancelDeleteProblem,
     confirmDeleteProblem = viewModel::confirmDeleteProblem,
-    backToList = viewModel::backToList,
+    backToList = onBackToList,
     solutionLanguageChanged = viewModel::solutionLanguageChanged,
     solutionCodeChanged = viewModel::solutionCodeChanged,
     solutionExplanationChanged = viewModel::solutionExplanationChanged,

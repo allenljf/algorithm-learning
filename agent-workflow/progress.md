@@ -71,6 +71,25 @@
   `:composeApp:wasmJsBrowserTest`, and `git diff --check`. DLE-002 is completed;
   DLE-003 (Web history) and DLE-004 (content projection) are ready.
 
+## DLE-003 closeout — 2026-09-28
+
+- Added a platform-safe `RouteHistory` seam and coordinator. It converts stable
+  routes such as `/problems/<id>` to the shared immutable destination, replaces
+  the initial route, pushes deliberate navigation, applies `popstate` without
+  an echo push, and delegates an in-app Detail back action to browser history
+  exactly once when available.
+- The Wasm implementation alone accesses browser APIs (`history`, `location`,
+  and `popstate`); common Compose continues to use state/callbacks only. A
+  browser pop back to `/problems` also restores the existing list state rather
+  than leaving a stale Detail pane under the library URL. Android/iOS use the
+  explicit no-op history seam and the shared Navigator fallback.
+- Deterministic coordinator tests cover canonical path mapping, initial replace,
+  push, popstate echo suppression, and app back. A Wasm browser test exercises
+  real `history.replaceState` plus `popstate` route restoration.
+- Task-limited verification passed: `:shared:allTests`, `:composeApp:allTests`,
+  forced `:composeApp:wasmJsBrowserTest --rerun-tasks`, and `git diff --check`.
+  DLE-003 is completed; DLE-004 is the next ready task.
+
 ## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
 
 - The published login page is reproducibly broken on both desktop and mobile

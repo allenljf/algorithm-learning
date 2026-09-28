@@ -2,6 +2,7 @@ package com.algorithmlearning.app
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import com.algorithmlearning.app.navigation.WasmRouteHistory
 import com.algorithmlearning.shared.EndpointOverrideStore
 import kotlinx.browser.localStorage
 
@@ -17,6 +18,7 @@ fun main() {
                 override fun read(): String? = localStorage.getItem("api-base-url")
                 override fun write(value: String?) { if (value == null) localStorage.removeItem("api-base-url") else localStorage.setItem("api-base-url", value) }
             },
+            routeHistory = WasmRouteHistory(),
         )
     }
 }

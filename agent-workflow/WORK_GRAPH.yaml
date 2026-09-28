@@ -36,7 +36,7 @@ tasks:
       - git diff --check
   - id: DLE-003
     title: Synchronize Web Detail URLs with browser Back and Forward
-    status: ready
+    status: completed
     depends_on: [DLE-002]
     parallel_group: detail-history
     spec_refs: ["3.3 AC-DLE-05/06", "4"]

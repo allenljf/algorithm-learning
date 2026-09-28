@@ -48,7 +48,7 @@ authoritative in `agent-workflow/WORK_GRAPH.yaml`.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`;
   `cd apps/multiplatform && ./gradlew :composeApp:allTests`;
   `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest`; `git diff --check`.
-- Status: pending.
+- Status: completed.
 
 ## Phase 3 — NeetCode learning material
 

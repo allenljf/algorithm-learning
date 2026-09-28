@@ -6,7 +6,7 @@
 flowchart TD
   D1[DLE-001 Detail state, mapping, route intent\ncompleted]
   D2[DLE-002 Standalone responsive Detail page\ncompleted]
-  D3[DLE-003 Web history synchronization\nready]
+  D3[DLE-003 Web history synchronization\ncompleted]
   D4[DLE-004 NeetCode 150 learning content\nready]
   D5[DLE-005 End-to-end acceptance\npending]
 

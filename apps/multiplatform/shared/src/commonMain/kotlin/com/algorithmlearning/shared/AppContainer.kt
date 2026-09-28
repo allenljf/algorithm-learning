@@ -38,8 +38,9 @@ class AppContainer(
     baseUrl: String = DEFAULT_API_BASE_URL,
     httpClient: HttpClient = createAuthHttpClient(),
     clock: Clock = Clock.System,
+    navigator: Navigator = Navigator(),
 ) {
-    val navigator: Navigator = Navigator()
+    val navigator: Navigator = navigator
 
     val authRemote: AuthRemote = KtorAuthRemote(client = httpClient, baseUrl = baseUrl)
 
