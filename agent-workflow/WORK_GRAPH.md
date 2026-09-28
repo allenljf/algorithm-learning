@@ -68,6 +68,9 @@ flowchart TD
 flowchart TD
   F1[WRF-001 Guard host resize forwarding and publish\ncompleted]
 ```
+  F2[WRF-002 Stop overflow-driven resize oscillation\ncompleted]
+
+  F1 --> F2
 
 ```mermaid
 flowchart TD

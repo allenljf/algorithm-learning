@@ -1,5 +1,16 @@
 # Progress
 
+## WRF-002 execution start — 2026-09-28
+
+- Public fixed-viewport measurement reproduced the resize feedback: 30 samples
+  alternated 10–13 times between `613x889` and `628x904`. The Compose child
+  overflowed its `#composeTarget` host and created a document scrollbar.
+- Execution contract: `single-agent` / `rapid` / `update-docs` / `infer`.
+- User explicitly requested the direct correction and no test-suite execution.
+- Published the Web-only overflow boundary to Firebase Hosting. The production
+  bundle completed successfully, public source contains `overflow: hidden`, and
+  a fresh fixed-viewport public measurement produced `0` transitions across 30
+  samples (`1280x720` throughout). `git diff --check` passed.
 ## DLE intake, governance, and work graph — 2026-09-28
 
 - `$session-handoff` confirmed the existing Compose, NeetCode 150, Review Mode,

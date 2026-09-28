@@ -238,6 +238,24 @@ tasks:
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'let observedWidth = composeTarget.getBoundingClientRect().width'
       - git diff --check
   - id: ALG-001
+  - id: WRF-002
+    title: Stop overflow-driven Wasm resize oscillation and publish
+    status: completed
+    depends_on: [WRF-001]
+    parallel_group: wasm-resize-feedback-recovery
+    spec_refs: ["Goal", "AC-WRF-01..04", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: single-agent, test_approach: rapid, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Contain overflow at composeTarget so a Compose child cannot create a
+      document scrollbar whose width change re-enters the existing guarded
+      ResizeObserver path; build and publish the Web-only correction, then
+      repeat the public fixed-viewport size measurement.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - npx firebase-tools deploy --only hosting --project allenljf-algorithm
+      - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'overflow: hidden'
+      - fixed-viewport public #composeTarget sampling shows one size pair
+      - git diff --check
     title: Create monorepo and reproducible toolchain skeleton
     status: completed
     depends_on: []
