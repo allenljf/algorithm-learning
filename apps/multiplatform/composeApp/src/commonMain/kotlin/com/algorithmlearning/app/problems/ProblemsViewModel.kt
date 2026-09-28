@@ -51,7 +51,16 @@ data class ProblemEditorState(
     val title: String = "",
     val platform: ProblemPlatform = ProblemPlatform.LEETCODE,
     val difficulty: ProblemDifficulty = ProblemDifficulty.EASY,
+    val description: String = "",
     val notes: String = "",
+    val keyInsight: String = "",
+    val timeComplexity: String = "",
+    val spaceComplexity: String = "",
+    val mistakes: String = "",
+    val testMaterial: String = "",
+    val kotlinSolutionId: String? = null,
+    val kotlinCode: String = "",
+    val kotlinExplanation: String = "",
     val tagIds: Set<String> = emptySet(),
     val tagName: String = "",
     val saving: Boolean = false,
@@ -152,6 +161,8 @@ class ProblemsViewModel(
 
     fun editProblem() {
         val detail = _state.value.detail?.detail ?: return
+        val kotlin = _state.value.detail?.solutions
+            ?.firstOrNull { it.language == SolutionLanguage.KOTLIN }
         _state.update {
             it.copy(
                 view = ProblemsView.EDITOR,
@@ -160,7 +171,16 @@ class ProblemsViewModel(
                     title = detail.summary.title,
                     platform = detail.summary.platform,
                     difficulty = detail.summary.difficulty,
+                    description = detail.description.orEmpty(),
                     notes = detail.notes.orEmpty(),
+                    keyInsight = detail.keyInsight.orEmpty(),
+                    timeComplexity = detail.timeComplexity.orEmpty(),
+                    spaceComplexity = detail.spaceComplexity.orEmpty(),
+                    mistakes = detail.mistakes.orEmpty(),
+                    testMaterial = detail.interviewNotes.orEmpty(),
+                    kotlinSolutionId = kotlin?.id,
+                    kotlinCode = kotlin?.code.orEmpty(),
+                    kotlinExplanation = kotlin?.explanation.orEmpty(),
                     tagIds = detail.summary.tags.map { tag -> tag.id }.toSet(),
                 ),
             )
@@ -186,6 +206,22 @@ class ProblemsViewModel(
 
     fun editorNotesChanged(value: String) = updateEditor { it.copy(notes = value) }
 
+    fun editorDescriptionChanged(value: String) = updateEditor { it.copy(description = value) }
+
+    fun editorKeyInsightChanged(value: String) = updateEditor { it.copy(keyInsight = value) }
+
+    fun editorTimeComplexityChanged(value: String) = updateEditor { it.copy(timeComplexity = value) }
+
+    fun editorSpaceComplexityChanged(value: String) = updateEditor { it.copy(spaceComplexity = value) }
+
+    fun editorMistakesChanged(value: String) = updateEditor { it.copy(mistakes = value) }
+
+    fun editorTestMaterialChanged(value: String) = updateEditor { it.copy(testMaterial = value) }
+
+    fun editorKotlinCodeChanged(value: String) = updateEditor { it.copy(kotlinCode = value) }
+
+    fun editorKotlinExplanationChanged(value: String) = updateEditor { it.copy(kotlinExplanation = value) }
+
     fun editorTagNameChanged(value: String) = updateEditor { it.copy(tagName = value) }
 
     fun toggleEditorTag(tagId: String) = updateEditor {
@@ -209,6 +245,7 @@ class ProblemsViewModel(
                 } else {
                     problems.replace(editor.problemId, write)
                 }
+                saveKotlinSolution(saved.summary.id, editor)
                 _state.update { it.copy(editor = null) }
                 openProblemInternal(saved.summary.id)
                 loadList()
@@ -370,12 +407,32 @@ class ProblemsViewModel(
 
     private fun updateDetail(transform: (ProblemDetailState) -> ProblemDetailState) =
         _state.update { current -> current.copy(detail = current.detail?.let(transform)) }
+
+    private suspend fun saveKotlinSolution(problemId: String, editor: ProblemEditorState) {
+        if (editor.kotlinCode.isBlank()) return
+        val write = SolutionWrite(
+            language = SolutionLanguage.KOTLIN,
+            code = editor.kotlinCode,
+            explanation = editor.kotlinExplanation.trim().ifBlank { null },
+        )
+        if (editor.kotlinSolutionId == null) {
+            solutions.create(problemId, write)
+        } else {
+            solutions.replace(editor.kotlinSolutionId, write)
+        }
+    }
 }
 
 private fun ProblemEditorState.toWrite(): ProblemWrite = ProblemWrite(
     title = title.trim(),
     platform = platform,
     difficulty = difficulty,
+    description = description.trim().ifBlank { null },
     notes = notes.trim().ifBlank { null },
+    keyInsight = keyInsight.trim().ifBlank { null },
+    timeComplexity = timeComplexity.trim().ifBlank { null },
+    spaceComplexity = spaceComplexity.trim().ifBlank { null },
+    mistakes = mistakes.trim().ifBlank { null },
+    interviewNotes = testMaterial.trim().ifBlank { null },
     tagIds = tagIds.toList(),
 )

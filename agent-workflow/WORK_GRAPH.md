@@ -1,5 +1,19 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# Algorithm Learning Detail Experience — Dependency Graph
+
+```mermaid
+flowchart TD
+  D1[DLE-001 Detail state, mapping, route intent\ncompleted]
+  D2[DLE-002 Standalone responsive Detail page\nready]
+  D3[DLE-003 Web history synchronization\npending]
+  D4[DLE-004 NeetCode 150 learning content\nready]
+  D5[DLE-005 End-to-end acceptance\npending]
+
+  D1 --> D2 --> D3 --> D5
+  D1 --> D4 --> D5
+```
+
 # NeetCode 150 Complete API Import — Dependency Graph
 
 ```mermaid

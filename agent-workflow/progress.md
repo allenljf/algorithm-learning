@@ -1,5 +1,49 @@
 # Progress
 
+## DLE intake, governance, and work graph — 2026-09-28
+
+- `$session-handoff` confirmed the existing Compose, NeetCode 150, Review Mode,
+  and scheduling tasks are closed; no prior graph task is active. The user's
+  autonomous-goal preflight is explicit and passed: complete learning Detail
+  experience, Compose/client and content-importer scope, deterministic tests,
+  no schema/deployment, and scoped local commit.
+- `$workflow-intake` selected `quick-analysis`; `$spec-governance` selected
+  `update-docs + infer`; `$work-graph` created feature
+  `algorithm-learning-detail-experience` and ready task `DLE-001`.
+- Existing field inventory confirms a no-migration path: `description` (English),
+  `notes` (Chinese), `keyInsight`, complexity fields, `Solution.explanation`,
+  `Solution.code`, and `interviewNotes` for tests; `mistakes` remains preserved
+  legacy common-mistake content. Existing `.firebase/` and `firebase.json`
+  modifications are excluded from this feature's scope and commit.
+
+## DLE-001 execution strategy — 2026-09-28
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+  Planner: preserve the frozen REST/schema boundary and introduce a canonical
+  Detail route and all-field learning draft. Implementer: add tests first for
+  field round-trip, selected Kotlin solution persistence, reload, and navigation
+  intent; then make the smallest shared/presentation changes. Evaluator: ensure
+  non-Kotlin solutions and `mistakes` are retained, UI receives no DTO/repository,
+  and no Review event or scheduling behavior is changed.
+
+## DLE-001 closeout — 2026-09-28
+
+- Added `AppDestination.ProblemDetail(problemId)` and routed selected library
+  items through the shared navigator, so a stable problem identity now reaches
+  the app-level Detail intent rather than remaining only in local pane state.
+- Expanded the existing problem edit state and `ProblemWrite` mapping to retain
+  English/Chinese descriptions, hint, both complexities, common mistakes, and
+  test material (`interviewNotes`). A selected Kotlin solution is independently
+  replaced with its Chinese approach/code on explicit problem save; a missing
+  Kotlin solution is created only when non-blank Kotlin code is supplied.
+- TDD evidence: the destination test initially failed because `ProblemDetail`
+  did not exist; the full-learning-content test then failed for the absent edit
+  intents and passed after the smallest mapping/update implementation.
+- Task-limited verification passed: `:shared:allTests`, `:composeApp:allTests`,
+  and `git diff --check`. Existing KMP/AGP compatibility/deprecation and Wasm
+  opt-in warnings remain pre-existing build warnings. DLE-001 is completed;
+  DLE-002 (Detail presentation) and DLE-004 (content projection) are ready.
+
 ## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
 
 - The published login page is reproducibly broken on both desktop and mobile

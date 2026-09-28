@@ -232,8 +232,11 @@ class FakeSolutionRepository : SolutionRepository {
     var listHandler: suspend (String) -> List<Solution> = { listResult }
     var createHandler: suspend (String, SolutionWrite) -> Solution =
         { problemId, write -> problemSolution(id = "solution-new", problemId = problemId, code = write.code) }
+    var replaceHandler: suspend (String, SolutionWrite) -> Solution =
+        { id, write -> problemSolution(id = id, problemId = "problem-1", code = write.code, explanation = write.explanation) }
     var deleteHandler: suspend (String) -> Unit = {}
     val created = mutableListOf<Pair<String, SolutionWrite>>()
+    val replaced = mutableListOf<Pair<String, SolutionWrite>>()
     val deleted = mutableListOf<String>()
 
     override suspend fun list(problemId: String): List<Solution> = listHandler(problemId)
@@ -243,8 +246,10 @@ class FakeSolutionRepository : SolutionRepository {
         return createHandler(problemId, write)
     }
 
-    override suspend fun replace(id: String, write: SolutionWrite): Solution =
-        error("replace is not used by the presentation layer")
+    override suspend fun replace(id: String, write: SolutionWrite): Solution {
+        replaced += id to write
+        return replaceHandler(id, write)
+    }
 
     override suspend fun delete(id: String) {
         deleted += id

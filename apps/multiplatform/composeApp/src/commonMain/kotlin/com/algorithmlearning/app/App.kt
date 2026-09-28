@@ -156,6 +156,7 @@ private fun SignedInApp(
         when (current) {
             AppDestination.Dashboard -> dashboardViewModel.load()
             AppDestination.Review -> reviewViewModel.initialize()
+            is AppDestination.ProblemDetail -> problemsViewModel.openProblem(current.problemId)
             else -> Unit
         }
     }
@@ -207,6 +208,19 @@ private fun SignedInApp(
                     strings = strings,
                     actions = problemsActions(
                         viewModel = problemsViewModel,
+                        onOpenProblem = { id -> container.navigator.navigateTo(AppDestination.ProblemDetail(id)) },
+                        onReviewProblem = { id ->
+                            reviewViewModel.openProblem(id)
+                            container.navigator.resetTo(AppDestination.Review)
+                        },
+                    ),
+                )
+                is AppDestination.ProblemDetail -> ProblemsScreen(
+                    state = problemsState,
+                    strings = strings,
+                    actions = problemsActions(
+                        viewModel = problemsViewModel,
+                        onOpenProblem = { id -> container.navigator.navigateTo(AppDestination.ProblemDetail(id)) },
                         onReviewProblem = { id ->
                             reviewViewModel.openProblem(id)
                             container.navigator.resetTo(AppDestination.Review)
@@ -237,6 +251,7 @@ private fun SignedInApp(
 
 private fun problemsActions(
     viewModel: ProblemsViewModel,
+    onOpenProblem: (String) -> Unit,
     onReviewProblem: (String) -> Unit,
 ): ProblemsActions = ProblemsActions(
     refresh = viewModel::refresh,
@@ -248,7 +263,7 @@ private fun problemsActions(
     toggleTag = viewModel::toggleTagFilter,
     previousPage = viewModel::previousPage,
     nextPage = viewModel::nextPage,
-    openProblem = viewModel::openProblem,
+    openProblem = onOpenProblem,
     newProblem = viewModel::newProblem,
     editProblem = viewModel::editProblem,
     cancelEditor = viewModel::cancelEditor,

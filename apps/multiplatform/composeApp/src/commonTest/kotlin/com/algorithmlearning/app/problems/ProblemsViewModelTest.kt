@@ -12,6 +12,7 @@ import com.algorithmlearning.shared.library.ApiFailure
 import com.algorithmlearning.shared.library.ApiFailureKind
 import com.algorithmlearning.shared.library.Page
 import com.algorithmlearning.shared.library.ProblemDifficulty
+import com.algorithmlearning.shared.library.SolutionLanguage
 import com.algorithmlearning.shared.library.Tag
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -188,6 +189,67 @@ class ProblemsViewModelTest {
         assertEquals(ProblemsView.DETAIL, viewModel.state.value.view)
         assertEquals("Use a hash map", viewModel.state.value.detail!!.detail.notes)
         assertEquals(1, viewModel.state.value.detail!!.solutions.size)
+    }
+
+    @Test
+    fun editingLearningContentPersistsEveryExistingFieldAndReloadsTheKotlinSolution() = runTest(UnconfinedTestDispatcher()) {
+        val original = problemDetail("p1", "Two Sum", notes = "原始中文").copy(
+            description = "Original English",
+            keyInsight = "原始提示",
+            timeComplexity = "O(n)",
+            spaceComplexity = "O(n)",
+            mistakes = "原始易錯點",
+            interviewNotes = "原始測試",
+        )
+        val saved = original.copy(
+            description = "English description",
+            notes = "中文題目描述",
+            keyInsight = "中文一句話提示",
+            timeComplexity = "O(n log n)",
+            spaceComplexity = "O(1)",
+            mistakes = "保留的常見錯誤",
+            interviewNotes = "assertEquals(9, twoSum(...))",
+        )
+        val kotlin = problemSolution("s-kotlin", "p1", code = "// 原始註解", explanation = "原始思路")
+        val problems = FakeProblemRepository().apply {
+            getHandler = { saved }
+            replaceHandler = { _, _ -> saved }
+        }
+        val solutions = FakeSolutionRepository().apply {
+            listHandler = { listOf(kotlin) }
+        }
+        val viewModel = ProblemsViewModel(problems, FakeTagRepository(), solutions, backgroundScope)
+
+        viewModel.openProblem("p1")
+        advanceUntilIdle()
+        viewModel.editProblem()
+        viewModel.editorDescriptionChanged("English description")
+        viewModel.editorNotesChanged("中文題目描述")
+        viewModel.editorKeyInsightChanged("中文一句話提示")
+        viewModel.editorTimeComplexityChanged("O(n log n)")
+        viewModel.editorSpaceComplexityChanged("O(1)")
+        viewModel.editorMistakesChanged("保留的常見錯誤")
+        viewModel.editorTestMaterialChanged("assertEquals(9, twoSum(...))")
+        viewModel.editorKotlinCodeChanged("// 中文註解\nfun solve() = 9")
+        viewModel.editorKotlinExplanationChanged("中文完整解題思路")
+        viewModel.saveProblem()
+        advanceUntilIdle()
+
+        val write = problems.replaced.single().second
+        assertEquals("English description", write.description)
+        assertEquals("中文題目描述", write.notes)
+        assertEquals("中文一句話提示", write.keyInsight)
+        assertEquals("O(n log n)", write.timeComplexity)
+        assertEquals("O(1)", write.spaceComplexity)
+        assertEquals("保留的常見錯誤", write.mistakes)
+        assertEquals("assertEquals(9, twoSum(...))", write.interviewNotes)
+        assertEquals("s-kotlin", solutions.replaced.single().first)
+        assertEquals(SolutionLanguage.KOTLIN, solutions.replaced.single().second.language)
+        assertEquals("// 中文註解\nfun solve() = 9", solutions.replaced.single().second.code)
+        assertEquals("中文完整解題思路", solutions.replaced.single().second.explanation)
+        assertEquals(ProblemsView.DETAIL, viewModel.state.value.view)
+        assertEquals("中文題目描述", viewModel.state.value.detail!!.detail.notes)
+        assertEquals("assertEquals(9, twoSum(...))", viewModel.state.value.detail!!.detail.interviewNotes)
     }
 
     @Test

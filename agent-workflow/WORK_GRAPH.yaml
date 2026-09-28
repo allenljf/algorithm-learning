@@ -1,6 +1,92 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: DLE-001
+    title: Establish lossless learning-detail state, mapping, and route intent
+    status: completed
+    depends_on: []
+    parallel_group: detail-foundation
+    spec_refs: ["3.1 AC-DLE-01/02", "3.2 AC-DLE-04", "3.3 AC-DLE-05/06", "4"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Define the complete durable learning-detail contract at the shared and
+      presentation boundary. Map every existing problem/solution field without
+      a DTO leak or schema change; prove a selected Kotlin solution and test
+      material save/reload through repository fakes; introduce a canonical
+      detail-route intent that later platform history can consume.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - git diff --check
+  - id: DLE-002
+    title: Build the complete responsive standalone Detail page
+    status: ready
+    depends_on: [DLE-001]
+    parallel_group: detail-presentation
+    spec_refs: ["3.1 AC-DLE-01..03", "3.2 AC-DLE-04", "3.3 AC-DLE-06", "4"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Replace master-detail and staged review presentation with a localized
+      standalone full-content detail screen. It uses only state and callbacks,
+      supports every mapped edit, and adapts deterministically from two columns
+      to one without execution/judge controls.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest
+      - git diff --check
+  - id: DLE-003
+    title: Synchronize Web Detail URLs with browser Back and Forward
+    status: pending
+    depends_on: [DLE-002]
+    parallel_group: detail-history
+    spec_refs: ["3.3 AC-DLE-05/06", "4"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Add a platform-safe browser-history boundary with a Web actual that owns
+      canonical URL parsing and popstate reconciliation, preventing push echoes
+      while preserving list state and app-back semantics.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest
+      - git diff --check
+  - id: DLE-004
+    title: Complete NeetCode 150 learning-content projection and importer checks
+    status: ready
+    depends_on: [DLE-001]
+    parallel_group: detail-content
+    spec_refs: ["3.2 AC-DLE-04", "3.4 AC-DLE-07/08", "4"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Normalize checked-in lessons, Kotlin sources, cases, and original bilingual
+      study material into a complete 150-item projection of the existing REST
+      fields. Preserve non-secret importer behavior and prove local coverage
+      before any safe idempotent external sync attempt.
+    verification:
+      - python3 docs/algorithm/neetcode150/checks/verify.py
+      - python3 tools/test_neetcode150_import.py
+      - python3 tools/neetcode150_import.py --validate
+      - git diff --check
+  - id: DLE-005
+    title: Verify the end-to-end learning Detail experience
+    status: pending
+    depends_on: [DLE-002, DLE-003, DLE-004]
+    parallel_group: detail-acceptance
+    spec_refs: ["3.1 AC-DLE-01..03", "3.2 AC-DLE-04", "3.3 AC-DLE-05/06", "3.4 AC-DLE-07/08", "5"]
+    execution_contract: {analysis: three-perspectives, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Run the deterministic release acceptance for mapping, save/reload,
+      initial content visibility, responsive layout, browser history, review
+      entry behavior, and complete NeetCode material; then persist closeout and
+      create only the scoped local commit.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest
+      - python3 docs/algorithm/neetcode150/checks/verify.py
+      - python3 tools/test_neetcode150_import.py
+      - python3 tools/neetcode150_import.py --validate
+      - git diff --check
   - id: N150-001
     title: Complete NeetCode 150 Kotlin solutions and idempotent API import
     status: completed

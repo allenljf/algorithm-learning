@@ -48,6 +48,17 @@ class SharedFoundationTest {
     }
 
     @Test
+    fun detailDestinationKeepsTheSelectedProblemIdentity() {
+        val navigator = Navigator(AppDestination.Problems)
+
+        navigator.navigateTo(AppDestination.ProblemDetail("problem-42"))
+
+        assertEquals(AppDestination.ProblemDetail("problem-42"), navigator.current)
+        assertTrue(navigator.goBack())
+        assertEquals(AppDestination.Problems, navigator.current)
+    }
+
+    @Test
     fun localizationResolvesBothLanguages() {
         assertEquals("Dashboard", StringCatalog.of(AppLanguage.ENGLISH).dashboardTitle)
         assertEquals("儀表板", StringCatalog.of(AppLanguage.TRADITIONAL_CHINESE).dashboardTitle)
