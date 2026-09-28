@@ -2,7 +2,6 @@ package com.algorithmlearning.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -227,14 +226,14 @@ private fun SignedInApp(
                         },
                     ),
                 )
-                AppDestination.Review -> BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    ReviewScreen(
-                        state = reviewState,
-                        strings = strings,
-                        actions = reviewActions(reviewViewModel),
-                        twoPane = maxWidth >= 840.dp,
-                    )
-                }
+                AppDestination.Review -> ReviewScreen(
+                    state = reviewState,
+                    strings = strings,
+                    actions = reviewActions(
+                        viewModel = reviewViewModel,
+                        onOpenProblem = { id -> container.navigator.navigateTo(AppDestination.ProblemDetail(id)) },
+                    ),
+                )
                 AppDestination.Settings -> SettingsContent(
                     strings = strings,
                     email = email,
@@ -270,7 +269,15 @@ private fun problemsActions(
     editorTitleChanged = viewModel::editorTitleChanged,
     editorPlatformChanged = viewModel::editorPlatformChanged,
     editorDifficultyChanged = viewModel::editorDifficultyChanged,
+    editorDescriptionChanged = viewModel::editorDescriptionChanged,
     editorNotesChanged = viewModel::editorNotesChanged,
+    editorKeyInsightChanged = viewModel::editorKeyInsightChanged,
+    editorTimeComplexityChanged = viewModel::editorTimeComplexityChanged,
+    editorSpaceComplexityChanged = viewModel::editorSpaceComplexityChanged,
+    editorMistakesChanged = viewModel::editorMistakesChanged,
+    editorTestMaterialChanged = viewModel::editorTestMaterialChanged,
+    editorKotlinCodeChanged = viewModel::editorKotlinCodeChanged,
+    editorKotlinExplanationChanged = viewModel::editorKotlinExplanationChanged,
     editorTagNameChanged = viewModel::editorTagNameChanged,
     toggleEditorTag = viewModel::toggleEditorTag,
     saveProblem = viewModel::saveProblem,
@@ -287,19 +294,12 @@ private fun problemsActions(
     reviewProblem = onReviewProblem,
 )
 
-private fun reviewActions(viewModel: ReviewViewModel): ReviewActions = ReviewActions(
+private fun reviewActions(
+    viewModel: ReviewViewModel,
+    onOpenProblem: (String) -> Unit,
+): ReviewActions = ReviewActions(
     refreshDue = viewModel::refreshDue,
-    openProblem = viewModel::openProblem,
-    exitReview = viewModel::exitReview,
-    startThinking = viewModel::startThinking,
-    revealHint = viewModel::revealHint,
-    revealApproach = viewModel::revealApproach,
-    revealSolution = viewModel::revealSolution,
-    rateConfidence = viewModel::rateConfidence,
-    selectSolution = viewModel::selectSolution,
-    confidenceSelected = viewModel::confidenceSelected,
-    notesChanged = viewModel::notesChanged,
-    submitReview = viewModel::submitReview,
+    openProblem = onOpenProblem,
 )
 
 @Composable

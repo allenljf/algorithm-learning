@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -31,6 +32,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * Web (Wasm) acceptance journeys that render the real Compose screens through
@@ -90,6 +92,7 @@ class AcceptanceUiTest {
         onNodeWithTag("problem-title").performTextInput("Two Sum")
         onNodeWithTag("problem-save").performClick()
 
+        waitForIdle()
         onNodeWithText("Two Sum").assertIsDisplayed()
         onNodeWithTag("solution-code").performTextInput("return complement")
         onNodeWithTag("solution-save").performClick()
@@ -97,41 +100,30 @@ class AcceptanceUiTest {
     }
 
     @Test
-    fun reviewExperienceRevealsInOrderAndSubmits() = runComposeUiTest {
+    fun scheduledReviewOpensTheLearningDetailWithoutAStageGate() = runComposeUiTest {
         val api = ControlledApiAdapter()
         val problemId = api.seedProblem(
             title = "Two Sum",
             keyInsight = "Use the complement",
             notes = "Hash map approach",
         )
-        api.seedSolution(problemId, "return map[n]")
-
         val viewModel = ReviewViewModel(api.reviews, api.problems, CoroutineScope(UnconfinedTestDispatcher()))
         viewModel.initialize()
-        viewModel.openProblem(problemId)
+        var opened: String? = null
 
         setContent {
             val state by viewModel.state.collectAsState()
-            ReviewScreen(state = state, strings = strings, actions = reviewActions(viewModel))
+            ReviewScreen(
+                state = state,
+                strings = strings,
+                actions = ReviewActions(refreshDue = viewModel::refreshDue, openProblem = { opened = it }),
+            )
         }
 
-        onNodeWithText(strings.reviewStartThinkingAction).assertIsDisplayed()
-        onNodeWithText(strings.reviewRateConfidenceAction).assertDoesNotExist()
-        onNodeWithTag("review-stage-action").performClick()
-        onNodeWithText(strings.reviewRevealHintAction).assertIsDisplayed()
-        onNodeWithTag("review-stage-action").performClick()
-        onNodeWithText("Use the complement").assertIsDisplayed()
-        onNodeWithTag("review-stage-action").performClick()
-        onNodeWithText("Hash map approach").assertIsDisplayed()
-        onNodeWithTag("review-stage-action").performClick()
-        onNodeWithText("return map[n]").assertIsDisplayed()
-        onNodeWithTag("review-stage-action").performClick()
-        onNodeWithTag("review-confidence-4").performClick()
-        onNodeWithTag("review-submit").performClick()
-
-        onNodeWithTag("review-submitted").assertIsDisplayed()
-        onNodeWithTag("schedule-context").assertIsDisplayed()
-        assertEquals(1, api.recordedReviews(problemId).size)
+        onNodeWithTag("review-open-$problemId").performClick()
+        assertEquals(problemId, opened)
+        assertTrue(onAllNodesWithTag("review-stage-action").fetchSemanticsNodes().isEmpty())
+        assertTrue(onAllNodesWithTag("review-submit").fetchSemanticsNodes().isEmpty())
     }
 
     @Test
@@ -186,18 +178,4 @@ class AcceptanceUiTest {
         deleteSolution = viewModel::deleteSolution,
     )
 
-    private fun reviewActions(viewModel: ReviewViewModel) = ReviewActions(
-        refreshDue = viewModel::refreshDue,
-        openProblem = viewModel::openProblem,
-        exitReview = viewModel::exitReview,
-        startThinking = viewModel::startThinking,
-        revealHint = viewModel::revealHint,
-        revealApproach = viewModel::revealApproach,
-        revealSolution = viewModel::revealSolution,
-        rateConfidence = viewModel::rateConfidence,
-        selectSolution = viewModel::selectSolution,
-        confidenceSelected = viewModel::confidenceSelected,
-        notesChanged = viewModel::notesChanged,
-        submitReview = viewModel::submitReview,
-    )
 }

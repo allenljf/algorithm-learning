@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -33,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.algorithmlearning.app.ScheduleContext
 import com.algorithmlearning.app.label
 import com.algorithmlearning.shared.AppStrings
 import com.algorithmlearning.shared.library.ProblemDifficulty
@@ -59,7 +59,15 @@ data class ProblemsActions(
     val editorTitleChanged: (String) -> Unit = {},
     val editorPlatformChanged: (ProblemPlatform) -> Unit = {},
     val editorDifficultyChanged: (ProblemDifficulty) -> Unit = {},
+    val editorDescriptionChanged: (String) -> Unit = {},
     val editorNotesChanged: (String) -> Unit = {},
+    val editorKeyInsightChanged: (String) -> Unit = {},
+    val editorTimeComplexityChanged: (String) -> Unit = {},
+    val editorSpaceComplexityChanged: (String) -> Unit = {},
+    val editorMistakesChanged: (String) -> Unit = {},
+    val editorTestMaterialChanged: (String) -> Unit = {},
+    val editorKotlinCodeChanged: (String) -> Unit = {},
+    val editorKotlinExplanationChanged: (String) -> Unit = {},
     val editorTagNameChanged: (String) -> Unit = {},
     val toggleEditorTag: (String) -> Unit = {},
     val saveProblem: () -> Unit = {},
@@ -371,12 +379,31 @@ private fun ProblemEditor(
             },
         )
         OutlinedTextField(
+            value = editor.description,
+            onValueChange = actions.editorDescriptionChanged,
+            label = { Text(strings.problemDescriptionLabel) },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+        )
+        OutlinedTextField(
             value = editor.notes,
             onValueChange = actions.editorNotesChanged,
             label = { Text(strings.problemNotesLabel) },
             minLines = 3,
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         )
+        Button(
+            onClick = actions.saveProblem,
+            enabled = !editor.saving,
+            modifier = Modifier.padding(top = 12.dp).testTag("problem-save"),
+        ) { Text(strings.problemSaveAction) }
+        LearningField(strings.problemKeyInsightLabel, editor.keyInsight, actions.editorKeyInsightChanged)
+        LearningField(strings.problemTimeComplexityLabel, editor.timeComplexity, actions.editorTimeComplexityChanged)
+        LearningField(strings.problemSpaceComplexityLabel, editor.spaceComplexity, actions.editorSpaceComplexityChanged)
+        LearningField(strings.problemMistakesLabel, editor.mistakes, actions.editorMistakesChanged)
+        LearningField(strings.problemInterviewNotesLabel, editor.testMaterial, actions.editorTestMaterialChanged)
+        LearningField(strings.solutionExplanationLabel, editor.kotlinExplanation, actions.editorKotlinExplanationChanged)
+        LearningField(strings.solutionCodeLabel, editor.kotlinCode, actions.editorKotlinCodeChanged, "solution-code")
         if (state.tags.isNotEmpty()) {
             ChipGroup(
                 label = strings.problemTagsLabel,
@@ -418,7 +445,7 @@ private fun ProblemEditor(
             Button(
                 onClick = actions.saveProblem,
                 enabled = !editor.saving,
-                modifier = Modifier.testTag("problem-save"),
+                modifier = Modifier.testTag("problem-save-bottom"),
             ) {
                 Text(strings.problemSaveAction)
             }
@@ -443,119 +470,33 @@ private fun ProblemDetailPane(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(16.dp)
+            .testTag("detail-learning-content"),
     ) {
         TextButton(onClick = actions.backToList) {
             Text(strings.problemDetailBackAction)
         }
         Text(detail.detail.summary.title, style = MaterialTheme.typography.headlineMedium)
-        Text(
-            text = detail.detail.summary.difficulty.label(strings) + " · " +
-                detail.detail.summary.platform.label(strings),
-        )
-        Row(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
-            detail.detail.summary.tags.forEach { tag ->
-                AssistChip(
-                    onClick = {},
-                    label = { Text(tag.name) },
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-            }
-        }
-        ScheduleContext(
-            key = detail.detail.summary.review.scheduleExplanationKey,
-            confidence = detail.detail.summary.review.confidence,
-            intervalDays = detail.detail.summary.review.intervalDays,
-            nextReviewAt = detail.detail.summary.review.nextReviewAt,
-            strings = strings,
-        )
-        Section(strings.problemDescriptionLabel, detail.detail.description)
-        Section(strings.problemNotesLabel, detail.detail.notes)
-        Section(strings.problemKeyInsightLabel, detail.detail.keyInsight)
-        Section(strings.problemTimeComplexityLabel, detail.detail.timeComplexity)
-        Section(strings.problemSpaceComplexityLabel, detail.detail.spaceComplexity)
-        Section(strings.problemMistakesLabel, detail.detail.mistakes)
-        Section(strings.problemInterviewNotesLabel, detail.detail.interviewNotes)
-        detail.formError?.let { failure ->
-            Text(
-                text = failure.label(strings),
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 8.dp),
-            )
-        }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(strings.solutionsTitle, style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.weight(1f))
-            TextButton(
-                onClick = { actions.reviewProblem(detail.detail.summary.id) },
-                modifier = Modifier.testTag("problem-review"),
-            ) {
-                Text(strings.problemReviewAction)
-            }
-            TextButton(
-                onClick = actions.editProblem,
-                modifier = Modifier.testTag("problem-edit"),
-            ) {
-                Text(strings.problemEditAction)
-            }
-            TextButton(
-                onClick = actions.requestDeleteProblem,
-                modifier = Modifier.testTag("problem-delete"),
-            ) {
-                Text(strings.problemDeleteAction)
-            }
-        }
-        detail.solutions.forEach { solution ->
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                    Text(solution.language.name, style = MaterialTheme.typography.titleMedium)
-                    Text(solution.code)
-                    solution.explanation?.let { Text(it) }
-                    TextButton(
-                        onClick = { actions.deleteSolution(solution.id) },
-                        modifier = Modifier.testTag("solution-delete-${solution.id}"),
-                    ) {
-                        Text(strings.solutionDeleteAction)
-                    }
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            when (problemDetailLayoutFor(maxWidth)) {
+                ProblemDetailLayout.TWO_COLUMN -> Row(modifier = Modifier.fillMaxWidth()) {
+                    DetailDescriptions(
+                        detail = detail,
+                        strings = strings,
+                        modifier = Modifier.weight(1f).padding(end = 12.dp).testTag("detail-wide-left"),
+                    )
+                    DetailLearningContent(
+                        detail = detail,
+                        strings = strings,
+                        actions = actions,
+                        modifier = Modifier.weight(1f).padding(start = 12.dp).testTag("detail-wide-right"),
+                    )
+                }
+                ProblemDetailLayout.SINGLE_COLUMN -> Column(modifier = Modifier.testTag("detail-narrow")) {
+                    DetailDescriptions(detail, strings)
+                    DetailLearningContent(detail, strings, actions)
                 }
             }
-        }
-        Text(
-            text = strings.solutionLanguageLabel,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        ChipGroup(
-            label = "",
-            options = SolutionLanguage.entries.map { language ->
-                FilterOption(
-                    text = language.name,
-                    selected = detail.language == language,
-                    onClick = { actions.solutionLanguageChanged(language) },
-                )
-            },
-        )
-        OutlinedTextField(
-            value = detail.code,
-            onValueChange = actions.solutionCodeChanged,
-            label = { Text(strings.solutionCodeLabel) },
-            minLines = 3,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("solution-code"),
-        )
-        OutlinedTextField(
-            value = detail.explanation,
-            onValueChange = actions.solutionExplanationChanged,
-            label = { Text(strings.solutionExplanationLabel) },
-            minLines = 2,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        )
-        Button(
-            onClick = actions.saveSolution,
-            enabled = !detail.savingSolution && detail.code.isNotBlank(),
-            modifier = Modifier.padding(top = 12.dp).testTag("solution-save"),
-        ) {
-            Text(strings.solutionSaveAction)
         }
     }
 
@@ -576,6 +517,122 @@ private fun ProblemDetailPane(
             },
         )
     }
+}
+
+internal enum class ProblemDetailLayout { TWO_COLUMN, SINGLE_COLUMN }
+
+internal fun problemDetailLayoutFor(maxWidth: androidx.compose.ui.unit.Dp): ProblemDetailLayout =
+    if (maxWidth >= 840.dp) ProblemDetailLayout.TWO_COLUMN else ProblemDetailLayout.SINGLE_COLUMN
+
+@Composable
+private fun DetailDescriptions(
+    detail: ProblemDetailState,
+    strings: AppStrings,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Section(strings.problemDescriptionLabel, detail.detail.description)
+        Section(strings.problemNotesLabel, detail.detail.notes)
+    }
+}
+
+@Composable
+private fun DetailLearningContent(
+    detail: ProblemDetailState,
+    strings: AppStrings,
+    actions: ProblemsActions,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = detail.detail.summary.difficulty.label(strings) + " · " +
+                detail.detail.summary.platform.label(strings),
+        )
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
+            detail.detail.summary.tags.forEach { tag ->
+                AssistChip(
+                    onClick = {},
+                    label = { Text(tag.name) },
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+            }
+        }
+        Section(strings.problemKeyInsightLabel, detail.detail.keyInsight)
+        Section(strings.problemTimeComplexityLabel, detail.detail.timeComplexity)
+        Section(strings.problemSpaceComplexityLabel, detail.detail.spaceComplexity)
+        Section(strings.problemMistakesLabel, detail.detail.mistakes)
+        Section(strings.problemInterviewNotesLabel, detail.detail.interviewNotes)
+        detail.formError?.let { failure ->
+            Text(
+                text = failure.label(strings),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(strings.solutionsTitle, style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.weight(1f))
+            TextButton(onClick = actions.editProblem, modifier = Modifier.testTag("problem-edit")) {
+                Text(strings.problemEditAction)
+            }
+            TextButton(onClick = actions.requestDeleteProblem, modifier = Modifier.testTag("problem-delete")) {
+                Text(strings.problemDeleteAction)
+            }
+        }
+        detail.solutions.forEach { solution ->
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                    Text(solution.language.name, style = MaterialTheme.typography.titleMedium)
+                    Text(solution.code)
+                    solution.explanation?.let { Text(it) }
+                    TextButton(
+                        onClick = { actions.deleteSolution(solution.id) },
+                        modifier = Modifier.testTag("solution-delete-${solution.id}"),
+                    ) { Text(strings.solutionDeleteAction) }
+                }
+            }
+        }
+        Text(strings.solutionLanguageLabel, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+        ChipGroup(
+            label = "",
+            options = SolutionLanguage.entries.map { language ->
+                FilterOption(language.name, detail.language == language) { actions.solutionLanguageChanged(language) }
+            },
+        )
+        OutlinedTextField(
+            value = detail.code,
+            onValueChange = actions.solutionCodeChanged,
+            label = { Text(strings.solutionCodeLabel) },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("solution-code"),
+        )
+        OutlinedTextField(
+            value = detail.explanation,
+            onValueChange = actions.solutionExplanationChanged,
+            label = { Text(strings.solutionExplanationLabel) },
+            minLines = 2,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+        Button(
+            onClick = actions.saveSolution,
+            enabled = !detail.savingSolution && detail.code.isNotBlank(),
+            modifier = Modifier.padding(top = 12.dp).testTag("solution-save"),
+        ) { Text(strings.solutionSaveAction) }
+    }
+}
+
+@Composable
+private fun LearningField(label: String, value: String, onValueChange: (String) -> Unit, tag: String? = null) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        minLines = 2,
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp).then(
+            if (tag == null) Modifier else Modifier.testTag(tag),
+        ),
+    )
 }
 
 @Composable

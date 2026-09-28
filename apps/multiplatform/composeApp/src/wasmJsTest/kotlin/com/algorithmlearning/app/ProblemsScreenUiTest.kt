@@ -83,16 +83,27 @@ class ProblemsScreenUiTest {
 
     @Test
     fun detailShowsNotesAndSolutionEditor() = runComposeUiTest {
-        val detail = problemDetail("p1", "Two Sum", notes = "Use a hash map")
+        val detail = problemDetail("p1", "Two Sum", notes = "中文題目描述").copy(
+            description = "English problem description",
+            keyInsight = "中文一句話提示",
+            timeComplexity = "O(n)",
+            spaceComplexity = "O(n)",
+            interviewNotes = "assertEquals(9, solve())",
+        )
+        val solution = problemSolution(
+            "s1", "p1", code = "// 中文註解\nfun solve() = 9", explanation = "中文完整解題思路",
+        )
         val state = ProblemsUiState(
             view = ProblemsView.DETAIL,
-            detail = com.algorithmlearning.app.problems.ProblemDetailState(detail = detail),
+            detail = com.algorithmlearning.app.problems.ProblemDetailState(detail = detail, solutions = listOf(solution)),
         )
         setContent { ProblemsScreen(state = state, strings = strings) }
-        onNodeWithText("Use a hash map").assertIsDisplayed()
-        onNodeWithTag("solution-code").assertIsDisplayed()
+        onNodeWithText("English problem description").assertIsDisplayed()
+        onNodeWithText("中文題目描述").assertIsDisplayed()
+        onNodeWithText("中文一句話提示").assertIsDisplayed()
+        onNodeWithText("中文完整解題思路").assertIsDisplayed()
+        onNodeWithText("assertEquals(9, solve())").assertIsDisplayed()
+        onNodeWithTag("detail-learning-content").assertIsDisplayed()
         onNodeWithTag("problem-delete").assertIsDisplayed()
-        onNodeWithTag("schedule-context").assertIsDisplayed()
-        onNodeWithText(strings.reviewScheduleNeverReviewed).assertIsDisplayed()
     }
 }

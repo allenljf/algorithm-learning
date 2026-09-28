@@ -44,6 +44,33 @@
   opt-in warnings remain pre-existing build warnings. DLE-001 is completed;
   DLE-002 (Detail presentation) and DLE-004 (content projection) are ready.
 
+## DLE-002 execution strategy — 2026-09-28
+
+- Selected contract: `three-perspectives` / `tdd` / `update-docs` / `infer`.
+  The Detail screen is the only learning presentation: all fields render without
+  a reveal state; responsive layout is a stateless UI concern; all edits flow
+  through the DLE-001 state callbacks; review scheduling remains data-only.
+
+## DLE-002 closeout — 2026-09-28
+
+- Replaced the Detail reading surface with a standalone full-content layout.
+  At 840dp or wider, English and Chinese descriptions occupy the left column;
+  tags, difficulty, hint, complexities, test material, solutions, and editing
+  controls occupy the right column. Narrow screens use the same content in a
+  single readable column. The deterministic breakpoint contract is covered by
+  `ProblemDetailLayoutTest`.
+- The full editor now exposes every DLE-001 field and a Kotlin explanation/code
+  draft, with a single problem-save operation; its direct solution editor remains
+  for deliberately editing a selected solution. Existing non-Kotlin solutions
+  are still displayed and are not replaced by that Kotlin path.
+- Today's Review is now only a scheduled due-item index. Choosing an item routes
+  to canonical Detail navigation; the rendered Review UI has no staged reveal,
+  confidence, judge, or submit controls. Backend review scheduling/event code is
+  intentionally retained rather than redesigned.
+- Task-limited verification passed: `:composeApp:allTests`,
+  `:composeApp:wasmJsBrowserTest`, and `git diff --check`. DLE-002 is completed;
+  DLE-003 (Web history) and DLE-004 (content projection) are ready.
+
 ## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
 
 - The published login page is reproducibly broken on both desktop and mobile

@@ -35,7 +35,7 @@ authoritative in `agent-workflow/WORK_GRAPH.yaml`.
 - Execution contract: `three-perspectives`; `tdd`; `update-docs`; `infer`.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests`;
   `cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest`; `git diff --check`.
-- Status: ready.
+- Status: completed.
 
 ### DLE-003 — Synchronize Web Detail URLs with browser Back and Forward
 
