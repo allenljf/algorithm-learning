@@ -1,0 +1,7 @@
+SIL OPEN FONT LICENSE Version 1.1
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is available at https://openfontlicense.org.
+
+Bundled font: Noto Sans Traditional Chinese Regular
+Source: https://github.com/notofonts/noto-cjk

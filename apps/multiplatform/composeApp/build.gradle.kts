@@ -11,6 +11,11 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+compose.resources {
+    packageOfResClass = "com.algorithmlearning.app.generated.resources"
+    generateResClass = always
+}
+
 val wasmApiBaseUrl = providers.gradleProperty("apiBaseUrl")
     .orElse("http://localhost:8080")
 
@@ -95,6 +100,26 @@ val verifyWasmNativeAuthInputs = tasks.register("verifyWasmNativeAuthInputs") {
     }
 }
 
+val verifyWasmCjkFont = tasks.register("verifyWasmCjkFont") {
+    group = "verification"
+    description = "Verifies that Web/Wasm ships a Traditional Chinese font."
+    val fontFile = layout.projectDirectory.file(
+        "src/commonMain/composeResources/font/NotoSansTC-Regular.otf",
+    )
+    val theme = layout.projectDirectory.file(
+        "src/commonMain/kotlin/com/algorithmlearning/app/Theme.kt",
+    )
+    inputs.files(fontFile, theme)
+    doLast {
+        check(fontFile.asFile.isFile) {
+            "The Web/Wasm application must bundle a Traditional Chinese font."
+        }
+        check(theme.asFile.readText().contains("Res.font.NotoSansTC_Regular")) {
+            "The application theme must use the bundled Traditional Chinese font."
+        }
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -122,6 +147,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared"))
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.compose.components.resources)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
