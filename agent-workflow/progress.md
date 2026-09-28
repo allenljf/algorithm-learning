@@ -90,6 +90,25 @@
   forced `:composeApp:wasmJsBrowserTest --rerun-tasks`, and `git diff --check`.
   DLE-003 is completed; DLE-004 is the next ready task.
 
+## DLE-004 closeout — 2026-09-28
+
+- Projected the existing 67 primary NeetCode lessons, 63 supplemental lessons,
+  and 20 reusable Kotlin lessons into a checked-in 150-record learning manifest.
+  Every record contains locally authored English/Chinese descriptions, category
+  provenance, Chinese hint/approach, time/space complexity, and a concrete local
+  test command. No third-party full problem statements, answers, or tokens were
+  copied into the manifest.
+- The safe importer now maps those records losslessly to `description`, `notes`,
+  `keyInsight`, complexity fields, `interviewNotes`, Kotlin `Solution.code`, and
+  `Solution.explanation`. Kotlin payloads begin with a Chinese learning comment;
+  they retain the independently verified implementation and never expose a token.
+- Local evidence passed: the 150-source verifier compiled and ran 312 authored
+  cases, importer tests proved all 150 complete payload mappings, and
+  `--validate` confirmed exact metadata/source coverage. A live synchronization
+  was not claimed: the environment's bounded execution connection did not yield
+  a new terminal importer summary; the existing safe idempotent command remains
+  the only permitted synchronization path.
+
 ## WNL-001 intake — high-DPI native authentication layout regression — 2026-09-28
 
 - The published login page is reproducibly broken on both desktop and mobile

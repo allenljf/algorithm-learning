@@ -1,0 +1,35 @@
+{
+  "checked_date": "2026-09-21",
+  "neetcode_page": "https://neetcode.io/practice/practice/neetcode150",
+  "neetcode_bundle": "https://neetcode.io/main.f39af0c52a4e9fb5.js",
+  "bundle_sha256": "426da304cbc42c91a25986ed680c06fd632fc25da741ac2881fd928ac9a051a8",
+  "repo_commit": "3186ede2ea4c4788e87be4b509bf2b66d5eba0e9",
+  "repo_data": "https://raw.githubusercontent.com/neetcode-gh/leetcode/3186ede2ea4c4788e87be4b509bf2b66d5eba0e9/.problemSiteData.json",
+  "leetcode_metadata_api": "https://leetcode.com/api/problems/all/",
+  "selection": "Object entries with neetcode150:!0 in current site bundle; same 150 codes as repo entries where neetcode150=true; join to LeetCode frontend_question_id, not internal question_id",
+  "counts": {
+    "Easy": 28,
+    "Medium": 101,
+    "Hard": 21
+  },
+  "categories": {
+    "Arrays & Hashing": 9,
+    "Two Pointers": 5,
+    "Sliding Window": 6,
+    "Stack": 6,
+    "Binary Search": 7,
+    "Linked List": 11,
+    "Trees": 15,
+    "Heap / Priority Queue": 7,
+    "Backtracking": 10,
+    "Tries": 3,
+    "Graphs": 13,
+    "Advanced Graphs": 6,
+    "1-D Dynamic Programming": 12,
+    "2-D Dynamic Programming": 11,
+    "Greedy": 8,
+    "Intervals": 6,
+    "Math & Geometry": 8,
+    "Bit Manipulation": 7
+  }
+}

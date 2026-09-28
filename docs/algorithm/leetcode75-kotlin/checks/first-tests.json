@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1768,
+    "call": "Solution_1768().mergeAlternately(\"dog\", \"xy\")",
+    "expected": "dxoyg"
+  },
+  {
+    "id": 1071,
+    "call": "Solution_1071().gcdOfStrings(\"XYXYXYXY\", \"XYXYXY\")",
+    "expected": "XY"
+  },
+  {
+    "id": 1431,
+    "call": "Solution_1431().kidsWithCandies(intArrayOf(1,4,2), 2)",
+    "expected": "[false, true, true]"
+  },
+  {
+    "id": 605,
+    "call": "Solution_605().canPlaceFlowers(intArrayOf(0,0,0,0,0), 3)",
+    "expected": "true"
+  },
+  {
+    "id": 345,
+    "call": "Solution_345().reverseVowels(\"radio\")",
+    "expected": "rodia"
+  },
+  {
+    "id": 151,
+    "call": "Solution_151().reverseWords(\"  learn   kotlin now \")",
+    "expected": "now kotlin learn"
+  },
+  {
+    "id": 238,
+    "call": "Solution_238().productExceptSelf(intArrayOf(2,3,4)).contentToString()",
+    "expected": "[12, 8, 6]"
+  },
+  {
+    "id": 334,
+    "call": "Solution_334().increasingTriplet(intArrayOf(5,1,4,2,3))",
+    "expected": "true"
+  },
+  {
+    "id": 443,
+    "call": "run { val a = \"bbbcdd\".toCharArray(); val n = Solution_443().compress(a); \"$n:\" + String(a,0,n) }",
+    "expected": "5:b3cd2"
+  },
+  {
+    "id": 283,
+    "call": "run { val a = intArrayOf(0,7,0,2); Solution_283().moveZeroes(a); a.contentToString() }",
+    "expected": "[7, 2, 0, 0]"
+  },
+  {
+    "id": 392,
+    "call": "Solution_392().isSubsequence(\"kt\", \"kotlin\")",
+    "expected": "true"
+  },
+  {
+    "id": 11,
+    "call": "Solution_11().maxArea(intArrayOf(2,5,4,3))",
+    "expected": "6"
+  },
+  {
+    "id": 1679,
+    "call": "Solution_1679().maxOperations(intArrayOf(2,4,2,4,3),6)",
+    "expected": "2"
+  },
+  {
+    "id": 643,
+    "call": "Solution_643().findMaxAverage(intArrayOf(2,-1,5,3),2)",
+    "expected": "4.0"
+  },
+  {
+    "id": 1456,
+    "call": "Solution_1456().maxVowels(\"audioz\",3)",
+    "expected": "2"
+  },
+  {
+    "id": 1004,
+    "call": "Solution_1004().longestOnes(intArrayOf(1,0,1,0,1),1)",
+    "expected": "3"
+  },
+  {
+    "id": 1493,
+    "call": "Solution_1493().longestSubarray(intArrayOf(1,0,1,1,0))",
+    "expected": "3"
+  },
+  {
+    "id": 1732,
+    "call": "Solution_1732().largestAltitude(intArrayOf(-2,5,-1))",
+    "expected": "3"
+  },
+  {
+    "id": 724,
+    "call": "Solution_724().pivotIndex(intArrayOf(2,1,2))",
+    "expected": "1"
+  },
+  {
+    "id": 2215,
+    "call": "Solution_2215().findDifference(intArrayOf(1,1,4),intArrayOf(4,6,6)).map { it.sorted() }",
+    "expected": "[[1], [6]]"
+  },
+  {
+    "id": 1207,
+    "call": "Solution_1207().uniqueOccurrences(intArrayOf(4,4,7,7,7,9))",
+    "expected": "true"
+  },
+  {
+    "id": 1657,
+    "call": "Solution_1657().closeStrings(\"aabbbc\", \"abbccc\")",
+    "expected": "true"
+  },
+  {
+    "id": 2352,
+    "call": "Solution_2352().equalPairs(arrayOf(intArrayOf(1,2),intArrayOf(2,1)))",
+    "expected": "2"
+  },
+  {
+    "id": 2390,
+    "call": "Solution_2390().removeStars(\"ab*c*d\")",
+    "expected": "ad"
+  },
+  {
+    "id": 735,
+    "call": "Solution_735().asteroidCollision(intArrayOf(4,2,-3)).contentToString()",
+    "expected": "[4]"
+  },
+  {
+    "id": 394,
+    "call": "Solution_394().decodeString(\"2[x3[y]]\")",
+    "expected": "xyyyxyyy"
+  },
+  {
+    "id": 933,
+    "call": "run { val c = RecentCounter(); listOf(c.ping(10),c.ping(100),c.ping(3010),c.ping(3011)) }",
+    "expected": "[1, 2, 3, 3]"
+  },
+  {
+    "id": 1768,
+    "call": "Solution_1768().mergeAlternately(\"a\",\"bcd\")",
+    "expected": "abcd"
+  },
+  {
+    "id": 1071,
+    "call": "Solution_1071().gcdOfStrings(\"AB\",\"AC\")",
+    "expected": ""
+  },
+  {
+    "id": 1431,
+    "call": "Solution_1431().kidsWithCandies(intArrayOf(1,2),1)",
+    "expected": "[true, true]"
+  },
+  {
+    "id": 605,
+    "call": "Solution_605().canPlaceFlowers(intArrayOf(1),0)",
+    "expected": "true"
+  },
+  {
+    "id": 345,
+    "call": "Solution_345().reverseVowels(\"xyz\")",
+    "expected": "xyz"
+  },
+  {
+    "id": 151,
+    "call": "Solution_151().reverseWords(\" a \")",
+    "expected": "a"
+  },
+  {
+    "id": 238,
+    "call": "Solution_238().productExceptSelf(intArrayOf(2,0,4)).contentToString()",
+    "expected": "[0, 8, 0]"
+  },
+  {
+    "id": 334,
+    "call": "Solution_334().increasingTriplet(intArrayOf(1,1,1))",
+    "expected": "false"
+  },
+  {
+    "id": 443,
+    "call": "run { val a = CharArray(12) { 'a' }; val n = Solution_443().compress(a); String(a,0,n) }",
+    "expected": "a12"
+  },
+  {
+    "id": 283,
+    "call": "run { val a = intArrayOf(0,0); Solution_283().moveZeroes(a); a.contentToString() }",
+    "expected": "[0, 0]"
+  },
+  {
+    "id": 392,
+    "call": "Solution_392().isSubsequence(\"\", \"abc\")",
+    "expected": "true"
+  },
+  {
+    "id": 11,
+    "call": "Solution_11().maxArea(intArrayOf(1,1))",
+    "expected": "1"
+  },
+  {
+    "id": 1679,
+    "call": "Solution_1679().maxOperations(intArrayOf(3,3,3),6)",
+    "expected": "1"
+  },
+  {
+    "id": 643,
+    "call": "Solution_643().findMaxAverage(intArrayOf(-4,-2),2)",
+    "expected": "-3.0"
+  },
+  {
+    "id": 1456,
+    "call": "Solution_1456().maxVowels(\"zzz\",2)",
+    "expected": "0"
+  },
+  {
+    "id": 1004,
+    "call": "Solution_1004().longestOnes(intArrayOf(0,0),0)",
+    "expected": "0"
+  },
+  {
+    "id": 1493,
+    "call": "Solution_1493().longestSubarray(intArrayOf(1,1,1))",
+    "expected": "2"
+  },
+  {
+    "id": 1732,
+    "call": "Solution_1732().largestAltitude(intArrayOf(-2,-1))",
+    "expected": "0"
+  },
+  {
+    "id": 724,
+    "call": "Solution_724().pivotIndex(intArrayOf(0,0))",
+    "expected": "0"
+  },
+  {
+    "id": 2215,
+    "call": "Solution_2215().findDifference(intArrayOf(1,2),intArrayOf(2,1))",
+    "expected": "[[], []]"
+  },
+  {
+    "id": 1207,
+    "call": "Solution_1207().uniqueOccurrences(intArrayOf(4,7))",
+    "expected": "false"
+  },
+  {
+    "id": 1657,
+    "call": "Solution_1657().closeStrings(\"aa\",\"bb\")",
+    "expected": "false"
+  },
+  {
+    "id": 2352,
+    "call": "Solution_2352().equalPairs(arrayOf(intArrayOf(1,1),intArrayOf(1,1)))",
+    "expected": "4"
+  },
+  {
+    "id": 2390,
+    "call": "Solution_2390().removeStars(\"xy**\")",
+    "expected": ""
+  },
+  {
+    "id": 735,
+    "call": "Solution_735().asteroidCollision(intArrayOf(3,-3)).contentToString()",
+    "expected": "[]"
+  },
+  {
+    "id": 394,
+    "call": "Solution_394().decodeString(\"12[a]\")",
+    "expected": "aaaaaaaaaaaa"
+  },
+  {
+    "id": 933,
+    "call": "run { val c=RecentCounter(); listOf(c.ping(1),c.ping(10000)) }",
+    "expected": "[1, 1]"
+  }
+]

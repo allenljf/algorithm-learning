@@ -1,0 +1,29 @@
+{
+  "new_lessons": 67,
+  "covered_neetcode150": 87,
+  "extension_only": 63,
+  "p0": 28,
+  "p1": 47,
+  "p2": 12,
+  "category_coverage": {
+    "Arrays & Hashing": 6,
+    "Two Pointers": 5,
+    "Sliding Window": 6,
+    "Stack": 4,
+    "Binary Search": 6,
+    "Linked List": 5,
+    "Trees": 9,
+    "Heap / Priority Queue": 3,
+    "Backtracking": 5,
+    "Tries": 2,
+    "Graphs": 6,
+    "Advanced Graphs": 3,
+    "1-D Dynamic Programming": 7,
+    "2-D Dynamic Programming": 7,
+    "Greedy": 3,
+    "Intervals": 3,
+    "Math & Geometry": 3,
+    "Bit Manipulation": 4
+  },
+  "new_tests": 146
+}

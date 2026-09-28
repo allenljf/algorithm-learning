@@ -1,0 +1,379 @@
+[
+  {
+    "id": 78,
+    "call": "Solution_78().subsets(intArrayOf(2,4))",
+    "expected": [
+      [],
+      [
+        4
+      ],
+      [
+        2
+      ],
+      [
+        2,
+        4
+      ]
+    ]
+  },
+  {
+    "id": 78,
+    "call": "Solution_78().subsets(intArrayOf(-3))",
+    "expected": [
+      [],
+      [
+        -3
+      ]
+    ]
+  },
+  {
+    "id": 46,
+    "call": "Solution_46().permute(intArrayOf(2,5))",
+    "expected": [
+      [
+        2,
+        5
+      ],
+      [
+        5,
+        2
+      ]
+    ]
+  },
+  {
+    "id": 46,
+    "call": "Solution_46().permute(intArrayOf(-2))",
+    "expected": [
+      [
+        -2
+      ]
+    ]
+  },
+  {
+    "id": 39,
+    "call": "Solution_39().combinationSum(intArrayOf(3,4),10)",
+    "expected": [
+      [
+        3,
+        3,
+        4
+      ]
+    ]
+  },
+  {
+    "id": 39,
+    "call": "Solution_39().combinationSum(intArrayOf(4,6),7)",
+    "expected": []
+  },
+  {
+    "id": 79,
+    "call": "Solution_79().exist(arrayOf(charArrayOf('A','B'),charArrayOf('D','C')), \"ABCD\")",
+    "expected": true
+  },
+  {
+    "id": 79,
+    "call": "Solution_79().exist(arrayOf(charArrayOf('A','B')), \"ABA\")",
+    "expected": false
+  },
+  {
+    "id": 211,
+    "call": "run { val d = WordDictionary(); d.addWord(\"sun\"); d.addWord(\"sea\"); listOf(d.search(\"s.n\"),d.search(\"s.\"),d.search(\".ea\")) }",
+    "expected": [
+      true,
+      false,
+      true
+    ]
+  },
+  {
+    "id": 211,
+    "call": "run { val d = WordDictionary(); d.addWord(\"go\"); listOf(d.search(\"..\"),d.search(\"g\"),d.search(\"no\")) }",
+    "expected": [
+      true,
+      false,
+      false
+    ]
+  },
+  {
+    "id": 70,
+    "call": "Solution_70().climbStairs(4)",
+    "expected": 5
+  },
+  {
+    "id": 70,
+    "call": "Solution_70().climbStairs(5)",
+    "expected": 8
+  },
+  {
+    "id": 322,
+    "call": "Solution_322().coinChange(intArrayOf(1,3,4),6)",
+    "expected": 2
+  },
+  {
+    "id": 322,
+    "call": "Solution_322().coinChange(intArrayOf(4,6),7)",
+    "expected": -1
+  },
+  {
+    "id": 300,
+    "call": "Solution_300().lengthOfLIS(intArrayOf(4,2,3,1,5))",
+    "expected": 3
+  },
+  {
+    "id": 300,
+    "call": "Solution_300().lengthOfLIS(intArrayOf(2,2,2))",
+    "expected": 1
+  },
+  {
+    "id": 309,
+    "call": "Solution_309().maxProfit(intArrayOf(2,5,1,4))",
+    "expected": 3
+  },
+  {
+    "id": 309,
+    "call": "Solution_309().maxProfit(intArrayOf(4,3,2))",
+    "expected": 0
+  },
+  {
+    "id": 5,
+    "call": "Solution_5().longestPalindrome(\"xabbay\")",
+    "expected": "abba"
+  },
+  {
+    "id": 5,
+    "call": "Solution_5().longestPalindrome(\"racecarx\")",
+    "expected": "racecar"
+  },
+  {
+    "id": 416,
+    "call": "Solution_416().canPartition(intArrayOf(2,2,3,5))",
+    "expected": false
+  },
+  {
+    "id": 416,
+    "call": "Solution_416().canPartition(intArrayOf(2,3,5))",
+    "expected": true
+  },
+  {
+    "id": 518,
+    "call": "Solution_518().change(6,intArrayOf(2,3))",
+    "expected": 2
+  },
+  {
+    "id": 518,
+    "call": "Solution_518().change(0,intArrayOf(2,3))",
+    "expected": 1
+  },
+  {
+    "id": 518,
+    "call": "Solution_518().change(4999,IntArray(300) { (it + 1) * 2 })",
+    "expected": 0
+  },
+  {
+    "id": 494,
+    "call": "Solution_494().findTargetSumWays(intArrayOf(0,1,2),1)",
+    "expected": 2
+  },
+  {
+    "id": 494,
+    "call": "Solution_494().findTargetSumWays(intArrayOf(0,0),0)",
+    "expected": 4
+  },
+  {
+    "id": 494,
+    "call": "Solution_494().findTargetSumWays(intArrayOf(2,4),1)",
+    "expected": 0
+  },
+  {
+    "id": 115,
+    "call": "Solution_115().numDistinct(\"aaba\",\"aa\")",
+    "expected": 3
+  },
+  {
+    "id": 115,
+    "call": "Solution_115().numDistinct(\"abc\",\"ac\")",
+    "expected": 1
+  },
+  {
+    "id": 115,
+    "call": "Solution_115().numDistinct(\"a\".repeat(100),\"a\".repeat(50)+\"b\")",
+    "expected": 0
+  },
+  {
+    "id": 53,
+    "call": "Solution_53().maxSubArray(intArrayOf(-4,3,-1,2,-6))",
+    "expected": 4
+  },
+  {
+    "id": 53,
+    "call": "Solution_53().maxSubArray(intArrayOf(-8,-2,-5))",
+    "expected": -2
+  },
+  {
+    "id": 55,
+    "call": "Solution_55().canJump(intArrayOf(2,0,1,0))",
+    "expected": true
+  },
+  {
+    "id": 55,
+    "call": "Solution_55().canJump(intArrayOf(1,0,2))",
+    "expected": false
+  },
+  {
+    "id": 45,
+    "call": "Solution_45().jump(intArrayOf(2,1,2,1,1))",
+    "expected": 2
+  },
+  {
+    "id": 45,
+    "call": "Solution_45().jump(intArrayOf(0))",
+    "expected": 0
+  },
+  {
+    "id": 56,
+    "call": "Solution_56().merge(arrayOf(intArrayOf(5,7),intArrayOf(1,3),intArrayOf(3,6))).map { it.toList() }",
+    "expected": [
+      [
+        1,
+        7
+      ]
+    ]
+  },
+  {
+    "id": 56,
+    "call": "Solution_56().merge(arrayOf(intArrayOf(1,2),intArrayOf(4,5))).map { it.toList() }",
+    "expected": [
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        5
+      ]
+    ]
+  },
+  {
+    "id": 57,
+    "call": "Solution_57().insert(arrayOf(intArrayOf(1,2),intArrayOf(5,6),intArrayOf(9,10)),intArrayOf(2,9)).map { it.toList() }",
+    "expected": [
+      [
+        1,
+        10
+      ]
+    ]
+  },
+  {
+    "id": 57,
+    "call": "Solution_57().insert(emptyArray<IntArray>(),intArrayOf(3,4)).map { it.toList() }",
+    "expected": [
+      [
+        3,
+        4
+      ]
+    ]
+  },
+  {
+    "id": 48,
+    "call": "run { val a = arrayOf(intArrayOf(2,4),intArrayOf(6,8)); Solution_48().rotate(a); a.map { it.toList() } }",
+    "expected": [
+      [
+        6,
+        2
+      ],
+      [
+        8,
+        4
+      ]
+    ]
+  },
+  {
+    "id": 48,
+    "call": "run { val a = arrayOf(intArrayOf(-3)); Solution_48().rotate(a); a.map { it.toList() } }",
+    "expected": [
+      [
+        -3
+      ]
+    ]
+  },
+  {
+    "id": 54,
+    "call": "Solution_54().spiralOrder(arrayOf(intArrayOf(2,4,6),intArrayOf(8,10,12)))",
+    "expected": [
+      2,
+      4,
+      6,
+      12,
+      10,
+      8
+    ]
+  },
+  {
+    "id": 54,
+    "call": "Solution_54().spiralOrder(arrayOf(intArrayOf(7),intArrayOf(8),intArrayOf(9)))",
+    "expected": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "id": 73,
+    "call": "run { val a = arrayOf(intArrayOf(2,0,4),intArrayOf(5,6,7)); Solution_73().setZeroes(a); a.map { it.toList() } }",
+    "expected": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        7
+      ]
+    ]
+  },
+  {
+    "id": 73,
+    "call": "run { val a = arrayOf(intArrayOf(1,2),intArrayOf(0,3)); Solution_73().setZeroes(a); a.map { it.toList() } }",
+    "expected": [
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "id": 190,
+    "call": "Solution_190().reverseBits(6)",
+    "expected": 1610612736
+  },
+  {
+    "id": 190,
+    "call": "Solution_190().reverseBits(2)",
+    "expected": 1073741824
+  },
+  {
+    "id": 190,
+    "call": "Solution_190().reverseBits(1)",
+    "expected": -2147483648
+  },
+  {
+    "id": 371,
+    "call": "Solution_371().getSum(5,7)",
+    "expected": 12
+  },
+  {
+    "id": 371,
+    "call": "Solution_371().getSum(-4,7)",
+    "expected": 3
+  },
+  {
+    "id": 371,
+    "call": "Solution_371().getSum(-9,-6)",
+    "expected": -15
+  }
+]

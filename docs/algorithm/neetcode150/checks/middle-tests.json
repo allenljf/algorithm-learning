@@ -1,0 +1,237 @@
+[
+  {
+    "id": 21,
+    "call": "generateSequence(Solution_21().mergeTwoLists(ListNode(-3).apply { next = ListNode(4) },ListNode(-2).apply { next = ListNode(4).apply { next = ListNode(7) } })) { it.next }.map { it.`val` }.toList().toString()",
+    "expected": "[-3, -2, 4, 4, 7]"
+  },
+  {
+    "id": 21,
+    "call": "generateSequence(Solution_21().mergeTwoLists(null,ListNode(9))) { it.next }.map { it.`val` }.toList().toString()",
+    "expected": "[9]"
+  },
+  {
+    "id": 19,
+    "call": "generateSequence(Solution_19().removeNthFromEnd(ListNode(8).apply { next = ListNode(6).apply { next = ListNode(3).apply { next = ListNode(1) } } },3)) { it.next }.map { it.`val` }.toList().toString()",
+    "expected": "[8, 3, 1]"
+  },
+  {
+    "id": 19,
+    "call": "generateSequence(Solution_19().removeNthFromEnd(ListNode(7).apply { next = ListNode(9) },2)) { it.next }.map { it.`val` }.toList().toString()",
+    "expected": "[9]"
+  },
+  {
+    "id": 143,
+    "call": "run { val h = ListNode(2).apply { next = ListNode(4).apply { next = ListNode(6).apply { next = ListNode(8).apply { next = ListNode(10) } } } }; Solution_143().reorderList(h); generateSequence(h) { it.next }.map { it.`val` }.toList().toString() }",
+    "expected": "[2, 10, 4, 8, 6]"
+  },
+  {
+    "id": 143,
+    "call": "run { val h = ListNode(4).apply { next = ListNode(7).apply { next = ListNode(9).apply { next = ListNode(12) } } }; Solution_143().reorderList(h); generateSequence(h) { it.next }.map { it.`val` }.toList().toString() }",
+    "expected": "[4, 12, 7, 9]"
+  },
+  {
+    "id": 146,
+    "call": "run { val c = LRUCache(2); c.put(5,50); c.put(7,70); val first=c.get(5); c.put(9,90); listOf(first,c.get(7),c.get(5),c.get(9)).toString() }",
+    "expected": "[50, -1, 50, 90]"
+  },
+  {
+    "id": 146,
+    "call": "run { val c = LRUCache(1); c.put(2,20); c.put(2,25); val updated=c.get(2); c.put(3,30); listOf(updated,c.get(2),c.get(3)).toString() }",
+    "expected": "[25, -1, 30]"
+  },
+  {
+    "id": 226,
+    "call": "run { val r=Solution_226().invertTree(TreeNode(6).apply { left=TreeNode(2).apply { right=TreeNode(4) }; right=TreeNode(9) }); listOf(r?.`val`,r?.left?.`val`,r?.right?.`val`,r?.right?.left?.`val`).toString() }",
+    "expected": "[6, 9, 2, 4]"
+  },
+  {
+    "id": 226,
+    "call": "Solution_226().invertTree(null) == null",
+    "expected": "true"
+  },
+  {
+    "id": 102,
+    "call": "Solution_102().levelOrder(TreeNode(5).apply { left=TreeNode(2).apply { right=TreeNode(3) }; right=TreeNode(8).apply { left=TreeNode(7) } }).toString()",
+    "expected": "[[5], [2, 8], [3, 7]]"
+  },
+  {
+    "id": 102,
+    "call": "Solution_102().levelOrder(null).toString()",
+    "expected": "[]"
+  },
+  {
+    "id": 98,
+    "call": "Solution_98().isValidBST(TreeNode(10).apply { right=TreeNode(16).apply { left=TreeNode(8) } })",
+    "expected": "false"
+  },
+  {
+    "id": 98,
+    "call": "Solution_98().isValidBST(TreeNode(Int.MIN_VALUE).apply { right=TreeNode(Int.MAX_VALUE) })",
+    "expected": "true"
+  },
+  {
+    "id": 98,
+    "call": "Solution_98().isValidBST(TreeNode(8).apply { left=TreeNode(8) })",
+    "expected": "false"
+  },
+  {
+    "id": 105,
+    "call": "run { val r=Solution_105().buildTree(intArrayOf(8,3,5,11),intArrayOf(3,5,8,11)); listOf(r?.`val`,r?.left?.`val`,r?.left?.right?.`val`,r?.right?.`val`).toString() }",
+    "expected": "[8, 3, 5, 11]"
+  },
+  {
+    "id": 105,
+    "call": "run { val r=Solution_105().buildTree(intArrayOf(4,3,2),intArrayOf(2,3,4)); listOf(r?.`val`,r?.left?.`val`,r?.left?.left?.`val`,r?.right?.`val`).toString() }",
+    "expected": "[4, 3, 2, null]"
+  },
+  {
+    "id": 124,
+    "call": "Solution_124().maxPathSum(TreeNode(-5).apply { left=TreeNode(4); right=TreeNode(7).apply { left=TreeNode(2); right=TreeNode(3) } })",
+    "expected": "12"
+  },
+  {
+    "id": 124,
+    "call": "Solution_124().maxPathSum(TreeNode(-8).apply { left=TreeNode(-2); right=TreeNode(-11) })",
+    "expected": "-2"
+  },
+  {
+    "id": 297,
+    "call": "run { val c=Codec(); val root=TreeNode(-4).apply { right=TreeNode(12).apply { left=TreeNode(-7) } }; val encoded=c.serialize(root); val copy=c.deserialize(encoded); listOf(encoded,c.serialize(copy),(copy !== root).toString()).toString() }",
+    "expected": "[-4,#,12,-7,#,#,#, -4,#,12,-7,#,#,#, true]"
+  },
+  {
+    "id": 297,
+    "call": "run { val c=Codec(); listOf(c.serialize(null),(c.deserialize(\"#\") == null).toString()).toString() }",
+    "expected": "[#, true]"
+  },
+  {
+    "id": 295,
+    "call": "run { val m=MedianFinder(); val results=mutableListOf<Double>(); for (x in intArrayOf(6,-2,10,4)) { m.addNum(x); results.add(m.findMedian()) }; results.toString() }",
+    "expected": "[6.0, 2.0, 6.0, 5.0]"
+  },
+  {
+    "id": 295,
+    "call": "run { val m=MedianFinder(); m.addNum(-9); m.addNum(-9); m.findMedian() }",
+    "expected": "-9.0"
+  },
+  {
+    "id": 621,
+    "call": "Solution_621().leastInterval(\"AAABC\".toCharArray(),2)",
+    "expected": "7"
+  },
+  {
+    "id": 621,
+    "call": "Solution_621().leastInterval(\"AABBCCDD\".toCharArray(),1)",
+    "expected": "8"
+  },
+  {
+    "id": 621,
+    "call": "Solution_621().leastInterval(\"ZZZY\".toCharArray(),0)",
+    "expected": "4"
+  },
+  {
+    "id": 200,
+    "call": "Solution_200().numIslands(arrayOf(\"101\".toCharArray(),\"101\".toCharArray(),\"010\".toCharArray()))",
+    "expected": "3"
+  },
+  {
+    "id": 200,
+    "call": "Solution_200().numIslands(arrayOf(\"111\".toCharArray(),\"111\".toCharArray()))",
+    "expected": "1"
+  },
+  {
+    "id": 133,
+    "call": "run { val a=Node(1); val b=Node(2); val c=Node(3); a.neighbors.add(b); a.neighbors.add(c); b.neighbors.add(a); b.neighbors.add(c); c.neighbors.add(a); c.neighbors.add(b); val copy=Solution_133().cloneGraph(a)!!; val cb=copy.neighbors[0]!!; val cc=copy.neighbors[1]!!; listOf(copy !== a,cb !== b,cc !== c,cb.neighbors[0] === copy,cb.neighbors[1] === cc,cc.neighbors[0] === copy).all { it } }",
+    "expected": "true"
+  },
+  {
+    "id": 133,
+    "call": "Solution_133().cloneGraph(null) == null",
+    "expected": "true"
+  },
+  {
+    "id": 207,
+    "call": "Solution_207().canFinish(4,arrayOf(intArrayOf(2,0),intArrayOf(2,1),intArrayOf(3,2)))",
+    "expected": "true"
+  },
+  {
+    "id": 207,
+    "call": "Solution_207().canFinish(4,arrayOf(intArrayOf(1,0),intArrayOf(2,1),intArrayOf(0,2)))",
+    "expected": "false"
+  },
+  {
+    "id": 210,
+    "call": "run { val edges=arrayOf(intArrayOf(1,0),intArrayOf(3,1),intArrayOf(2,0)); val order=Solution_210().findOrder(4,edges); val position=IntArray(4); for (i in order.indices) position[order[i]]=i; order.size == 4 && order.toSet().size == 4 && edges.all { position[it[1]] < position[it[0]] } }",
+    "expected": "true"
+  },
+  {
+    "id": 210,
+    "call": "Solution_210().findOrder(3,arrayOf(intArrayOf(1,0),intArrayOf(2,1),intArrayOf(0,2))).contentToString()",
+    "expected": "[]"
+  },
+  {
+    "id": 684,
+    "call": "Solution_684().findRedundantConnection(arrayOf(intArrayOf(1,2),intArrayOf(2,4),intArrayOf(3,4),intArrayOf(1,3))).contentToString()",
+    "expected": "[1, 3]"
+  },
+  {
+    "id": 684,
+    "call": "Solution_684().findRedundantConnection(arrayOf(intArrayOf(1,4),intArrayOf(1,2),intArrayOf(2,4),intArrayOf(3,4))).contentToString()",
+    "expected": "[2, 4]"
+  },
+  {
+    "id": 743,
+    "call": "Solution_743().networkDelayTime(arrayOf(intArrayOf(1,2,8),intArrayOf(1,3,2),intArrayOf(3,2,1)),3,1)",
+    "expected": "3"
+  },
+  {
+    "id": 743,
+    "call": "Solution_743().networkDelayTime(arrayOf(intArrayOf(1,2,0),intArrayOf(2,1,0)),3,1)",
+    "expected": "-1"
+  },
+  {
+    "id": 1584,
+    "call": "Solution_1584().minCostConnectPoints(arrayOf(intArrayOf(0,0),intArrayOf(2,0),intArrayOf(2,3)))",
+    "expected": "5"
+  },
+  {
+    "id": 1584,
+    "call": "Solution_1584().minCostConnectPoints(arrayOf(intArrayOf(-8,9)))",
+    "expected": "0"
+  },
+  {
+    "id": 332,
+    "call": "Solution_332().findItinerary(listOf(listOf(\"JFK\",\"AAA\"),listOf(\"JFK\",\"BBB\"),listOf(\"BBB\",\"JFK\"))).toString()",
+    "expected": "[JFK, BBB, JFK, AAA]"
+  },
+  {
+    "id": 332,
+    "call": "Solution_332().findItinerary(listOf(listOf(\"JFK\",\"AAA\"),listOf(\"JFK\",\"AAA\"),listOf(\"AAA\",\"JFK\"))).toString()",
+    "expected": "[JFK, AAA, JFK, AAA]"
+  },
+  {
+    "id": 332,
+    "call": "Solution_332().findItinerary(listOf(listOf(\"JFK\",\"CCC\"),listOf(\"CCC\",\"JFK\"),listOf(\"JFK\",\"BBB\"),listOf(\"BBB\",\"JFK\"))).toString()",
+    "expected": "[JFK, BBB, JFK, CCC, JFK]"
+  },
+  {
+    "id": 105,
+    "call": "run { val values=IntArray(3000) { it - 1500 }; val root=Solution_105().buildTree(values,values); var current=root; var count=0; var valid=true; while (current != null) { if (current.left != null || current.`val` != values[count]) valid=false; count++; current=current.right }; valid && count==3000 }",
+    "expected": "true"
+  },
+  {
+    "id": 124,
+    "call": "run { val root=TreeNode(1); var tail=root; repeat(29999) { val next=TreeNode(1); tail.right=next; tail=next }; Solution_124().maxPathSum(root) }",
+    "expected": "30000"
+  },
+  {
+    "id": 297,
+    "call": "run { val root=TreeNode(-1); var tail=root; repeat(9999) { val next=TreeNode(-1); tail.right=next; tail=next }; val codec=Codec(); var current=codec.deserialize(codec.serialize(root)); var count=0; var valid=true; while (true) { val node = current ?: break; if (node.left != null || node.`val` != -1) valid=false; count++; current=node.right }; valid && count==10000 }",
+    "expected": "true"
+  },
+  {
+    "id": 621,
+    "call": "Solution_621().leastInterval(\"AABB\".toCharArray(),3)",
+    "expected": "6"
+  }
+]

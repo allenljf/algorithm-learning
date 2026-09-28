@@ -1,0 +1,22 @@
+[
+  {"id":11,"call":"Solution_11().maxArea(intArrayOf(2,5,4,3))","expected":6},{"id":11,"call":"Solution_11().maxArea(intArrayOf(1,1))","expected":1},
+  {"id":17,"call":"Solution_17().letterCombinations(\"24\")","expected":["ag","ah","ai","bg","bh","bi","cg","ch","ci"]},{"id":17,"call":"Solution_17().letterCombinations(\"\")","expected":[]},
+  {"id":62,"call":"Solution_62().uniquePaths(3,3)","expected":6},{"id":62,"call":"Solution_62().uniquePaths(1,5)","expected":1},
+  {"id":72,"call":"Solution_72().minDistance(\"cat\",\"cut\")","expected":1},{"id":72,"call":"Solution_72().minDistance(\"\",\"go\")","expected":2},
+  {"id":104,"call":"Solution_104().maxDepth(TreeNode(4).apply { left = TreeNode(2).apply { left = TreeNode(1) } })","expected":3},{"id":104,"call":"Solution_104().maxDepth(null)","expected":0},
+  {"id":136,"call":"Solution_136().singleNumber(intArrayOf(7,3,7))","expected":3},{"id":136,"call":"Solution_136().singleNumber(intArrayOf(-8))","expected":-8},
+  {"id":198,"call":"Solution_198().rob(intArrayOf(4,1,2,7))","expected":11},{"id":198,"call":"Solution_198().rob(intArrayOf(5,1,1,5))","expected":10},
+  {"id":199,"call":"Solution_199().rightSideView(TreeNode(8).apply { left = TreeNode(4).apply { left = TreeNode(2) }; right = TreeNode(9) })","expected":[8,9,2]},{"id":199,"call":"Solution_199().rightSideView(null)","expected":[]},
+  {"id":206,"call":"run { val h=ListNode(7).apply { next=ListNode(3).apply { next=ListNode(9) } };generateSequence(Solution_206().reverseList(h)){it.next}.map{it.`val`}.toList() }","expected":[9,3,7]},{"id":206,"call":"Solution_206().reverseList(null) == null","expected":true},
+  {"id":208,"call":"run { val t=Trie();t.insert(\"car\");t.insert(\"cat\");listOf(t.search(\"ca\"),t.startsWith(\"ca\"),t.search(\"car\")) }","expected":[false,true,true]},{"id":208,"call":"run { val t=Trie();t.insert(\"car\");listOf(t.search(\"cat\"),t.startsWith(\"dog\")) }","expected":[false,false]},
+  {"id":215,"call":"Solution_215().findKthLargest(intArrayOf(8,2,8,5),2)","expected":8},{"id":215,"call":"Solution_215().findKthLargest(intArrayOf(1),1)","expected":1},
+  {"id":238,"call":"Solution_238().productExceptSelf(intArrayOf(2,3,4)).toList()","expected":[12,8,6]},{"id":238,"call":"Solution_238().productExceptSelf(intArrayOf(2,0,4)).toList()","expected":[0,8,0]},
+  {"id":338,"call":"Solution_338().countBits(4).toList()","expected":[0,1,1,2,1]},{"id":338,"call":"Solution_338().countBits(0).toList()","expected":[0]},
+  {"id":435,"call":"Solution_435().eraseOverlapIntervals(arrayOf(intArrayOf(1,4),intArrayOf(2,3),intArrayOf(3,5),intArrayOf(6,8)))","expected":1},{"id":435,"call":"Solution_435().eraseOverlapIntervals(arrayOf(intArrayOf(1,2),intArrayOf(2,3)))","expected":0},
+  {"id":739,"call":"Solution_739().dailyTemperatures(intArrayOf(60,55,55,65)).toList()","expected":[3,2,1,0]},{"id":739,"call":"Solution_739().dailyTemperatures(intArrayOf(70,70)).toList()","expected":[0,0]},
+  {"id":746,"call":"Solution_746().minCostClimbingStairs(intArrayOf(5,2,4,1))","expected":3},{"id":746,"call":"Solution_746().minCostClimbingStairs(intArrayOf(9,3))","expected":3},
+  {"id":875,"call":"Solution_875().minEatingSpeed(intArrayOf(4,8),4)","expected":4},{"id":875,"call":"Solution_875().minEatingSpeed(intArrayOf(1),1)","expected":1},
+  {"id":994,"call":"Solution_994().orangesRotting(arrayOf(intArrayOf(2,1,1,1,2)))","expected":2},{"id":994,"call":"Solution_994().orangesRotting(arrayOf(intArrayOf(0)))","expected":0},
+  {"id":1143,"call":"Solution_1143().longestCommonSubsequence(\"abca\",\"aca\")","expected":3},{"id":1143,"call":"Solution_1143().longestCommonSubsequence(\"abc\",\"cba\")","expected":1},
+  {"id":1448,"call":"Solution_1448().goodNodes(TreeNode(5).apply { left=TreeNode(3).apply { left=TreeNode(6) };right=TreeNode(5) })","expected":3},{"id":1448,"call":"Solution_1448().goodNodes(TreeNode(1))","expected":1}
+]

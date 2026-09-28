@@ -1,0 +1,283 @@
+[
+  {
+    "id": 1,
+    "call": "Solution_1().twoSum(intArrayOf(6,1,8,4),5).toList()",
+    "expected": [
+      1,
+      3
+    ]
+  },
+  {
+    "id": 1,
+    "call": "Solution_1().twoSum(intArrayOf(2,2),4).toList()",
+    "expected": [
+      0,
+      1
+    ]
+  },
+  {
+    "id": 242,
+    "call": "Solution_242().isAnagram(\"aabc\",\"caba\")",
+    "expected": true
+  },
+  {
+    "id": 242,
+    "call": "Solution_242().isAnagram(\"aa\",\"ab\")",
+    "expected": false
+  },
+  {
+    "id": 49,
+    "call": "Solution_49().groupAnagrams(arrayOf(\"arc\",\"car\",\"bat\",\"rat\",\"tar\")).map { it.sorted().joinToString(\",\") }.sorted()",
+    "expected": [
+      "arc,car",
+      "bat",
+      "rat,tar"
+    ]
+  },
+  {
+    "id": 49,
+    "call": "Solution_49().groupAnagrams(arrayOf(\"\", \"\")).map { it.size }",
+    "expected": [
+      2
+    ]
+  },
+  {
+    "id": 347,
+    "call": "Solution_347().topKFrequent(intArrayOf(4,4,4,7,7,9),2).sorted()",
+    "expected": [
+      4,
+      7
+    ]
+  },
+  {
+    "id": 347,
+    "call": "Solution_347().topKFrequent(intArrayOf(-1,-1),1).toList()",
+    "expected": [
+      -1
+    ]
+  },
+  {
+    "id": 128,
+    "call": "Solution_128().longestConsecutive(intArrayOf(9,3,1,2,2,8))",
+    "expected": 3
+  },
+  {
+    "id": 128,
+    "call": "Solution_128().longestConsecutive(intArrayOf())",
+    "expected": 0
+  },
+  {
+    "id": 125,
+    "call": "Solution_125().isPalindrome(\"No, on!\")",
+    "expected": true
+  },
+  {
+    "id": 125,
+    "call": "Solution_125().isPalindrome(\"0P\")",
+    "expected": false
+  },
+  {
+    "id": 167,
+    "call": "Solution_167().twoSum(intArrayOf(1,3,6,8),9).toList()",
+    "expected": [
+      1,
+      4
+    ]
+  },
+  {
+    "id": 167,
+    "call": "Solution_167().twoSum(intArrayOf(-2,0,3),1).toList()",
+    "expected": [
+      1,
+      3
+    ]
+  },
+  {
+    "id": 15,
+    "call": "Solution_15().threeSum(intArrayOf(-2,0,0,2,2))",
+    "expected": [
+      [
+        -2,
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "id": 15,
+    "call": "Solution_15().threeSum(intArrayOf(0,0,0,0))",
+    "expected": [
+      [
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "id": 42,
+    "call": "Solution_42().trap(intArrayOf(3,0,2,0,4))",
+    "expected": 7
+  },
+  {
+    "id": 42,
+    "call": "Solution_42().trap(intArrayOf(1,2,3))",
+    "expected": 0
+  },
+  {
+    "id": 121,
+    "call": "Solution_121().maxProfit(intArrayOf(8,3,6,2,7))",
+    "expected": 5
+  },
+  {
+    "id": 121,
+    "call": "Solution_121().maxProfit(intArrayOf(9,6,2))",
+    "expected": 0
+  },
+  {
+    "id": 3,
+    "call": "Solution_3().lengthOfLongestSubstring(\"abba\")",
+    "expected": 2
+  },
+  {
+    "id": 3,
+    "call": "Solution_3().lengthOfLongestSubstring(\"\")",
+    "expected": 0
+  },
+  {
+    "id": 424,
+    "call": "Solution_424().characterReplacement(\"ABBBAC\",1)",
+    "expected": 4
+  },
+  {
+    "id": 424,
+    "call": "Solution_424().characterReplacement(\"ABCDE\",0)",
+    "expected": 1
+  },
+  {
+    "id": 567,
+    "call": "Solution_567().checkInclusion(\"ac\",\"zzcaxy\")",
+    "expected": true
+  },
+  {
+    "id": 567,
+    "call": "Solution_567().checkInclusion(\"aa\",\"ab\")",
+    "expected": false
+  },
+  {
+    "id": 76,
+    "call": "Solution_76().minWindow(\"XAABYC\",\"ABC\")",
+    "expected": "ABYC"
+  },
+  {
+    "id": 76,
+    "call": "Solution_76().minWindow(\"A\",\"AA\")",
+    "expected": ""
+  },
+  {
+    "id": 239,
+    "call": "Solution_239().maxSlidingWindow(intArrayOf(4,2,5,1),2).toList()",
+    "expected": [
+      4,
+      5,
+      5
+    ]
+  },
+  {
+    "id": 239,
+    "call": "Solution_239().maxSlidingWindow(intArrayOf(-2,-2,-3),1).toList()",
+    "expected": [
+      -2,
+      -2,
+      -3
+    ]
+  },
+  {
+    "id": 20,
+    "call": "Solution_20().isValid(\"{[]}\")",
+    "expected": true
+  },
+  {
+    "id": 20,
+    "call": "Solution_20().isValid(\"([)]\")",
+    "expected": false
+  },
+  {
+    "id": 155,
+    "call": "run { val s=MinStack(); s.push(5);s.push(2);s.push(4); val a=s.getMin();s.pop();s.pop(); listOf(a,s.getMin(),s.top()) }",
+    "expected": [
+      2,
+      5,
+      5
+    ]
+  },
+  {
+    "id": 155,
+    "call": "run { val s=MinStack();s.push(Int.MIN_VALUE);s.push(Int.MIN_VALUE);s.pop();s.getMin() }",
+    "expected": -2147483648
+  },
+  {
+    "id": 84,
+    "call": "Solution_84().largestRectangleArea(intArrayOf(2,4,4,1))",
+    "expected": 8
+  },
+  {
+    "id": 84,
+    "call": "Solution_84().largestRectangleArea(intArrayOf(0))",
+    "expected": 0
+  },
+  {
+    "id": 704,
+    "call": "Solution_704().search(intArrayOf(2,5,8,11,14),11)",
+    "expected": 3
+  },
+  {
+    "id": 704,
+    "call": "Solution_704().search(intArrayOf(2,5,8,11,14),10)",
+    "expected": -1
+  },
+  {
+    "id": 33,
+    "call": "Solution_33().search(intArrayOf(6,8,10,1,3,5),3)",
+    "expected": 4
+  },
+  {
+    "id": 33,
+    "call": "Solution_33().search(intArrayOf(1),2)",
+    "expected": -1
+  },
+  {
+    "id": 74,
+    "call": "Solution_74().searchMatrix(arrayOf(intArrayOf(1,4,7),intArrayOf(9,12,15)),12)",
+    "expected": true
+  },
+  {
+    "id": 74,
+    "call": "Solution_74().searchMatrix(arrayOf(intArrayOf(2)),1)",
+    "expected": false
+  },
+  {
+    "id": 153,
+    "call": "Solution_153().findMin(intArrayOf(7,9,1,3,5))",
+    "expected": 1
+  },
+  {
+    "id": 153,
+    "call": "Solution_153().findMin(intArrayOf(1,2,3))",
+    "expected": 1
+  },
+  {
+    "id": 981,
+    "call": "run { val t=TimeMap();t.set(\"color\",\"red\",2);t.set(\"color\",\"blue\",6);listOf(t.get(\"color\",1),t.get(\"color\",5),t.get(\"color\",6)) }",
+    "expected": [
+      "",
+      "red",
+      "blue"
+    ]
+  },
+  {
+    "id": 981,
+    "call": "TimeMap().get(\"unknown\",100)",
+    "expected": ""
+  }
+]
