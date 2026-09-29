@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import dev.algorithmlearning.api.auth.application.AuthSessionRepository;
 import dev.algorithmlearning.api.auth.application.AuthUserRepository;
+import dev.algorithmlearning.api.courses.application.CourseRepository;
 import dev.algorithmlearning.api.dashboard.application.DashboardRepository;
 import dev.algorithmlearning.api.problems.application.ProblemRepository;
 import dev.algorithmlearning.api.problems.application.SolutionRepository;
@@ -33,7 +34,8 @@ class SecurityConfigurationMigrationModeTest {
             .withBean(ProblemRepository.class, () -> mock(ProblemRepository.class))
             .withBean(SolutionRepository.class, () -> mock(SolutionRepository.class))
             .withBean(ReviewRepository.class, () -> mock(ReviewRepository.class))
-            .withBean(DashboardRepository.class, () -> mock(DashboardRepository.class));
+            .withBean(DashboardRepository.class, () -> mock(DashboardRepository.class))
+            .withBean(CourseRepository.class, () -> mock(CourseRepository.class));
 
     @Test
     void nonWebStartupSkipsTheServletSecurityChainButKeepsServiceBeans() {
