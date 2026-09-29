@@ -32,7 +32,8 @@
 - Depends on: COURSE-001, COURSE-002. Parallel group: `course-service`.
 - Spec refs: AC-COURSE-01/02/05/06.
 - Verification: `python3 tools/test_course_import.py`; `python3 tools/course_import.py --validate`; `git diff --check`.
-- Status: ready.
+- Execution contract: `single-agent`; `tdd`; `update-docs`; `infer`.
+- Status: completed. Verification passed: `python3 tools/test_course_import.py`; `python3 tools/course_import.py --validate`; `git diff --check`.
 
 ## Phase 3 — Cross-platform reading
 

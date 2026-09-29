@@ -49,6 +49,17 @@
   -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'` and `git
   diff --check`. COURSE-002 is completed. COURSE-003 and COURSE-004 are ready.
 
+### COURSE-003 closeout — 2026-09-29
+
+- Added `tools/course_import.py`, which derives its 398 payloads only from the
+  checked-in manifest and canonical Markdown, checks the detail digest before
+  projection, and makes no network request during normal validation. Real
+  import requires both `--import` and an explicit process-only
+  `APP_COURSE_INGESTION_TOKEN`; diagnostics contain counts only.
+- Task-limited verification passed: `python3 tools/test_course_import.py`,
+  `python3 tools/course_import.py --validate`, and `git diff --check`.
+  COURSE-003 is completed; COURSE-004 is ready in Phase 3.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail

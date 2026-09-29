@@ -1155,10 +1155,11 @@ tasks:
       - git diff --check
   - id: COURSE-003
     title: Safe Course importer and lossless payload verification
-    status: ready
+    status: completed
     depends_on: [COURSE-001, COURSE-002]
     parallel_group: course-service
     spec_refs: ["AC-COURSE-01/02/05/06"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification:
       - python3 tools/test_course_import.py
       - python3 tools/course_import.py --validate
