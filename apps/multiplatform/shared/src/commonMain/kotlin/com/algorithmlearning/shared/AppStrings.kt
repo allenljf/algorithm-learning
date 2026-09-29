@@ -127,6 +127,12 @@ data class AppStrings(
     val reviewScheduleRatedLabel: String,
     val reviewScheduleNextReviewInLabel: String,
     val reviewScheduleDaysLabel: String,
+    val coursesTitle: String,
+    val courseSearchLabel: String,
+    val courseCategoryLabel: String,
+    val courseTagLabel: String,
+    val courseEmptyMessage: String,
+    val courseBackAction: String,
 )
 
 object StringCatalog {
@@ -254,6 +260,7 @@ object StringCatalog {
             reviewScheduleRatedLabel = "Rated",
             reviewScheduleNextReviewInLabel = "next review in",
             reviewScheduleDaysLabel = "days",
+            coursesTitle = "Courses", courseSearchLabel = "Search courses", courseCategoryLabel = "Collection", courseTagLabel = "Tag", courseEmptyMessage = "No lessons found", courseBackAction = "Back to courses",
         )
         AppLanguage.TRADITIONAL_CHINESE -> AppStrings(
             appName = "演算法學習",
@@ -378,6 +385,7 @@ object StringCatalog {
             reviewScheduleRatedLabel = "評分",
             reviewScheduleNextReviewInLabel = "下次複習於",
             reviewScheduleDaysLabel = "天",
+            coursesTitle = "課程", courseSearchLabel = "搜尋教材", courseCategoryLabel = "教材分類", courseTagLabel = "標籤", courseEmptyMessage = "找不到教材", courseBackAction = "回到課程",
         )
     }
 }

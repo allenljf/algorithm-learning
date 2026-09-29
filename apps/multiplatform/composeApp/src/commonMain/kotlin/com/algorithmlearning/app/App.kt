@@ -35,6 +35,9 @@ import com.algorithmlearning.app.auth.AuthViewModel
 import com.algorithmlearning.app.dashboard.DashboardActions
 import com.algorithmlearning.app.dashboard.DashboardScreen
 import com.algorithmlearning.app.dashboard.DashboardViewModel
+import com.algorithmlearning.app.course.CourseActions
+import com.algorithmlearning.app.course.CourseScreen
+import com.algorithmlearning.app.course.CourseViewModel
 import com.algorithmlearning.app.problems.ProblemsActions
 import com.algorithmlearning.app.problems.ProblemsScreen
 import com.algorithmlearning.app.problems.ProblemsViewModel
@@ -157,10 +160,12 @@ private fun SignedInApp(
     val dashboardViewModel = remember(container) {
         DashboardViewModel(dashboard = container.dashboardRepository, scope = scope)
     }
+    val courseViewModel = remember(container) { CourseViewModel(container.courseRepository, scope) }
 
     val problemsState by problemsViewModel.state.collectAsState()
     val reviewState by reviewViewModel.state.collectAsState()
     val dashboardState by dashboardViewModel.state.collectAsState()
+    val courseState by courseViewModel.state.collectAsState()
     val backStack by container.navigator.backStack.collectAsState()
     val current = backStack.last()
     val routeCoordinator = remember(container.navigator, routeHistory) {
@@ -178,6 +183,8 @@ private fun SignedInApp(
         when (current) {
             AppDestination.Dashboard -> dashboardViewModel.load()
             AppDestination.Review -> reviewViewModel.initialize()
+            AppDestination.Courses -> courseViewModel.load()
+            is AppDestination.CourseDetail -> courseViewModel.open(current.sourceIdentity)
             is AppDestination.ProblemDetail -> problemsViewModel.openProblem(current.problemId)
             else -> Unit
         }
@@ -249,6 +256,8 @@ private fun SignedInApp(
                         },
                     ),
                 )
+                AppDestination.Courses -> CourseScreen(courseState, strings, CourseActions(courseViewModel::category,courseViewModel::tag,courseViewModel::keyword,{ id->container.navigator.navigateTo(AppDestination.CourseDetail(id)) },{courseViewModel.back();container.navigator.resetTo(AppDestination.Courses)},courseViewModel::back))
+                is AppDestination.CourseDetail -> CourseScreen(courseState, strings, CourseActions(courseViewModel::category,courseViewModel::tag,courseViewModel::keyword,{ id->container.navigator.navigateTo(AppDestination.CourseDetail(id)) },{courseViewModel.back();container.navigator.resetTo(AppDestination.Courses)},courseViewModel::back))
                 is AppDestination.ProblemDetail -> ProblemsScreen(
                     state = problemsState,
                     strings = strings,
@@ -409,12 +418,14 @@ private fun SettingsContent(
 private enum class TopLevelDestination(val destination: AppDestination) {
     Dashboard(AppDestination.Dashboard),
     Problems(AppDestination.Problems),
+    Courses(AppDestination.Courses),
     Review(AppDestination.Review),
     Settings(AppDestination.Settings);
 
     fun label(strings: AppStrings): String = when (this) {
         Dashboard -> strings.dashboardTitle
         Problems -> strings.problemsTitle
+        Courses -> strings.coursesTitle
         Review -> strings.reviewTitle
         Settings -> strings.settingsTitle
     }

@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 sealed interface AppDestination {
     data object Dashboard : AppDestination
     data object Problems : AppDestination
+    data object Courses : AppDestination
+    data class CourseDetail(val sourceIdentity: String) : AppDestination
     data class ProblemDetail(val problemId: String) : AppDestination
     data object Review : AppDestination
     data object Settings : AppDestination

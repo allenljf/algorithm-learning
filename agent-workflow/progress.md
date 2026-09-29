@@ -70,6 +70,17 @@
   :shared:allTests` and `git diff --check`. COURSE-004 is completed and
   COURSE-005 is ready in the same Cross-platform reading phase.
 
+### COURSE-005 closeout — 2026-09-29
+
+- Added localized Course top-level navigation plus `/courses` and lesson
+  history routes. The shared Course view model owns category, tag, keyword,
+  list and detail state; the stateless reader renders the entire `detail`
+  string in a vertical scroll rather than summarizing or truncating it.
+  There are no Course authoring actions.
+- Task-limited verification passed: `cd apps/multiplatform && ./gradlew
+  :composeApp:allTests :composeApp:wasmJsBrowserTest` and `git diff --check`.
+  COURSE-005 is completed; COURSE-006 is ready in Phase 4.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail

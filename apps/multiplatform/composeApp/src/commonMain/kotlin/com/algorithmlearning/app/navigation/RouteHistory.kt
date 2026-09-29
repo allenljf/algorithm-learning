@@ -26,6 +26,8 @@ object NoopRouteHistory : RouteHistory {
 internal fun pathFor(destination: AppDestination): String = when (destination) {
     AppDestination.Dashboard -> "/"
     AppDestination.Problems -> "/problems"
+    AppDestination.Courses -> "/courses"
+    is AppDestination.CourseDetail -> "/courses/${destination.sourceIdentity}"
     is AppDestination.ProblemDetail -> "/problems/${destination.problemId}"
     AppDestination.Review -> "/review"
     AppDestination.Settings -> "/settings"
@@ -39,6 +41,10 @@ internal fun destinationForPath(path: String): AppDestination? {
         normalized.startsWith("/problems/") -> normalized.removePrefix("/problems/")
             .takeIf(String::isNotBlank)
             ?.let(AppDestination::ProblemDetail)
+        normalized == "/courses" -> AppDestination.Courses
+        normalized.startsWith("/courses/") -> normalized.removePrefix("/courses/")
+            .takeIf(String::isNotBlank)
+            ?.let(AppDestination::CourseDetail)
         normalized == "/review" -> AppDestination.Review
         normalized == "/settings" -> AppDestination.Settings
         else -> null
