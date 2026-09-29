@@ -1,5 +1,24 @@
 # Algorithm Learning Platform — Dependency Graph
 
+# NeetCode 150 End-to-End Detail Upgrade — Dependency Graph
+
+```mermaid
+flowchart TD
+  E1[N150E-001 Complete 150 records and importer validation\ncompleted]
+  E2[N150E-002 Detail sections and official link\ncompleted]
+  E3[N150E-003 CJK deep-link regression\ncompleted]
+  E4[N150E-004 Production import and read-back\ncompleted]
+  E5[N150E-005 Hosting release and all-150 acceptance\ncompleted]
+  E1 --> E2 --> E3 --> E4 --> E5
+```
+
+# NeetCode #371 Detail Lesson and Publishing — Dependency Graph
+
+```mermaid
+flowchart TD
+  N371[N371-001 #371 lesson, Detail, API sync, and Hosting publish\ncompleted: API synchronized and public Detail reload verified]
+```
+
 # Algorithm Learning Detail Experience — Dependency Graph
 
 ```mermaid
@@ -67,10 +86,10 @@ flowchart TD
 ```mermaid
 flowchart TD
   F1[WRF-001 Guard host resize forwarding and publish\ncompleted]
-```
   F2[WRF-002 Stop overflow-driven resize oscillation\ncompleted]
 
   F1 --> F2
+```
 
 ```mermaid
 flowchart TD

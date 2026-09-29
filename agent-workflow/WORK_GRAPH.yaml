@@ -1,6 +1,101 @@
 version: 1
 source_of_truth: task dependency and execution state
 tasks:
+  - id: N150E-001
+    title: Complete all-150 structured bilingual content and lossless importer validation
+    status: completed
+    depends_on: []
+    parallel_group: n150e-foundation
+    spec_refs: ["AC-N150E-01/02", "Technical constraints", "Decisions and assumptions"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    verification:
+      - python3 docs/algorithm/neetcode150/checks/verify.py
+      - python3 tools/test_neetcode150_import.py
+      - python3 tools/neetcode150_import.py --validate
+      - git diff --check
+  - id: N150E-002
+    title: Prove complete Detail sections and official external-link dispatch
+    status: completed
+    depends_on: [N150E-001]
+    parallel_group: n150e-presentation
+    spec_refs: ["AC-N150E-03"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest
+      - git diff --check
+  - id: N150E-003
+    title: Extend CJK root-resource and deep-link regression to full learning material
+    status: completed
+    depends_on: [N150E-002]
+    parallel_group: n150e-web
+    spec_refs: ["AC-N150E-04"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmCjkFont :composeApp:wasmJsBrowserTest
+      - git diff --check
+  - id: N150E-004
+    title: Synchronize and read back all 150 production Detail records
+    status: completed
+    depends_on: [N150E-003]
+    parallel_group: n150e-release
+    spec_refs: ["AC-N150E-02", "Technical constraints"]
+    execution_contract: {analysis: single-agent, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    verification:
+      - python3 tools/neetcode150_import.py --import-and-verify
+      - git diff --check
+  - id: N150E-005
+    title: Build, publish, and verify all 150 public Detail deep links
+    status: completed
+    depends_on: [N150E-004]
+    parallel_group: n150e-release
+    spec_refs: ["AC-N150E-05"]
+    execution_contract: {analysis: single-agent, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - firebase deploy --only hosting
+      - authenticated all-150 public reload and official-link assertion
+      - git diff --check
+  - id: N371-001
+    title: Complete and publish NeetCode #371 Detail lesson
+    status: completed
+    depends_on: []
+    parallel_group: neetcode371-detail-publish
+    spec_refs: ["AC-371-01..04", "Constraints and decisions", "Verification and stop condition"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Complete the #371 structured lesson and safe existing-field projection,
+      prove Detail rendering of its externally linked bilingual material, then
+      synchronize and publish only through the authorized production paths.
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserTest
+      - python3 docs/algorithm/neetcode150/checks/verify.py
+      - python3 tools/test_neetcode150_import.py
+      - python3 tools/neetcode150_import.py --validate
+      - python3 tools/neetcode150_import.py --import-and-verify
+      - cd apps/multiplatform && ./gradlew :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - firebase deploy --only hosting
+      - public #371 reload assertion
+      - git diff --check
+  - id: N371-002
+    title: Correct CJK rendering on published Detail deep links
+    status: in_progress
+    depends_on: [N371-001]
+    parallel_group: neetcode371-detail-publish
+    spec_refs: ["AC-371-05"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    implementation_strategy: >-
+      Map Compose Web resources to the hosting root, prove the font verification
+      detects a missing mapping, then publish and visually verify Chinese glyphs
+      on the authenticated #371 deep link.
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:verifyWasmCjkFont :composeApp:wasmJsBrowserProductionWebpack -PapiBaseUrl=https://allenljf-algorithm.web.app
+      - firebase deploy --only hosting
+      - authenticated public #371 reload and visual Chinese-glyph assertion
+      - git diff --check
   - id: DLE-001
     title: Establish lossless learning-detail state, mapping, and route intent
     status: completed
@@ -237,7 +332,6 @@ tasks:
       - npx firebase-tools deploy --only hosting --project allenljf-algorithm
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'let observedWidth = composeTarget.getBoundingClientRect().width'
       - git diff --check
-  - id: ALG-001
   - id: WRF-002
     title: Stop overflow-driven Wasm resize oscillation and publish
     status: completed
@@ -256,6 +350,7 @@ tasks:
       - curl --fail --silent --show-error https://allenljf-algorithm.web.app | rg -F 'overflow: hidden'
       - fixed-viewport public #composeTarget sampling shows one size pair
       - git diff --check
+  - id: ALG-001
     title: Create monorepo and reproducible toolchain skeleton
     status: completed
     depends_on: []

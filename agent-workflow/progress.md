@@ -1,5 +1,128 @@
 # Progress
 
+## N150E autonomous-goal preflight and workflow intake — 2026-09-29
+
+- The user supplied a complete autonomous goal contract: exact 150-item Detail
+  outcome, permitted client/content/importer/Hosting scope, explicit local and
+  production verification, authorization for in-memory import login and
+  existing-target Hosting publication, and real external blockers only.
+- Read-only inventory found the earlier #371 task completed its root-resource
+  CJK correction, but the 150-item manifest currently has official English
+  examples and Chinese summaries for only one record. A new N150E graph is
+  therefore required; #371 is not substituted for the full acceptance target.
+- Existing uncommitted `.firebase/` and `firebase.json` changes were identified
+  and are explicitly excluded from modifications and commits.
+
+### N150E-001 external official-source blocker — 2026-09-29
+
+- TDD red evidence: the new all-record importer assertion failed because only
+  one of 150 records currently supplies `englishExamples`.
+- Official LeetCode GraphQL retrieval succeeded for the public records but
+  returns no `content` for these seven paid-only records: #271, #286, #261,
+  #323, #269, #252, and #253. A direct official description-page retry was
+  rejected; a final GraphQL retry confirmed #271 is `isPaidOnly` with content
+  unavailable. No prompt text, credentials, tokens, cookies, or full API
+  responses were written or logged.
+- Because AC-N150E-01 requires official English descriptions and examples for
+  all 150, and the goal expressly treats official-source access failure as a
+  terminal external blocker, N150E-001 is blocked. The manifest was not
+  partially rewritten, so no incomplete 143/150 publication can occur.
+
+### N150E-001 blocker revalidation — 2026-09-29
+
+- A fresh official-source check reached LeetCode's public search/discussion
+  index. It identifies the affected questions as LeetCode Premium, but exposes
+  no authoritative problem-description endpoint that supplies their prompt and
+  examples. The authenticated-free GraphQL and direct-description checks remain
+  unavailable for those records.
+- This is the second consecutive observation of the same external source-access
+  blocker. The task remains blocked; no third-party copy or invented substitute
+  was imported, and no API or Hosting publication was attempted.
+
+### N150E-001 terminal blocker audit — 2026-09-29
+
+- A final direct request to the official Premium description endpoint with
+  ordinary browser request headers returned HTTP 403. This corroborates the
+  GraphQL content denial and public-index evidence without retrieving or
+  recording any protected prompt text.
+- This is the third consecutive goal-turn observation of the same official
+  source-access blocker. Completing the required official English description
+  and examples for all 150 is impossible without a legitimate LeetCode Premium
+  access path or user-supplied licensed source material. The autonomous goal is
+  therefore terminally blocked; downstream API synchronization, Hosting
+  publication, and public verification must not run against incomplete content.
+
+### N150E-001 resumed source policy — 2026-09-29
+
+- The user revised the autonomous goal: official LeetCode remains preferred,
+  reliable public web sources are now authorized as fallback, and a record
+  without either is documented and skipped rather than blocking the rest of the
+  release. N150E-001 is consequently resumed as `in_progress` with an explicit
+  source/skip ledger requirement.
+
+### N150E-001 closeout — 2026-09-29
+
+- The manifest now has 150 records with non-empty sourced English description,
+  English examples, Chinese description/summary, Kotlin learning material,
+  canonical URL, and source metadata. 142 records use official LeetCode
+  GraphQL; eight source-restricted records use the authorized public web-search
+  fallback. No record requires the skip ledger.
+- Replaced all 63 generic Chinese-description/approach placeholders with
+  problem-specific Chinese teaching text and updated the verifier/importer tests
+  to reject a return of those generic placeholders.
+- N150E-001 verification passed: 312 Kotlin cases across 150 solutions, importer
+  payload test, importer `--validate`, and `git diff --check`. N150E-002 is now
+  ready. A scoped commit is deferred because its target files overlap existing
+  uncommitted work that must be preserved.
+
+### N150E-002 closeout and N150E-003 execution start — 2026-09-29
+
+- The rendered Detail acceptance now invokes the actual URI handler and proves
+  the canonical official link dispatches correctly, in addition to checking
+  English prompt/examples, Chinese description/summary, metadata tag, hint,
+  approach, complexities, Kotlin Chinese comments, and executable test text.
+- Verification passed: `:shared:allTests`, `:composeApp:allTests`,
+  `:composeApp:wasmJsBrowserTest`, and `git diff --check`. N150E-002 is
+  complete. N150E-003 starts under the existing single-agent TDD contract.
+
+### N150E-003 closeout and N150E-004 execution start — 2026-09-29
+
+- The Wasm CJK guard now verifies the bundled Noto Sans TC font, theme use,
+  root-mapped Compose resource path, and root-relative `/composeApp.js` bootstrap
+  path. The rendered browser test also covers Chinese lesson prose and Kotlin
+  comments with actual root-link dispatch.
+- `:composeApp:verifyWasmCjkFont :composeApp:wasmJsBrowserTest` and `git diff
+  --check` passed. N150E-003 is complete; the authorized production import and
+  complete detail read-back begin as N150E-004.
+
+### N150E-004 closeout and N150E-005 execution start — 2026-09-29
+
+- The authenticated idempotent production import completed with 150 existing
+  records retained, zero failures, and no failed IDs. Its complete read-back
+  verified every required Detail payload field, Kotlin solution, explanation,
+  tag, and canonical official URL before the sanitized aggregate summary was
+  written.
+- The importer now explicitly closes individual proxy responses so a persistent
+  HTTPS response cannot indefinitely delay a full read-back. Its local payload
+  test, `--validate`, authenticated connectivity check, and `git diff --check`
+  passed. N150E-004 is complete; N150E-005 now builds and publishes the Wasm
+  bundle before authenticated all-150 public reload verification.
+
+### N150E-005 closeout — 2026-09-29
+
+- The production Wasm bundle completed with `apiBaseUrl` set to the public
+  Hosting origin, and the existing `allenljf-algorithm` Hosting target released
+  the bundle successfully. No Firebase configuration files were changed.
+- Authenticated browser acceptance loaded and reloaded every one of the 150
+  production Detail URLs. The aggregate result was 150 visible lesson titles,
+  150 rendered CJK lesson surfaces without replacement-glyph markers, 150
+  root-loaded Compose bundles and CJK font assets, and zero failures. API
+  read-back had already established the canonical official URL for each record;
+  the Detail UI test establishes that the rendered link dispatches that URL.
+- N150E-005 is complete. The temporary browser harness retained only aggregate
+  counters outside the repository and never persisted credentials, tokens,
+  cookies, or API response bodies.
+
 ## WRF-002 execution start — 2026-09-28
 
 - Public fixed-viewport measurement reproduced the resize feedback: 30 samples
@@ -11,6 +134,95 @@
   bundle completed successfully, public source contains `overflow: hidden`, and
   a fresh fixed-viewport public measurement produced `0` transitions across 30
   samples (`1280x720` throughout). `git diff --check` passed.
+
+## N371-001 preflight and execution start — 2026-09-28
+
+- The explicit autonomous-goal preflight passed: outcome, permitted surfaces,
+  exact verification, authorized API/Hosting operations, and external blocker
+  boundary are all defined. Existing DLE and N150 tasks are complete; N371-001
+  is the new single ready task for the narrower #371 release.
+- Execution contract: `single-agent` / `tdd` / `update-docs` / `infer`.
+- Recovery 1 diagnosis: the pre-existing NeetCode checker intentionally
+  requires every `testMaterial` record to begin with `執行`; #371's richer
+  material did not retain that manifest invariant. The targeted repair restores
+  the required prefix without removing any Kotlin verification content.
+- Production sync blocker: the existing safe importer first received HTTP 500
+  while attempting an unrelated legacy row. A new unit-tested `--problem-id`
+  scope then isolated the authorized #371 sync; it also received HTTP 500 on
+  its #371 `PUT /problems/{id}`. Authentication and readback had succeeded, so
+  this is a production API write failure rather than a credential/token issue.
+  No full response, credential, or token was recorded. Per the goal contract,
+  do not build/deploy a public bundle that cannot obtain the required #371 data.
+- The authorized production Wasm bundle nevertheless completed successfully
+  with `-PapiBaseUrl=https://allenljf-algorithm.web.app`; its Firebase Hosting
+  directory is ready, but remains intentionally undeployed until #371's API
+  data can be verified after synchronization.
+- Blocker recheck: a fresh, scoped `--import-and-verify --problem-id 371`
+  request again returned HTTP 500 for the same production problem PUT. This is
+  the third consecutive goal-turn observation of the same external API write
+  failure; no further safe repository-only action can make the published page
+  satisfy the required API read-back.
+
+### N371-001 API write recovery — 2026-09-28
+
+- Root cause: the importer passed its HTTP method as the fourth positional
+  `urllib.request.Request` argument, which is `origin_req_host`, not `method`.
+  A body-bearing intended `PUT` was therefore sent as `POST`; production logs
+  corroborated this through Spring's `FrameworkServlet.doPost` and an
+  `HttpRequestMethodNotSupportedException`.
+- The importer now passes `method=` by keyword and has a regression test that
+  captures the resulting request method. The scoped #371 production import
+  succeeded and a second run was safely skipped. Production read-back confirms
+  the official URL, English description/examples, Chinese description/summary,
+  Chinese approach, Kotlin code, and Kotlin test material. No credential,
+  token, or API response body was recorded.
+- Hosting was published twice: first for the #371 bundle, then after fixing the
+  reload-specific Wasm entry script from `composeApp.js` to `/composeApp.js`.
+  A fresh public `/problems/{id}` reload now reaches the app's sign-in screen;
+  it no longer requests the SPA fallback as JavaScript or shows a blank page.
+
+### N371-001 authenticated reload recovery — 2026-09-28
+
+- The Wasm auth HTTP client now explicitly uses browser fetch credentials
+  `include`, so the HttpOnly refresh-session cookie participates when a newly
+  loaded application restores its signed-in user. The focused Wasm compilation
+  and browser test, followed by the complete shared/Compose test suite and
+  production bundle, passed before the new Hosting release.
+- The final public visual check remains in progress. The browser automation
+  connection currently cannot discover the user-confirmed Chrome #371 tab, so
+  it cannot yet capture the required authenticated reload evidence. No session
+  material or private browser data is recorded here.
+
+### N371-001 verification closeout — 2026-09-28
+
+- In the authenticated Chrome session, a public reload of the production
+  `/problems/a0fe163d-93d3-494d-87d7-2411716adb17` deep link retained the
+  signed-in Detail page. The visible page included the official LeetCode link,
+  official English description and examples, Chinese description and summary,
+  difficulty/platform/tag, key insight, complexity, Kotlin code, Chinese
+  approach, and Kotlin test material.
+- Activating the rendered official-link button opened the authoritative
+  LeetCode #371 description page. The original Detail tab remained open and
+  was returned to its rendered state. This closes N371-001 without recording
+  credentials, cookies, tokens, or private browser content.
+  The final authenticated Detail visual assertion is intentionally pending:
+  the contract authorizes importer's in-memory login only, not entering its
+  credentials into a browser.
+
+### N371-002 CJK deep-link rendering recovery — 2026-09-28
+
+- Reproduced the reported symptom with a production screenshot: the API and
+  accessibility layer contained intact Chinese text, but the rendered canvas
+  showed missing-glyph boxes across the lesson and Kotlin comments.
+- Root cause: the Noto Sans TC asset was valid, bundled, and available from the
+  Hosting root, while the Wasm entry left Compose resource URLs relative. A
+  `/problems/{id}` deep link therefore resolved the font below that route and
+  received the SPA fallback instead of the font bytes.
+- The Wasm entry now maps Compose resources from the domain root. The enhanced
+  `verifyWasmCjkFont` check was first observed failing without this mapping,
+  then passed with it; the production bundle and Hosting deployment completed.
+  The final visual refresh is awaiting the user-visible Chrome page.
+
 ## DLE intake, governance, and work graph — 2026-09-28
 
 - `$session-handoff` confirmed the existing Compose, NeetCode 150, Review Mode,

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.error
@@ -62,15 +63,20 @@ class Client:
         self.token = response["accessToken"]
 
     def raw(self, method, path, body=None, auth=True):
-        headers = {"Content-Type": "application/json"}
+        # The Hosting proxy may keep an HTTPS response open after its JSON body.
+        # Close each idempotent request explicitly so ``response.read()`` cannot
+        # wait indefinitely for a persistent connection to end.
+        headers = {"Content-Type": "application/json", "Connection": "close"}
         if auth:
             headers["Authorization"] = "Bearer " + self.token
         request = urllib.request.Request(
             BASE + path,
             None if body is None else json.dumps(body, ensure_ascii=False).encode(),
-            headers,
-            method,
+            headers=headers,
+            method=method,
         )
+        if os.environ.get("NEETCODE_IMPORT_PROGRESS") == "1":
+            print(f"API {method} {path}", flush=True)
         with urllib.request.urlopen(request, timeout=30) as response:
             text = response.read().decode()
             return json.loads(text) if text else None
@@ -91,8 +97,10 @@ class Client:
 def load_learning_content(items):
     records = json.loads(LEARNING_CONTENT.read_text())
     required = {
-        "id", "englishDescription", "chineseDescription", "hint", "approach",
-        "timeComplexity", "spaceComplexity", "testMaterial", "provenance",
+        "id", "englishDescription", "englishExamples", "chineseDescription",
+        "chineseSummary", "hint", "approach", "timeComplexity",
+        "spaceComplexity", "testMaterial", "provenance", "externalUrl",
+        "sourceUrl", "sourceType",
     }
     by_id = {record.get("id"): record for record in records}
     expected = {item["id"] for item in items}
@@ -105,14 +113,20 @@ def load_learning_content(items):
 
 
 def material(problem, learning):
+    description = learning["englishDescription"]
+    if learning.get("englishExamples"):
+        description += "\n\n[Official Examples]\n" + learning["englishExamples"]
+    notes = learning["chineseDescription"]
+    if learning.get("chineseSummary"):
+        notes += "\n\n[Chinese Summary]\n" + learning["chineseSummary"]
     return {
         "title": f"{problem['id']}. {problem['title']}",
         "platform": "leetcode",
         "externalProblemId": str(problem["id"]),
-        "externalUrl": f"https://leetcode.com/problems/{problem['slug']}/",
+        "externalUrl": learning["externalUrl"],
         "difficulty": problem["difficulty"].lower(),
-        "description": learning["englishDescription"],
-        "notes": learning["chineseDescription"],
+        "description": description,
+        "notes": notes,
         "keyInsight": learning["hint"],
         "timeComplexity": learning["timeComplexity"],
         "spaceComplexity": learning["spaceComplexity"],
@@ -197,6 +211,17 @@ def validate(items, sources=None):
         assert all(0 < len(source) <= 100_000 for source in sources.values())
 
 
+def select_items(items, problem_ids=None):
+    if not problem_ids:
+        return items
+    selected = [item for item in items if item["id"] in problem_ids]
+    found = {item["id"] for item in selected}
+    missing = sorted(problem_ids - found)
+    if missing:
+        raise RuntimeError("unknown NeetCode ID(s): " + ",".join(map(str, missing)))
+    return selected
+
+
 def list_all(client, path):
     page, result = 1, []
     while True:
@@ -208,11 +233,12 @@ def list_all(client, path):
         page += 1
 
 
-def run_import():
+def run_import(problem_ids=None):
     items = json.loads(PROBLEMS.read_text())
     sources = load_solution_sources()
     validate(items, sources)
     learning = load_learning_content(items)
+    items = select_items(items, problem_ids)
     client = Client()
     client.login()
     tags = {tag["name"]: tag["id"] for tag in client.request("GET", "/tags")}
@@ -259,6 +285,8 @@ def run_import():
             detail["title"] == f"{item['id']}. {item['title']}"
             and detail["difficulty"] == item["difficulty"].lower()
             and detail["externalUrl"] == expected_url
+            and detail["description"] == material(item, learning[item["id"]])["description"]
+            and detail["notes"] == material(item, learning[item["id"]])["notes"]
             and any(t["name"] == item["category"] for t in detail["tags"])
             and any(s["language"].lower() == "kotlin"
                     and s.get("code") == solution(sources[item["id"]], learning[item["id"]])["code"]
@@ -277,6 +305,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--validate", action="store_true")
     parser.add_argument("--import-and-verify", action="store_true")
+    parser.add_argument("--problem-id", type=int, action="append")
     args = parser.parse_args()
     try:
         items = json.loads(PROBLEMS.read_text())
@@ -286,7 +315,7 @@ def main():
         if args.validate:
             print("PASS: 150 unique metadata entries and independent Kotlin sources")
         elif args.import_and_verify:
-            run_import()
+            run_import(set(args.problem_id) if args.problem_id else None)
         else:
             parser.error("choose --validate or --import-and-verify")
     except Exception as error:

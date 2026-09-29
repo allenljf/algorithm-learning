@@ -32,6 +32,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.algorithmlearning.app.label
@@ -530,9 +531,20 @@ private fun DetailDescriptions(
     strings: AppStrings,
     modifier: Modifier = Modifier,
 ) {
+    val uriHandler = LocalUriHandler.current
+    val (englishDescription, englishExamples) = detail.detail.description.splitLessonSection("[Official Examples]")
+    val (chineseDescription, chineseSummary) = detail.detail.notes.splitLessonSection("[Chinese Summary]")
     Column(modifier = modifier) {
-        Section(strings.problemDescriptionLabel, detail.detail.description)
-        Section(strings.problemNotesLabel, detail.detail.notes)
+        detail.detail.externalUrl?.takeIf(String::isNotBlank)?.let { url ->
+            Column(modifier = Modifier.padding(top = 12.dp)) {
+                Text(strings.problemExternalLinkLabel, style = MaterialTheme.typography.titleMedium)
+                TextButton(onClick = { uriHandler.openUri(url) }) { Text(url) }
+            }
+        }
+        Section(strings.problemEnglishDescriptionLabel, englishDescription)
+        Section(strings.problemEnglishExamplesLabel, englishExamples)
+        Section(strings.problemChineseDescriptionLabel, chineseDescription)
+        Section(strings.problemChineseSummaryLabel, chineseSummary)
     }
 }
 
@@ -561,7 +573,7 @@ private fun DetailLearningContent(
         Section(strings.problemTimeComplexityLabel, detail.detail.timeComplexity)
         Section(strings.problemSpaceComplexityLabel, detail.detail.spaceComplexity)
         Section(strings.problemMistakesLabel, detail.detail.mistakes)
-        Section(strings.problemInterviewNotesLabel, detail.detail.interviewNotes)
+        Section(strings.problemKotlinTestsLabel, detail.detail.interviewNotes)
         detail.formError?.let { failure ->
             Text(
                 text = failure.label(strings),
@@ -585,7 +597,7 @@ private fun DetailLearningContent(
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text(solution.language.name, style = MaterialTheme.typography.titleMedium)
                     Text(solution.code)
-                    solution.explanation?.let { Text(it) }
+                    solution.explanation?.let { Section(strings.problemLearningApproachLabel, it) }
                     TextButton(
                         onClick = { actions.deleteSolution(solution.id) },
                         modifier = Modifier.testTag("solution-delete-${solution.id}"),
@@ -642,6 +654,12 @@ private fun Section(label: String, value: String?) {
         Text(label, style = MaterialTheme.typography.titleMedium)
         Text(value)
     }
+}
+
+private fun String?.splitLessonSection(marker: String): Pair<String?, String?> {
+    if (isNullOrBlank()) return null to null
+    val pieces = split("\n\n$marker\n", limit = 2)
+    return pieces.first().trim() to pieces.getOrNull(1)?.trim()?.ifBlank { null }
 }
 
 private data class FilterOption(

@@ -49,14 +49,18 @@ for f in sorted(root.glob('0[123]-*.md')):
 assert len(ids)==67 and len(set(ids))==67,len(ids)
 old_ids={p['id'] for p in json.loads((root.parent/'leetcode75-kotlin'/'problems.json').read_text())}
 assert not set(ids)&old_ids
-nc_ids={p['id'] for p in json.loads((root/'problems.json').read_text())}
+problems={p['id']:p for p in json.loads((root/'problems.json').read_text())}
+nc_ids=set(problems)
 learning=json.loads((root/'learning-content.json').read_text())
 learning_by_id={record['id']:record for record in learning}
-required_learning={'id','englishDescription','chineseDescription','hint','approach','timeComplexity','spaceComplexity','testMaterial','provenance'}
+required_learning={'id','englishDescription','englishExamples','chineseDescription','chineseSummary','hint','approach','timeComplexity','spaceComplexity','testMaterial','provenance','externalUrl','sourceUrl','sourceType'}
 assert len(learning)==150 and set(learning_by_id)==nc_ids
 assert all(required_learning <= record.keys() for record in learning)
 assert all(isinstance(record[field],str) and record[field].strip() for record in learning for field in required_learning-{'id'})
 assert all(record['testMaterial'].startswith('執行') for record in learning)
+assert all(record['externalUrl']==f"https://leetcode.com/problems/{problems[record['id']]['slug']}/" for record in learning)
+assert all('刻意只描述學習目標' not in record['chineseDescription'] for record in learning)
+assert all('先選擇能保留關鍵不變量' not in record['approach'] for record in learning)
 assert set(ids)<=nc_ids
 reused_ids={11,17,62,72,104,136,198,199,206,208,215,238,338,435,739,746,875,994,1143,1448}
 for f in sorted((root.parent/'leetcode75-kotlin').glob('0[123]-*.md')):

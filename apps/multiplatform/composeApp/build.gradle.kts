@@ -111,13 +111,23 @@ val verifyWasmCjkFont = tasks.register("verifyWasmCjkFont") {
     val theme = layout.projectDirectory.file(
         "src/commonMain/kotlin/com/algorithmlearning/app/Theme.kt",
     )
-    inputs.files(fontFile, theme)
+    val wasmMain = layout.projectDirectory.file(
+        "src/wasmJsMain/kotlin/com/algorithmlearning/app/main.kt",
+    )
+    val indexHtml = layout.projectDirectory.file("src/wasmJsMain/resources/index.html")
+    inputs.files(fontFile, theme, wasmMain, indexHtml)
     doLast {
         check(fontFile.asFile.isFile) {
             "The Web/Wasm application must bundle a Traditional Chinese font."
         }
         check(theme.asFile.readText().contains("Res.font.NotoSansTC_Regular")) {
             "The application theme must use the bundled Traditional Chinese font."
+        }
+        check(wasmMain.asFile.readText().contains("resourcePathMapping { path -> \"/\$path\" }")) {
+            "The Web/Wasm application must resolve Compose resources from the hosting root for deep links."
+        }
+        check(indexHtml.asFile.readText().contains("src=\"/composeApp.js\"")) {
+            "The Web/Wasm bootstrap script must load from the hosting root for /problems/{id} deep links."
         }
     }
 }
