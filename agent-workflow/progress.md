@@ -81,6 +81,23 @@
   :composeApp:allTests :composeApp:wasmJsBrowserTest` and `git diff --check`.
   COURSE-005 is completed; COURSE-006 is ready in Phase 4.
 
+### COURSE-006 closeout — 2026-09-29
+
+- Final local acceptance passed without deployment, production writes, or any
+  ingestion token. Content proof confirms all 398 canonical lessons and their
+  byte-identical manifest detail; importer proof confirms 398 lossless payloads
+  with no network request; focused Course backend tests prove migration,
+  idempotency, filtering, detail, and token denial.
+- Shared, Android, iOS, and Wasm Compose tests all passed through the required
+  Gradle targets. No Course task remains ready or in progress. The scoped
+  implementation commits are `97b7699`, `06ca2b1`, `a440d45`, `d161cf1`, and
+  `7f9e318`.
+- Task-limited acceptance passed: `python3
+  docs/algorithm/course-materials/checks/verify.py`; `python3
+  tools/test_course_import.py`; `python3 tools/course_import.py --validate`;
+  focused Course Maven tests; shared/Compose/Wasm Gradle tests; and `git diff
+  --check`.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail

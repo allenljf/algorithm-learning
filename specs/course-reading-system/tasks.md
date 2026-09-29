@@ -66,4 +66,5 @@
 - Depends on: COURSE-003, COURSE-005. Parallel group: `course-acceptance`.
 - Spec refs: AC-COURSE-01..07; verification and stop condition.
 - Verification: `python3 docs/algorithm/course-materials/checks/verify.py`; `python3 tools/test_course_import.py`; `python3 tools/course_import.py --validate`; `cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'`; `cd apps/multiplatform && ./gradlew :shared:allTests :composeApp:allTests :composeApp:wasmJsBrowserTest`; `git diff --check`.
-- Status: ready.
+- Execution contract: `single-agent`; `test-candidates`; `update-docs`; `infer`.
+- Status: completed. Verification passed: all commands in the task verification field.

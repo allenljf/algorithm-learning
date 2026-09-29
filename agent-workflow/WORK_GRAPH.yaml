@@ -1186,10 +1186,11 @@ tasks:
       - git diff --check
   - id: COURSE-006
     title: Local end-to-end Course acceptance
-    status: ready
+    status: completed
     depends_on: [COURSE-003, COURSE-005]
     parallel_group: course-acceptance
     spec_refs: ["AC-COURSE-01..07", "Verification and stop condition"]
+    execution_contract: {analysis: single-agent, test_approach: test-candidates, documentation: update-docs, ambiguity: infer}
     verification:
       - python3 docs/algorithm/course-materials/checks/verify.py
       - python3 tools/test_course_import.py

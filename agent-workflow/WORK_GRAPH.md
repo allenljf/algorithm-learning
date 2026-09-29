@@ -171,7 +171,7 @@ flowchart TD
   C3[COURSE-003 importer\ncompleted]
   C4[COURSE-004 shared data\ncompleted]
   C5[COURSE-005 Compose reader\ncompleted]
-  C6[COURSE-006 local acceptance\nready]
+  C6[COURSE-006 local acceptance\ncompleted]
   C1 --> C2 --> C3 --> C6
   C2 --> C4 --> C5 --> C6
 ```
