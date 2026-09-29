@@ -1166,16 +1166,17 @@ tasks:
       - git diff --check
   - id: COURSE-004
     title: Shared Course domain and data mapping
-    status: ready
+    status: completed
     depends_on: [COURSE-002]
     parallel_group: course-client
     spec_refs: ["AC-COURSE-05/07", "Compose guide sections 1-6"]
+    execution_contract: {analysis: single-agent, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification:
       - cd apps/multiplatform && ./gradlew :shared:allTests
       - git diff --check
   - id: COURSE-005
     title: Compose Course navigation and non-truncating reader
-    status: pending
+    status: ready
     depends_on: [COURSE-004]
     parallel_group: course-client
     spec_refs: ["AC-COURSE-07", "Compose guide sections 1-7"]

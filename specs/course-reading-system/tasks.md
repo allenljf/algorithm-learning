@@ -44,7 +44,8 @@
 - Depends on: COURSE-002. Parallel group: `course-client`.
 - Spec refs: AC-COURSE-05/07; Compose guide sections 1–6.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`.
-- Status: ready.
+- Execution contract: `single-agent`; `tdd`; `update-docs`; `infer`.
+- Status: completed. Verification passed: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`.
 
 ### COURSE-005 — Compose Course navigation and non-truncating reader
 
@@ -53,7 +54,7 @@
 - Depends on: COURSE-004. Parallel group: `course-client`.
 - Spec refs: AC-COURSE-07; Compose guide sections 1–7.
 - Verification: `cd apps/multiplatform && ./gradlew :composeApp:allTests :composeApp:wasmJsBrowserTest`; `git diff --check`.
-- Status: pending.
+- Status: ready.
 
 ## Phase 4 — Local acceptance
 

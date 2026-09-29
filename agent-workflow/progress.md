@@ -60,6 +60,16 @@
   `python3 tools/course_import.py --validate`, and `git diff --check`.
   COURSE-003 is completed; COURSE-004 is ready in Phase 3.
 
+### COURSE-004 closeout — 2026-09-29
+
+- Added a separate `shared/course` domain boundary: categories, query, list
+  summaries, full lesson, repository contract, remote adapter, DTOs and Ktor
+  mapping. The public API is used without a user bearer token, while DTO types
+  remain outside presentation. `AppContainer` now supplies the Course repository.
+- Task-limited verification passed: `cd apps/multiplatform && ./gradlew
+  :shared:allTests` and `git diff --check`. COURSE-004 is completed and
+  COURSE-005 is ready in the same Cross-platform reading phase.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail

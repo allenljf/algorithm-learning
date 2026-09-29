@@ -23,6 +23,9 @@ import com.algorithmlearning.shared.library.data.KtorProblemRemote
 import com.algorithmlearning.shared.library.data.KtorReviewRemote
 import com.algorithmlearning.shared.library.data.KtorSolutionRemote
 import com.algorithmlearning.shared.library.data.KtorTagRemote
+import com.algorithmlearning.shared.course.CourseRepository
+import com.algorithmlearning.shared.course.RemoteCourseRepository
+import com.algorithmlearning.shared.course.data.KtorCourseRemote
 import io.ktor.client.HttpClient
 import kotlin.time.Clock
 
@@ -59,6 +62,7 @@ class AppContainer(
     val reviewRepository: ReviewRepository = RemoteReviewRepository(KtorReviewRemote(apiClient))
 
     val dashboardRepository: DashboardRepository = RemoteDashboardRepository(KtorDashboardRemote(apiClient))
+    val courseRepository: CourseRepository = RemoteCourseRepository(KtorCourseRemote(apiClient))
 
     private var language: AppLanguage = AppLanguage.ENGLISH
 
