@@ -39,3 +39,5 @@ app:
     jwt-issuer: ${APP_JWT_ISSUER:algorithm-learning-api}
     jwt-audience: ${APP_JWT_AUDIENCE:algorithm-learning-client}
     refresh-hash-key: ${APP_REFRESH_HASH_KEY:development-only-refresh-key-at-least-thirty-two-bytes}
+  course:
+    ingestion-token: ${APP_COURSE_INGESTION_TOKEN:}

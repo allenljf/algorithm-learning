@@ -26,7 +26,7 @@ class SecurityConfigurationMigrationModeTest {
                             "migration-mode-jwt-key-0123456789abcdef",
                             "algorithm-learning-api",
                             "algorithm-learning-client",
-                            "migration-mode-refresh-key-0123456789abcdef")))
+                            "migration-mode-refresh-key-0123456789abcdef"), new ApiProperties.Course("")))
             .withBean(AuthSessionRepository.class, () -> mock(AuthSessionRepository.class))
             .withBean(AuthUserRepository.class, () -> mock(AuthUserRepository.class))
             .withBean(TagRepository.class, () -> mock(TagRepository.class))

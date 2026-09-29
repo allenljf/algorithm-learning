@@ -22,7 +22,8 @@
 - Depends on: COURSE-001. Parallel group: `course-service`.
 - Spec refs: AC-COURSE-03/04/05; constraints.
 - Verification: `cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'`; `git diff --check`.
-- Status: ready.
+- Execution contract: `three-perspectives`; `tdd`; `update-docs`; `infer`.
+- Status: completed. Verification passed: `cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'`; `git diff --check`.
 
 ### COURSE-003 — Safe Course importer and lossless payload verification
 
@@ -31,7 +32,7 @@
 - Depends on: COURSE-001, COURSE-002. Parallel group: `course-service`.
 - Spec refs: AC-COURSE-01/02/05/06.
 - Verification: `python3 tools/test_course_import.py`; `python3 tools/course_import.py --validate`; `git diff --check`.
-- Status: pending.
+- Status: ready.
 
 ## Phase 3 — Cross-platform reading
 
@@ -42,7 +43,7 @@
 - Depends on: COURSE-002. Parallel group: `course-client`.
 - Spec refs: AC-COURSE-05/07; Compose guide sections 1–6.
 - Verification: `cd apps/multiplatform && ./gradlew :shared:allTests`; `git diff --check`.
-- Status: pending.
+- Status: ready.
 
 ### COURSE-005 — Compose Course navigation and non-truncating reader
 

@@ -167,9 +167,9 @@ not authorization to begin a task without `$execution-strategy`.
 ```mermaid
 flowchart TD
   C1[COURSE-001 canonical content\ncompleted]
-  C2[COURSE-002 isolated API\nready]
-  C3[COURSE-003 importer\npending]
-  C4[COURSE-004 shared data\npending]
+  C2[COURSE-002 isolated API\ncompleted]
+  C3[COURSE-003 importer\nready]
+  C4[COURSE-004 shared data\nready]
   C5[COURSE-005 Compose reader\npending]
   C6[COURSE-006 local acceptance\npending]
   C1 --> C2 --> C3 --> C6

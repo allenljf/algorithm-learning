@@ -23,6 +23,8 @@ import dev.algorithmlearning.api.reviews.application.ReviewRepository;
 import dev.algorithmlearning.api.reviews.application.ReviewService;
 import dev.algorithmlearning.api.dashboard.application.DashboardRepository;
 import dev.algorithmlearning.api.dashboard.application.DashboardService;
+import dev.algorithmlearning.api.courses.application.CourseRepository;
+import dev.algorithmlearning.api.courses.application.CourseService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +51,7 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health/**", "/api/actuator/health/**").permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
+                        .requestMatchers("/api/v1/courses/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -82,4 +85,5 @@ class SecurityConfiguration {
     @Bean SolutionService solutionService(ProblemRepository problems, SolutionRepository solutions) { return new SolutionService(problems, solutions); }
     @Bean ReviewService reviewService(ProblemRepository problems, ReviewRepository reviews, Clock clock) { return new ReviewService(problems, reviews, clock); }
     @Bean DashboardService dashboardService(DashboardRepository dashboard) { return new DashboardService(dashboard); }
+    @Bean CourseService courseService(CourseRepository courses, Clock clock) { return new CourseService(courses, clock); }
 }

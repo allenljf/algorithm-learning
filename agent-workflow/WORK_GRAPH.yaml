@@ -1145,16 +1145,17 @@ tasks:
       - git diff --check
   - id: COURSE-002
     title: Isolated Course migration and three-route API
-    status: ready
+    status: completed
     depends_on: [COURSE-001]
     parallel_group: course-service
     spec_refs: ["AC-COURSE-03/04/05", "Technical constraints and decisions"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
     verification:
       - cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'
       - git diff --check
   - id: COURSE-003
     title: Safe Course importer and lossless payload verification
-    status: pending
+    status: ready
     depends_on: [COURSE-001, COURSE-002]
     parallel_group: course-service
     spec_refs: ["AC-COURSE-01/02/05/06"]
@@ -1164,7 +1165,7 @@ tasks:
       - git diff --check
   - id: COURSE-004
     title: Shared Course domain and data mapping
-    status: pending
+    status: ready
     depends_on: [COURSE-002]
     parallel_group: course-client
     spec_refs: ["AC-COURSE-05/07", "Compose guide sections 1-6"]

@@ -37,6 +37,18 @@
   docs/algorithm/course-materials/checks/verify.py` and `git diff --check`.
   COURSE-001 is completed; COURSE-002 is ready for its own execution contract.
 
+### COURSE-002 closeout — 2026-09-29
+
+- Added Flyway V3 with only `course_categories` and `course_lessons`; the sole
+  relation is lesson-to-category. No existing practice table is referenced.
+- Added the three specified routes: public `GET /api/v1/courses` and
+  `GET /api/v1/courses/{sourceIdentity}`, plus token-protected idempotent
+  `POST /api/v1/courses/import`. Read queries combine category, tag, keyword,
+  deterministic ordering and pagination; stored detail is returned unchanged.
+- Task-limited verification passed: `cd services/api && ./mvnw -q test
+  -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'` and `git
+  diff --check`. COURSE-002 is completed. COURSE-003 and COURSE-004 are ready.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail
