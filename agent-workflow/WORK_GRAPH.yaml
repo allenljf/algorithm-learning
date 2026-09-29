@@ -82,7 +82,7 @@ tasks:
       - git diff --check
   - id: N371-002
     title: Correct CJK rendering on published Detail deep links
-    status: in_progress
+    status: completed
     depends_on: [N371-001]
     parallel_group: neetcode371-detail-publish
     spec_refs: ["AC-371-05"]
@@ -1132,4 +1132,64 @@ tasks:
       changing signing material, iOS Xcode settings, or Firebase local cache.
     verification:
       - cd apps/multiplatform && ./gradlew :composeApp:assembleDebug
+      - git diff --check
+  - id: COURSE-001
+    title: Census and canonical Kotlin Course teaching material
+    status: in_progress
+    depends_on: []
+    parallel_group: course-content
+    spec_refs: ["AC-COURSE-01/02/06", "Technical constraints and decisions"]
+    execution_contract: {analysis: three-perspectives, test_approach: tdd, documentation: update-docs, ambiguity: infer}
+    verification:
+      - python3 docs/algorithm/course-materials/checks/verify.py
+      - git diff --check
+  - id: COURSE-002
+    title: Isolated Course migration and three-route API
+    status: ready
+    depends_on: [COURSE-001]
+    parallel_group: course-service
+    spec_refs: ["AC-COURSE-03/04/05", "Technical constraints and decisions"]
+    verification:
+      - cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'
+      - git diff --check
+  - id: COURSE-003
+    title: Safe Course importer and lossless payload verification
+    status: pending
+    depends_on: [COURSE-001, COURSE-002]
+    parallel_group: course-service
+    spec_refs: ["AC-COURSE-01/02/05/06"]
+    verification:
+      - python3 tools/test_course_import.py
+      - python3 tools/course_import.py --validate
+      - git diff --check
+  - id: COURSE-004
+    title: Shared Course domain and data mapping
+    status: pending
+    depends_on: [COURSE-002]
+    parallel_group: course-client
+    spec_refs: ["AC-COURSE-05/07", "Compose guide sections 1-6"]
+    verification:
+      - cd apps/multiplatform && ./gradlew :shared:allTests
+      - git diff --check
+  - id: COURSE-005
+    title: Compose Course navigation and non-truncating reader
+    status: pending
+    depends_on: [COURSE-004]
+    parallel_group: course-client
+    spec_refs: ["AC-COURSE-07", "Compose guide sections 1-7"]
+    verification:
+      - cd apps/multiplatform && ./gradlew :composeApp:allTests :composeApp:wasmJsBrowserTest
+      - git diff --check
+  - id: COURSE-006
+    title: Local end-to-end Course acceptance
+    status: pending
+    depends_on: [COURSE-003, COURSE-005]
+    parallel_group: course-acceptance
+    spec_refs: ["AC-COURSE-01..07", "Verification and stop condition"]
+    verification:
+      - python3 docs/algorithm/course-materials/checks/verify.py
+      - python3 tools/test_course_import.py
+      - python3 tools/course_import.py --validate
+      - cd services/api && ./mvnw -q test -Dtest='*CourseTest,*CourseControllerTest,*CourseMigrationTest'
+      - cd apps/multiplatform && ./gradlew :shared:allTests :composeApp:allTests :composeApp:wasmJsBrowserTest
       - git diff --check

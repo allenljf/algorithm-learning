@@ -162,6 +162,20 @@ flowchart TD
 Parallel groups are recorded in `WORK_GRAPH.yaml`; they are eligibility groups,
 not authorization to begin a task without `$execution-strategy`.
 
+# Course Reading System — Dependency Graph
+
+```mermaid
+flowchart TD
+  C1[COURSE-001 canonical content\ncompleted]
+  C2[COURSE-002 isolated API\nready]
+  C3[COURSE-003 importer\npending]
+  C4[COURSE-004 shared data\npending]
+  C5[COURSE-005 Compose reader\npending]
+  C6[COURSE-006 local acceptance\npending]
+  C1 --> C2 --> C3 --> C6
+  C2 --> C4 --> C5 --> C6
+```
+
 # GCP Cloud Run Delivery — Dependency Graph
 
 ```mermaid

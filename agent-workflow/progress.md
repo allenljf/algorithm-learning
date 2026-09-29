@@ -1,5 +1,42 @@
 # Progress
 
+## Course Reading System intake, governance, and work graph — 2026-09-29
+
+- The autonomous-goal preflight passed with an explicit outcome, scope,
+  verification boundary, and stop condition. The existing `N371-002` node is
+  in progress and explicitly excluded; the worktree was clean before Course
+  artifacts were created.
+- `$session-handoff` found no prior Course feature artifacts or graph nodes.
+  `$workflow-intake` recorded the separate read-only Course subsystem in
+  `specs/course-reading-system/spec.md`; `$spec-governance` selected
+  `update-docs + infer`; `$work-graph` added COURSE-001 through COURSE-006.
+- COURSE-001 is the only ready task. It must perform a mechanical source census
+  before content generation so aggregation, README, tracker, index, provenance,
+  and verification Markdown cannot be imported as lessons.
+
+### COURSE-001 execution strategy — 2026-09-29
+
+- Selected `three-perspectives` / `tdd` / `update-docs` / `infer`. The task is
+  limited to source-to-canonical lesson extraction, provenance, manifest and
+  validation; it does not add API or UI code. The initial test will establish
+  the four allowlisted material groups and reject non-lesson Markdown.
+
+### COURSE-001 closeout — 2026-09-29
+
+- Generated canonical, independently addressable Markdown and a lossless
+  manifest for 398 real lessons: 75 `leetcode75`, 150 `neetcode150`, 69
+  `hackerrank-interview`, and 104 `hackerrank-three-month-prep-kotlin`.
+  README, index, tracker, provenance, verification, and the LeetCode75
+  HackerRank-advice chapter are excluded by an explicit allowlist.
+- The initially discovered 20 NeetCode Markdown-detail gaps are now canonical
+  lessons assembled solely from checked-in learning metadata, official source
+  URLs, Kotlin implementations, and local test references. The checker proves
+  course coverage, stable uniqueness, Kotlin code, source URL, manifest/detail
+  byte equality, and SHA-256 equality for every lesson.
+- Task-limited verification passed: `python3
+  docs/algorithm/course-materials/checks/verify.py` and `git diff --check`.
+  COURSE-001 is completed; COURSE-002 is ready for its own execution contract.
+
 ## N150E autonomous-goal preflight and workflow intake — 2026-09-29
 
 - The user supplied a complete autonomous goal contract: exact 150-item Detail
